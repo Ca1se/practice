@@ -2,7 +2,6 @@
 /*安迪的第一个字典
 输入一个文本,找出所有不同的单词(连续的字母序列),按字典序从小到大输出,单词不区分大小写*/
 
-
 #include<iostream>
 #include<string>
 #include<set>
