@@ -25,7 +25,8 @@ int main()
     for(set<string>::iterator it = dict.begin();it!=dict.end();it++)
         cout << *it << endl;
     return 0;
-}*/
+}
+*/
 
 #include<iostream>
 #include<string>
