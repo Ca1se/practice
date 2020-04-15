@@ -1,4 +1,4 @@
-/*
+﻿/*
 例题6-1并行程序模拟 (Concurrency Simulator, ACMICPC World Finals 1991, UVa210)
 你的任务是模拟n个程序(按输入顺序编号为1~n)的并行执行。每个程序包含不超过
 25条语句，格式-共有5种: var = constant (赋值) ; print var (打印) ; lock; unlock; end.
@@ -22,134 +22,150 @@ lock的作用是中申请对所有变量的独占访问。lock 和unlock总是�
 #include <map>
 #include <sstream>
 using namespace std;
-map<string,string> var;
+map<string, string> var;
 
-struct Queue
-{
+struct Queue {
     string command;
     Queue* next;
 };
-Queue* head[2];
+Queue* head[2];//0为等待队列,1为阻止队列
 Queue* tail[2];
-void inqueue(Queue* &head,int marl,string str)
-{
-    Queue* newqu=(Queue*)malloc(sizeof(Queue));
-    newqu->command=str;
-    if(head==NULL)
-    {
-        head=newqu;
-        tail[marl]=newqu;
-        newqu->next=NULL;
+void inqueue(Queue*& ahead, int marl, string str) {
+    Queue* newqu;
+    newqu = new Queue;
+    newqu->command = str;
+    if (ahead == NULL) {
+        ahead = newqu;
+        tail[marl] = newqu;
+        newqu->next = NULL;
     }
-    else
-    {
-        tail[marl]->next=newqu;
-        tail[marl]=newqu;
-        newqu->next=NULL;
+    else {
+        tail[marl]->next = newqu;
+        tail[marl] = newqu;
+        newqu->next = NULL;
     }
 }
 
-string outqueue(Queue* &head)
-{
-    Queue* target;
-    target=head;
+string outqueue(Queue*& ahead) {
+    Queue* target = ahead;
+    static int count=0;
+    if (count == 0) {
+        count++;
+        ahead = ahead->next;
+    }
     string temp;
-    temp=head->command;
-    head=head->next;
-    free(target);
+    temp = ahead->command;
+    ahead = ahead->next;
+    delete target;
     return temp;
 }
 
-Queue* findend(Queue* &head)
+Queue* findend(Queue*& ahead)
 {
     Queue* target;
-    target=head;
-    while (target->command!="end")
-        target=target->next;
+    target = ahead;
+    while (target->command != "end")
+        target = target->next;
     return target;
 }
+
+void movetostop(Queue*& ahead) {
+    Queue* endp, * temp;
+    temp = ahead;
+    endp = findend(ahead);
+    ahead = endp->next;
+    endp->next = NULL;
+    if (head[1] == NULL) {
+        head[1] = temp;
+        tail[1] = endp;
+    }
+    else {
+        tail[1]->next = temp;
+        tail[1] = endp;
+    }
+}
+
+void movetowait(Queue*& ahead) {
+    Queue* endp, * temp;
+    endp = findend(ahead);
+    temp = ahead;
+    ahead = endp->next;
+    endp->next = head[0];
+    head[0] = temp;
+}
+
+void movetotail(Queue*& ahead) {
+    Queue* endp, * temp;
+    endp = findend(ahead);
+    if (endp->next == NULL)
+        return;
+    temp = ahead;
+    ahead = endp->next;
+    endp->next = NULL;
+    tail[0]->next = temp;
+    tail[0] = endp;
+}
+
 int main()
 {
-    #if 1
-    freopen("compli/test.in","r",stdin);
-    freopen("compli/test.out","w",stdout);
-    #endif
-    int n,t1,t2,t3,t4,t5,Q,count=0,islocked=0,timecount=0;
+#if 1
+    freopen("test.in", "r", stdin);
+    freopen("test.out", "w", stdout);
+#endif
+    int n, t1, t2, t3, t4, t5, Q, islocked = 0, timecount = 0;
     cin >> n >> t1 >> t2 >> t3 >> t4 >> t5 >> Q;
     string str;
-    while (getline(cin,str))
-        inqueue(head[0],0,str);
+    while (getline(cin, str)) {
+        inqueue(head[0], 0, str);//head[0]为等待队列
+    }
     while (1)
     {
-        if(timecount<Q&&head[0]!=NULL)
-        {
-            string temp = outqueue(head[0]);
-            inqueue(head[1], 1, temp);
-            if (temp.find("print ") < 1000)
-                timecount += t2;
-            else if (temp == "lock")
-                timecount += t3;
-            else if (temp == "unlock")
-                timecount += t4;
-            else if (temp == "end")
-                timecount += t5;
+        string temp;
+        temp = outqueue(head[0]);
+        if (temp.find("print ") < 1000) {
+            //执行print语句
+            timecount += t2;
+            stringstream ss(temp);
+            string as;
+            ss >> as >> as;
+            if (var.count(as))
+                cout << atoi(var[as].c_str()) << endl;
             else
-                timecount += t1;
+                cout << 0 << endl;
         }
-        else
-        {
-            if(head[1]==NULL)
-            {
-                if(head[0]==NULL)
-                    break;
-                timecount=0;
+        else if (temp == "lock") {
+            //执行lock
+            timecount += t3;
+            if (islocked == 1) {
+                timecount = 0;
+                movetostop(head[0]);
                 continue;
             }
-            string temp = outqueue(head[1]);
-            if(temp.find("print ")>1000)
-            {
-                string as1;
-                stringstream ss(temp);
-                ss >> as1 >> as1;
-                if(var.count(as1))
-                    cout << atoi(var[as1].c_str()) << "\n";
-                else
-                    cout << 0 << "\n";
-            }
-            else if(temp == "lock")
-            {
-                if(islocked==0)
-                    islocked=1;
-                else
-                {
-                    timecount=0;
-                    Queue* temptr;
-                    temptr=findend(head[1]);
-                    tail[1]->next=head[1];
-                    head[1]=temptr->next;
-                    temptr->next=NULL;
-                }
-            }
-            else if(temp == "unlock")
-            {
-                islocked=0;
-                Queue* temptr,*temptr1;
-                temptr1=head[0];
-                temptr=findend(head[0]);
-                head[0]=temptr->next;
-                temptr->next=head[1];
-                head[1]=temptr1;
-            }
-            else if(temp == "end")
-                ;
-            else
-            {
-                string as1,as2;
-                stringstream ss(temp);
-                ss >> as1 >> as2 >> as2;
-                var[as1]=as2;
-            }
+            islocked = 1;
+        }
+        else if (temp == "unlock") {
+            //执行unlock
+            timecount += t4;
+            islocked = 0;
+            movetowait(head[1]);
+        }
+        else if (temp == "end") {
+            //执行end
+            timecount = 0;
+            continue;
+        }
+        else {
+            //执行var = r
+            timecount += t1;
+            stringstream ss(temp);
+            string as1, as2;
+            ss >> as1 >> as2 >> as2;
+            var[as1] = as2;
+        }
+        if (timecount >= Q) {
+            timecount = 0;
+            movetotail(head[0]);
         }
     }
-    
+
 }
