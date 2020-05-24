@@ -17,8 +17,8 @@ struct cmp
 int cnt=0;
 
 int main(){
-    //freopen("test.in","r",stdin);
-    //freopen("test.out","w+",stdout);
+    freopen("test.in","r",stdin);
+    freopen("test.out","w+",stdout);
     ios::sync_with_stdio(false);
     char a[500];
     set<string,cmp> p;
@@ -27,7 +27,7 @@ int main(){
         if(a[0]=='('&&a[1]==')'){
             if(!cnt){
                 for (auto it = p.begin(); it != p.end(); it++){
-                    if ((*it).size()&&!count(p.begin(), p.end(), (*it).size()==1?"":string((*it).begin(),(*it).end()-1))){
+                    if ((*it).size()&&!count(p.begin(), p.end(), string((*it).begin(),(*it).end()-1))){
                         cnt++;
                         break;
                     }
