@@ -24,7 +24,7 @@ int main(){
     set<string,cmp> p;
     map<string,string> fp;
     while(cin >> a){
-        if(a[0]=='('&&a[1]==')'){
+        if(a[1]==')'){
             if(!cnt){
                 for (auto it = p.begin(); it != p.end(); it++){
                     if ((*it).size()&&!count(p.begin(), p.end(), string((*it).begin(),(*it).end()-1))){
