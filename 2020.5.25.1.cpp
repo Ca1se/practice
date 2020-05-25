@@ -14,15 +14,15 @@ bool cmp(Data x,Data y){
 }
 
 int main(){
-    //freopen("test.in","r",stdin);
-    //freopen("test.out","w+",stdout);
+    freopen("test.in","r",stdin);
+    freopen("test.out","w+",stdout);
     ios::sync_with_stdio(false);
     Data* data;
     int n,m;
     cin >> n;
     for(int i=0;i<n;i++){
         cin >> m;
-        data=new Data[100];
+        Data data[100];
         int cnt=0;
         for(int j=0;j<m;j++){
             string temps[2];
@@ -49,7 +49,6 @@ int main(){
             }
             cout << "   |----" << data[j].fruit << "(" << data[j].sum << ")\n";
         }
-        delete[] data;
     }
     return 0;
 }
