@@ -17,8 +17,8 @@ struct cmp
 int cnt=0;
 
 int main(){
-    //freopen("test.in","r",stdin);
-    //freopen("test.out","w+",stdout);
+    freopen("test.in","r",stdin);
+    freopen("test.out","w+",stdout);
     ios::sync_with_stdio(false);
     char a[500];
     set<string,cmp> p;
