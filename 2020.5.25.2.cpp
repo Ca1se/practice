@@ -13,8 +13,8 @@ bool cmp(Students x, Students y) {
 }
 
 int main() {
-    //freopen("test.in", "r", stdin);
-    //freopen("test.out", "w+", stdout);
+    freopen("test.in", "r", stdin);
+    freopen("test.out", "w+", stdout);
     ios::sync_with_stdio(false);
     int n, m, g;
     while (cin >> n && n && cin >> m >> g)
@@ -36,8 +36,8 @@ int main() {
                 students[cnt].exnumber = temps;
                 students[cnt++].score = sum;
             }
-            sort(students, students + cnt, cmp);
         }
+        sort(students, students + cnt, cmp);
         cout << cnt << "\n";
         for (int i = 0; i < cnt; i++)  cout << students[i].exnumber << " " << students[i].score << "\n";
     }
