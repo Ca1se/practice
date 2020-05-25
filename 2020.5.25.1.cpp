@@ -49,6 +49,7 @@ int main(){
             }
             cout << "   |----" << data[j].fruit << "(" << data[j].sum << ")\n";
         }
+        delete[] data;
     }
     return 0;
 }
