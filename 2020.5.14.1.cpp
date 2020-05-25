@@ -16,8 +16,10 @@ int main(){
         for(int i=0;i<m;i++,it--){
             if(i)   cout << " ";
             cout << *it;
+            if(it==a.begin())   break;
         }
         cout << "\n";
     }
     return 0;
 }
+
