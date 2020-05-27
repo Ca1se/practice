@@ -13,6 +13,7 @@ bool cmp(Tvprogram x,Tvprogram y){
 int main(){
     //freopen("test.in", "r", stdin);
     //freopen("test.out", "w+", stdout);
+    ios::sync_with_stdio(false);
     int n;
     while (cin >> n && n)
     {
