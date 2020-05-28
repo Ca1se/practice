@@ -20,7 +20,10 @@ void findwayout(int y, int x, int cnt, int fdirection) {
     if (cnt >= t)  return;
     int bdc = 0, temp;
     if (jar[y][x] == '^') {
-        if (!ans || cnt < ans)  ans = cnt;
+        if (!ans || cnt < ans){
+            ans = cnt;
+            t=ans+1;
+        }
     }
     else if (jar[y][x] > 96 && jar[y][x] < 107) {
         if (keybox.find(jar[y][x] - 32) == keybox.end()) {
