@@ -33,8 +33,10 @@ void findwayout(int y,int x){
             ans=tv[2];
             break;
         }else if(jar[tv[0]][tv[1]]>96&&jar[tv[0]][tv[1]]<107){
-            keybox.insert(jar[tv[0]][tv[1]]-32);
-            bdc++;
+            if(keybox.find(jar[tv[0]][tv[1]]-32)==keybox.end()){
+                keybox.insert(jar[tv[0]][tv[1]]-32);
+                bdc++;
+            }
         }
         for(int i=0;i<4;i++){
             if(i%2!=tv[3]%2||i==tv[3]){
@@ -48,8 +50,8 @@ void findwayout(int y,int x){
 }
 int main(){
     ios::sync_with_stdio(false);
-    freopen("test.in", "r", stdin);
-    freopen("test.out", "w+", stdout);
+    //freopen("test.in", "r", stdin);
+    //freopen("test.out", "w+", stdout);
     while (cin >> n >> m >> t)
     {
         int initx,inity;
@@ -66,5 +68,5 @@ int main(){
         ans=0;
         keybox.clear();
     }
-    
+    return 0;
 }
