@@ -4,7 +4,7 @@
 using namespace std;
 struct Tree
 {
-    string value = "";
+    string value;
     Tree* Lnext = NULL;
     Tree* Rnext = NULL;
 };
