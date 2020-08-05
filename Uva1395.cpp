@@ -1,6 +1,5 @@
 #include<iostream>
 #include<algorithm>
-#include<set>
 //#define LOCAL
 using namespace std;
 const int maxm = 100 * 99 / 2;
