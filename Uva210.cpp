@@ -23,7 +23,7 @@ int main(){
         Program program;
         string tmp;
         cin >> n >> t1 >> t2 >> t3 >> t4 >> t5 >> q;
-        getline(cin, tmp);
+        getchar();
         for(int j = 0; j < n && getline(cin, tmp);){
             program.statement.push_back(tmp);
             if(tmp == "end"){
