@@ -16,7 +16,6 @@ void dfs(int i, int j){
     dfs(i + 1, j + 1);
     dfs(i + 1, j - 1);
     dfs(i - 1, j - 1);
-    return;
 }
 
 int main(){
