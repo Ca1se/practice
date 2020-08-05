@@ -19,8 +19,8 @@ bool cmp1(string x, string y){
 int main(){
     //freopen("test.in", "r", stdin);
     //freopen("test.out", "w+", stdout);
-    Tree* node = new Tree[256];
-    string* mark = new string[256];
+    Tree node[256];
+    string mark[256];
     string tmp;
     int i = 0;
     bool judge = true;
@@ -63,7 +63,5 @@ int main(){
             i++;
         }
     }
-    delete[] node;
-    delete[] mark;
     return 0;
 }
