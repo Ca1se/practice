@@ -2,6 +2,7 @@
 #include<cstring>
 using namespace std;
 int tree[1 << 20];
+
 int main(){
     //freopen("test.in", "r", stdin);
     //freopen("test.out", "w+", stdout);
@@ -24,4 +25,5 @@ int main(){
         }
         cout << step / 2 << endl;
     }
+    return 0;
 }
