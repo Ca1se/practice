@@ -17,6 +17,8 @@ Input
 
 Output
 对于每个测试实例，输出能完整看到的电视节目的个数，每个测试实例的输出占一行。*/
+//贪心
+/*
 #include<iostream>
 #include<algorithm>
 using namespace std;
@@ -48,6 +50,31 @@ int main(){
             }
         }
         cout << cnt << "\n";
+    }
+    return 0;
+}*/
+//dp
+#include<bits/stdc++.h>
+using namespace std;
+const int maxn = 100 + 5;
+int s[maxn], e[maxn], p[maxn], n;
+int solve(int f) {
+    if(p[f] != -1)  return p[f];
+    for(int i = 0; i < n; i++){
+        if(s[i] >= f){
+            p[f] =  max(p[f], solve(e[i]) + 1);
+        }
+    }
+    return p[f] == -1 ? 0 : p[f];
+}
+int main() {
+    int t1, t2;
+    while(cin >> n && n){
+        memset(p, -1, sizeof(p));
+        for(int i = 0; i < n; i++){
+            cin >> s[i] >> e[i];
+        }
+        cout << solve(0) << endl;
     }
     return 0;
 }
