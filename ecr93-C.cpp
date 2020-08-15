@@ -1,4 +1,7 @@
-#include <bits/stdc++.h>
+// 前缀和, 将问题化为求和为0区间的个数
+#include<iostream>
+#include<map>
+#include<cstring>
 #define ll long long
 using namespace std;
 
@@ -24,4 +27,5 @@ int main() {
 		}
 		cout << ans << endl;
 	}
+	return 0;
 }
