@@ -1,7 +1,7 @@
 # Codeforce
 ## Codeforce Global Round 10
 ### E. Omkar and Duck 题解
-题目传送门:[E. Omkar and Duck](https://codeforces.com/contest/1392/problem/E)
+题目传送门:[E. Omkar and Duck](https://codeforces.com/contest/1392/problem/E)  
 这是一道交互题,还是第一次遇到这种题,感觉有必要记录下这道题的题解  
 这道题的大意是先给你一个整数n(n <= 25),然后你输出n行n列的整数a<sub>i</sub> (0 <= a<sub>i</sub> <= 10<sup>16</sup>), 接下来给你测试次数t, 每次测试根据你输出的数组输出一个路径和, 路径从左上角(1, 1)开始,在右下角(n, n)结束,你要打印这个路径  
 如果你输出的路径路径和与给出的相同, 但路径与系统使用的路径不一致, 则你的输出错误 
