@@ -85,9 +85,9 @@ bool bfs(pair<int, int> p, char d) {
     return false;
 }
 int main() {
-    
+    /*
     freopen("test.in", "r", stdin);
-    freopen("test.out", "w+", stdout);
+    freopen("test.out", "w+", stdout);*/
     int py, px;
     char str[50], c, t[10];
     while (cin >> str && strcmp(str, "END")) {
@@ -102,4 +102,5 @@ int main() {
         if (!bfs(make_pair(startp.first + direction[c].first, startp.second + direction[c].second), c))
             cout << endl << "  No Solution Possible" << endl;
     }
+    return 0;
 }
