@@ -19,7 +19,7 @@ struct Q {
     pair<int, int> p;
     char d;
     vector<pair<int, int> > rp;
-    vector<pair<pair<int, int>, char> > r;
+
 };
 
 ostream& operator<< (ostream& os, Q& q) {
@@ -56,6 +56,7 @@ char transfer(char pd, char rl) {
 
 bool bfs(pair<int, int> p, char d) {
     queue<Q> q; char a;
+    vector<pair<pair<int, int>, char> > mark;
     q.push(Q(p, d, { startp }));
     while (!q.empty()) {
         Q t = q.front(); q.pop();
@@ -63,6 +64,11 @@ bool bfs(pair<int, int> p, char d) {
             t.rp.push_back(t.p);
             cout << t << endl;
             return true;
+        }
+        if (find(mark.begin(), mark.end(), make_pair(t.p, t.d)) == mark.end()) {
+            mark.push_back(make_pair(t.p, t.d));
+        }else {
+            continue;
         }
         string s = mp[t.p.first][t.p.second][t.d];
         for (int i = 0; i < s.size(); i++) {
@@ -72,14 +78,7 @@ bool bfs(pair<int, int> p, char d) {
             tq.rp.push_back(tq.p);
             tq.p.first += direction[a].first;
             tq.p.second += direction[a].second;
-            auto& mark = tq.r;
-            if (find(mark.begin(), mark.end(), make_pair(tq.p, tq.d)) == mark.end()) {
-                mark.push_back(make_pair(tq.p, tq.d));
-                q.push(tq);
-            }
-            else {
-                continue;
-            }
+            q.push(tq);
         }
     }
     return false;
@@ -102,5 +101,4 @@ int main() {
         if (!bfs(make_pair(startp.first + direction[c].first, startp.second + direction[c].second), c))
             cout << endl << "  No Solution Possible" << endl;
     }
-    return 0;
 }
