@@ -14,15 +14,15 @@ map<char, pair<int, int> > direction = {
     {'N', make_pair(-1, 0)}, {'E', make_pair(0, 1)}, {'S', make_pair(1, 0)}, {'W', make_pair(0, -1)}
 };
 
-struct Q {
-    Q(pair<int, int> p, char d, vector<pair<int, int> > rp) : p(p), d(d), rp(rp) {}
+struct Route {
+    Route(pair<int, int> p, char d, vector<pair<int, int> > rp) : p(p), d(d), rp(rp) {}
     pair<int, int> p;
     char d;
     vector<pair<int, int> > rp;
 
 };
 
-ostream& operator<< (ostream& os, Q& q) {
+ostream& operator<< (ostream& os, Route& q) {
     for (int i = 0; i < q.rp.size(); i++) {
         if (i % 10 == 0) cout << endl << "  ";
         else    cout << ' ';
@@ -55,11 +55,11 @@ char transfer(char pd, char rl) {
 }
 
 bool bfs(pair<int, int> p, char d) {
-    queue<Q> q; char a;
+    queue<Route> q; char a;
     vector<pair<pair<int, int>, char> > mark;
-    q.push(Q(p, d, { startp }));
+    q.push(Route(p, d, { startp }));
     while (!q.empty()) {
-        Q t = q.front(); q.pop();
+        Route t = q.front(); q.pop();
         if (t.p.first == endp.first && t.p.second == endp.second) {
             t.rp.push_back(t.p);
             cout << t << endl;
@@ -73,7 +73,7 @@ bool bfs(pair<int, int> p, char d) {
         string s = mp[t.p.first][t.p.second][t.d];
         for (int i = 0; i < s.size(); i++) {
             a = transfer(t.d, s[i]);
-            Q tq = t;
+            Route tq = t;
             tq.d = a;
             tq.rp.push_back(tq.p);
             tq.p.first += direction[a].first;
