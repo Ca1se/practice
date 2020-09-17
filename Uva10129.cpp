@@ -35,8 +35,8 @@ bool judge() {
 }
 
 int main() {
-    freopen("test.in", "r", stdin);
-    freopen("test.out", "w", stdout);
+    //freopen("test.in", "r", stdin);
+    //freopen("test.out", "w", stdout);
     int test;
     string s;
     cin >> test;
