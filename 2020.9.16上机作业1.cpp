@@ -1,63 +1,60 @@
 #include<iostream>
-#include<list>
-#include<map>
 #include<string>
+
 using namespace std;
 
-struct StudentsInformation {
-    StudentsInformation(int no, string name): no(no), name(move(name)) {}
-    int no;
+const int maxSize = 200;
+
+struct stuinfo {
+    string no;
     string name;
 };
 
-class Solution {
-public:
-    Solution() = default;
-    ~Solution() = default;
-
-    void ReceiveStudentsInfo();
-    void OutputSchoolsClasses();
-
-private:
-    void OutputStudentsInfo(const string& _school, const string& _class);
-
-    map<string, map<string, list<StudentsInformation> > > infoTable;
+struct eduinfo {
+    string school;
+    string className;
+    stuinfo stu[maxSize];
+    int stuNum = 0;
 };
 
-void Solution::ReceiveStudentsInfo() {
-    string name, sch, cla;
-    int no;
+void Input(eduinfo& edu) {
+    string s[4];
     char choose;
 
+    cout << "Please input school name:";
+    cin >> s[0];
+    cout << "Please input class name:";
+    cin >> s[1];
+    edu.school = s[0];
+    edu.className = s[1];
+
     do {
-        cout << "Please input:\n";
-        cin >> no >> name >> sch >> cla;
-        infoTable[sch][cla].emplace_back(no, name);
+        cout << "Please input student no:";
+        cin >> s[2];
+        cout << "Please input student name:";
+        cin >> s[3];
+        edu.stu[edu.stuNum].no = s[2];
+        edu.stu[edu.stuNum++].name = s[3];
         cout << "Do you wanna input again?[y/n]\n";
-    }while (cin >> choose && choose == 'y');
+    }while(cin >> choose && (choose == 'y' || choose == 'Y'));
 }
 
-void Solution::OutputSchoolsClasses() {
-    for(auto& i: infoTable){
-        cout << i.first << endl;
-        for(auto& j: i.second){
-            cout << '\t' << j.first << endl;
-            OutputStudentsInfo(i.first, j.first);
-        }
-    }
+void Output(const eduinfo& edu) {
+    cout << edu.school << '\n';
+    cout << '\t' << edu.className << '\n';
 }
 
-void Solution::OutputStudentsInfo(const string &_school, const string &_class) {
-    for(auto& i: infoTable[_school][_class]){
-        cout << "\t\t" << i.no << ' ' << i.name << endl;
-    }
+void Output(const stuinfo& stu) {
+    cout << "\t\tno." << stu.no;
+    cout << ' ' << stu.name << '\n';
 }
 
 int main() {
-    Solution solve;
-
-    solve.ReceiveStudentsInfo();
-    solve.OutputSchoolsClasses();
-
+    eduinfo edu;
+    Input(edu);
+    Output(edu);
+    for(int i = 0; i < edu.stuNum; i++){
+        Output(edu.stu[i]);
+    }
     return 0;
 }
