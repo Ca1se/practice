@@ -29,15 +29,20 @@ void solve() {
 
     while(!q.empty()){
         Point t = q.front(); q.pop();
-        v += (x[t.x + 1] - x[t.x]) * (x[t.y + 1] - y[t.y]) * (z[t.z + 1] - z[t.z]);
+        v += (x[t.x + 1] - x[t.x]) * (y[t.y + 1] - y[t.y]) * (z[t.z + 1] - z[t.z]);
         for(int i = 0; i < 6; i++){
             int xx = t.x + dx[i];
             int yy = t.y + dy[i];
             int zz = t.z + dz[i];
-            if(xx < 0 || xx > nx - 1 || yy < 0 || yy > ny - 1 || zz < 0 || zz > nz -1 || vis[xx][yy][zz])  continue;
+            if(xx < 0 || xx > nx - 2 || yy < 0 || yy > ny - 2 || zz < 0 || zz > nz - 2 || vis[xx][yy][zz])  continue;
             else if(dicar[xx][yy][zz]){
-                //--
-                s++;
+                if(i <= 1){
+                    s += (y[t.y + 1] - y[t.y]) * (z[t.z + 1] - z[t.z]);
+                }else if(i <= 3){
+                    s += (x[t.x + 1] - x[t.x]) * (z[t.z + 1] - z[t.z]);
+                }else if(i <= 5){
+                    s += (x[t.x + 1] - x[t.x]) * (y[t.y + 1] - y[t.y]);
+                }
                 continue;
             }
             vis[xx][yy][zz] = 1;
@@ -90,7 +95,7 @@ int main() {
             }
         }
         solve();
-        cout << v << ' ' << s << endl;
+        cout << s << ' ' << maxr * maxr * maxr - v << endl;
     }
     return 0;
 }
