@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#include<algorithm
+#include<algorithm>
 using namespace std;
 const int maxn = 1e6 + 5;
 int num[maxn], dp[maxn], maxx[maxn];
