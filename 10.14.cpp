@@ -2,8 +2,10 @@
 #include<cstdlib>
 #include<ctime>
 #include<string>
+#include<cstring>
 #define MAXN 1000
 using namespace std;
+
 class cat {
 public:
     cat();
@@ -57,20 +59,40 @@ int cat::getFurLength() const {
     return furLength;
 }
 
+class cage {
+public:
+    cage();
+    cat** getCatCage();
+    void insertACat();
+private:
+    cat* cats[MAXN];
+};
+cage::cage() {
+    memset(cats, 0x0, sizeof(cats));
+}
+
+cat** cage::getCatCage() {
+    return cats;
+}
+
+void cage::insertACat() {
+    cats[cat::cnt - 1] = new cat;
+}
+
 int main() {
     srand(time(NULL));
-    cat* cage[MAXN];
+    cage cageA;
     while(true){
-        char ch;
-        ch = getchar();
+        char ch = getchar();
         if(ch != '\n')  break;
-        cage[cat::cnt - 1] = new cat;
+        cageA.insertACat();
     }
-    for(int i = 0;i < cat::cnt; i++) {
+    cat** t = cageA.getCatCage();
+    for(int i = 0; i < cat::cnt; i++){
         cout << "No." << i + 1 << '\n';
-        cout << "eyecolor: " << cage[i]->getEyeColor() << '\n';
-        cout << "furcolor: " << cage[i]->getFurColor() << '\n';
-        cout << "furlength: " << cage[i]->getFurLength() << '\n';
+        cout << "eyecolor: " << t[i]->getEyeColor() << '\n';
+        cout << "furcolor: " << t[i]->getFurColor() << '\n';
+        cout << "furlength: " << t[i]->getFurLength() << '\n';
     }
     cout << "cats count: " << cat::cnt << '\n';
     return 0;
