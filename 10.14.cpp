@@ -3,6 +3,7 @@
 #include<ctime>
 #include<string>
 #include<cstring>
+#include<conio.h>
 #define MAXN 1000
 using namespace std;
 
@@ -27,12 +28,34 @@ private:
 };
 int cat::cnt = 0;
 cat::cat() {
-    cnt++;
+    char choose;
     const char* furColorSet[] = {"green", "red", "yellow", "blue"};
     const char* eyeColorSet[] = {"black", "blue", "brown", "red"};
     setFurColor(furColorSet[rand() % 4]);
     setEyeColor(eyeColorSet[rand() % 4]);
     setFurLength(rand() % 6 + 5);
+    cout << "A cat has been created.Do you wanna change this cat's eye color?[y/n]\n";
+    if(cin >> choose && choose == 'y'){
+        string eyeChoose;
+        cout << "Please enter the cat's eye color:";
+        cin >> eyeChoose;
+        setEyeColor(eyeChoose);
+    }
+    cout << "Do you wanna change this cat's fur color?[y/n]\n";
+    if(cin >> choose && choose == 'y'){
+        string furColorChoose;
+        cout << "Please enter the cat's fur color:";
+        cin >> furColorChoose;
+        setFurColor(furColorChoose);
+    }
+    cout << "Do you wanna change this cat's fur length?[y/n]\n";
+    if(cin >> choose && choose == 'y'){
+        int length;
+        cout << "Please enter the cat's fur length:";
+        cin >> length;
+        setFurLength(length);
+    }
+    cnt++;
 }
 
 void cat::setEyeColor(const string& color) {
@@ -83,8 +106,8 @@ int main() {
     srand(time(NULL));
     cage cageA;
     while(true){
-        char ch = getchar();
-        if(ch != '\n')  break;
+        char ch = getch();
+        if(ch != '\r')  break;
         cageA.insertACat();
     }
     cat** t = cageA.getCatCage();
