@@ -15,16 +15,26 @@ public:
     Widget& operator= (const Widget& rhs);
     friend std::ostream& operator<< (std::ostream&, const Widget);
 private:
+    void swap(const Widget&);
     Bitmap* pb;
 
 };
 Widget::Widget(const Widget& rhs) {
     pb = rhs.pb;
 }
+void Widget::swap(const Widget& w) {
+    //...
+}
+/*
 Widget& Widget::operator= (const Widget& rhs) {
     Bitmap* t = pb;
     pb = new Bitmap(*rhs.pb);
     delete t;
+    return *this;
+}*/
+Widget& Widget::operator= (const Widget& rhs) {
+    Widget t(rhs);
+    swap(t);
     return *this;
 }
 std::ostream& operator<< (std::ostream& os, const Widget rhs) {
