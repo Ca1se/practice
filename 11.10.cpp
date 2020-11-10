@@ -13,7 +13,7 @@ void employee::print() const {
     cout << "name:" << name << endl;
     cout << "age:" << age << endl;
 }
-class waiter: employee {
+class waiter: virtual public employee {
 public:
     waiter(string name, int age, double bs, double bu): employee(name, age), basicSalary(bs), bonus(bu) {}
     virtual void print() const override;
@@ -30,7 +30,7 @@ void waiter::print() const {
 double waiter::calculation() const {
     return basicSalary + bonus;
 }
-class singer: employee {
+class singer: virtual public employee {
 public:
     singer(string name, int age, int h): employee(name, age), hours(h) {}
     virtual void print() const override;
@@ -47,9 +47,11 @@ void singer::print() const {
 double singer::calculation() const {
     return hours * salaryPerHour;
 }
-class singer_and_waiter: virtual waiter, virtual singer {
+class singer_and_waiter: public waiter, public singer {
 public:
-    singer_and_waiter(string name, int age, double bs, double bu): waiter(name, age, bs, bu), singer(name, age, 10){}
+    singer_and_waiter(string name, int age, double bs, double bu): singer(name, age, 10),
+                                                                waiter(name, age, bs, bu),
+                                                                employee(name, age) {}
     void print() const override;
     double calculation() const override;
 };
@@ -62,15 +64,15 @@ double singer_and_waiter::calculation() const {
 }
 int main() {
 //---------------------------test class: waiter------------------------
-    waiter w("小红", 18, 2000, 500);
-    w.print();
-    cout << "每月薪水:" << w.calculation() << endl;
+    waiter* w = new waiter("小红", 18, 2000, 500);
+    w->print();
+    cout << "每月薪水:" << w->calculation() << endl;
 //---------------------------test class: singer------------------------
-    singer s("小蓝", 20, 40);
-    s.print();
-    cout << "每周薪水:" << s.calculation() << endl;
+    singer* s = new singer("小蓝", 20, 40);
+    s->print();
+    cout << "每周薪水:" << s->calculation() << endl;
 //---------------------------test class: waiter and singer-------------
-    singer_and_waiter wns("小黑", 22, 3000, 800);
-    wns.print();
-    cout << "每月薪水:" << wns.calculation() << endl;
+    singer_and_waiter* wns = new singer_and_waiter("小黑", 22, 3000, 800);
+    wns->print();
+    cout << "每月薪水:" << wns->calculation() << endl;
 }
