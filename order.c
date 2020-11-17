@@ -111,6 +111,7 @@ int main() {
             }
         }
     }
+    ReleaseList(head);
     printf("退出系统\n");
     return 0;
 }
