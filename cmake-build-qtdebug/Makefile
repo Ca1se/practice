@@ -210,32 +210,32 @@ GUI/sources/widget.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/GUI/sources/widget.cpp.s
 .PHONY : GUI/sources/widget.cpp.s
 
-MAIN/sources/ManageMachine.o: MAIN/sources/ManageMachine.cpp.o
+MAIN/sources/dealmaintain.o: MAIN/sources/dealmaintain.cpp.o
 
-.PHONY : MAIN/sources/ManageMachine.o
+.PHONY : MAIN/sources/dealmaintain.o
 
 # target to build an object file
-MAIN/sources/ManageMachine.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o
-.PHONY : MAIN/sources/ManageMachine.cpp.o
+MAIN/sources/dealmaintain.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o
+.PHONY : MAIN/sources/dealmaintain.cpp.o
 
-MAIN/sources/ManageMachine.i: MAIN/sources/ManageMachine.cpp.i
+MAIN/sources/dealmaintain.i: MAIN/sources/dealmaintain.cpp.i
 
-.PHONY : MAIN/sources/ManageMachine.i
+.PHONY : MAIN/sources/dealmaintain.i
 
 # target to preprocess a source file
-MAIN/sources/ManageMachine.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.i
-.PHONY : MAIN/sources/ManageMachine.cpp.i
+MAIN/sources/dealmaintain.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.i
+.PHONY : MAIN/sources/dealmaintain.cpp.i
 
-MAIN/sources/ManageMachine.s: MAIN/sources/ManageMachine.cpp.s
+MAIN/sources/dealmaintain.s: MAIN/sources/dealmaintain.cpp.s
 
-.PHONY : MAIN/sources/ManageMachine.s
+.PHONY : MAIN/sources/dealmaintain.s
 
 # target to generate assembly for a file
-MAIN/sources/ManageMachine.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.s
-.PHONY : MAIN/sources/ManageMachine.cpp.s
+MAIN/sources/dealmaintain.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.s
+.PHONY : MAIN/sources/dealmaintain.cpp.s
 
 MAIN/sources/explain.o: MAIN/sources/explain.cpp.o
 
@@ -263,6 +263,87 @@ MAIN/sources/explain.s: MAIN/sources/explain.cpp.s
 MAIN/sources/explain.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.s
 .PHONY : MAIN/sources/explain.cpp.s
+
+MAIN/sources/log.o: MAIN/sources/log.cpp.o
+
+.PHONY : MAIN/sources/log.o
+
+# target to build an object file
+MAIN/sources/log.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o
+.PHONY : MAIN/sources/log.cpp.o
+
+MAIN/sources/log.i: MAIN/sources/log.cpp.i
+
+.PHONY : MAIN/sources/log.i
+
+# target to preprocess a source file
+MAIN/sources/log.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.i
+.PHONY : MAIN/sources/log.cpp.i
+
+MAIN/sources/log.s: MAIN/sources/log.cpp.s
+
+.PHONY : MAIN/sources/log.s
+
+# target to generate assembly for a file
+MAIN/sources/log.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.s
+.PHONY : MAIN/sources/log.cpp.s
+
+MAIN/sources/machine.o: MAIN/sources/machine.cpp.o
+
+.PHONY : MAIN/sources/machine.o
+
+# target to build an object file
+MAIN/sources/machine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o
+.PHONY : MAIN/sources/machine.cpp.o
+
+MAIN/sources/machine.i: MAIN/sources/machine.cpp.i
+
+.PHONY : MAIN/sources/machine.i
+
+# target to preprocess a source file
+MAIN/sources/machine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.i
+.PHONY : MAIN/sources/machine.cpp.i
+
+MAIN/sources/machine.s: MAIN/sources/machine.cpp.s
+
+.PHONY : MAIN/sources/machine.s
+
+# target to generate assembly for a file
+MAIN/sources/machine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s
+.PHONY : MAIN/sources/machine.cpp.s
+
+MAIN/sources/managemachine.o: MAIN/sources/managemachine.cpp.o
+
+.PHONY : MAIN/sources/managemachine.o
+
+# target to build an object file
+MAIN/sources/managemachine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o
+.PHONY : MAIN/sources/managemachine.cpp.o
+
+MAIN/sources/managemachine.i: MAIN/sources/managemachine.cpp.i
+
+.PHONY : MAIN/sources/managemachine.i
+
+# target to preprocess a source file
+MAIN/sources/managemachine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i
+.PHONY : MAIN/sources/managemachine.cpp.i
+
+MAIN/sources/managemachine.s: MAIN/sources/managemachine.cpp.s
+
+.PHONY : MAIN/sources/managemachine.s
+
+# target to generate assembly for a file
+MAIN/sources/managemachine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s
+.PHONY : MAIN/sources/managemachine.cpp.s
 
 main.o: main.cpp.o
 
@@ -307,12 +388,21 @@ help:
 	@echo "... GUI/sources/widget.o"
 	@echo "... GUI/sources/widget.i"
 	@echo "... GUI/sources/widget.s"
-	@echo "... MAIN/sources/ManageMachine.o"
-	@echo "... MAIN/sources/ManageMachine.i"
-	@echo "... MAIN/sources/ManageMachine.s"
+	@echo "... MAIN/sources/dealmaintain.o"
+	@echo "... MAIN/sources/dealmaintain.i"
+	@echo "... MAIN/sources/dealmaintain.s"
 	@echo "... MAIN/sources/explain.o"
 	@echo "... MAIN/sources/explain.i"
 	@echo "... MAIN/sources/explain.s"
+	@echo "... MAIN/sources/log.o"
+	@echo "... MAIN/sources/log.i"
+	@echo "... MAIN/sources/log.s"
+	@echo "... MAIN/sources/machine.o"
+	@echo "... MAIN/sources/machine.i"
+	@echo "... MAIN/sources/machine.s"
+	@echo "... MAIN/sources/managemachine.o"
+	@echo "... MAIN/sources/managemachine.i"
+	@echo "... MAIN/sources/managemachine.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

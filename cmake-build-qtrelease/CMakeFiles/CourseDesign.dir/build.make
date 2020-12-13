@@ -103,18 +103,18 @@ CMakeFiles/CourseDesign.dir/GUI/sources/widget.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/GUI/sources/widget.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/GUI/sources/widget.cpp -o CMakeFiles/CourseDesign.dir/GUI/sources/widget.cpp.s
 
-CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
-CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o: ../MAIN/sources/ManageMachine.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/ManageMachine.cpp
+CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
+CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o: ../MAIN/sources/dealmaintain.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/dealmaintain.cpp
 
-CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/ManageMachine.cpp > CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.i
+CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/dealmaintain.cpp > CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.i
 
-CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/ManageMachine.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.s
+CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/dealmaintain.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.s
 
 CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
 CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o: ../MAIN/sources/explain.cpp
@@ -129,9 +129,48 @@ CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/explain.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.s
 
+CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
+CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o: ../MAIN/sources/log.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/log.cpp
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/log.cpp > CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.i
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/log.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.s
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
+CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o: ../MAIN/sources/machine.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp > CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.i
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
+CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o: ../MAIN/sources/managemachine.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp > CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i
+
+CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s
+
 CMakeFiles/CourseDesign.dir/main.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
 CMakeFiles/CourseDesign.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/CourseDesign.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/CourseDesign.dir/main.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/main.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/main.cpp
 
 CMakeFiles/CourseDesign.dir/main.cpp.i: cmake_force
@@ -146,8 +185,11 @@ CMakeFiles/CourseDesign.dir/main.cpp.s: cmake_force
 CourseDesign_OBJECTS = \
 "CMakeFiles/CourseDesign.dir/CourseDesign_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/CourseDesign.dir/GUI/sources/widget.cpp.o" \
-"CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o" \
+"CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o" \
 "CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o" \
+"CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o" \
+"CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o" \
+"CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o" \
 "CMakeFiles/CourseDesign.dir/main.cpp.o"
 
 # External object files for target CourseDesign
@@ -155,15 +197,18 @@ CourseDesign_EXTERNAL_OBJECTS =
 
 CourseDesign: CMakeFiles/CourseDesign.dir/CourseDesign_autogen/mocs_compilation.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/GUI/sources/widget.cpp.o
-CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o
+CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o
+CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o
+CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o
+CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/main.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/build.make
 CourseDesign: /home/ca1se/Qt5.12.10/5.12.10/gcc_64/lib/libQt5Widgets.so.5.12.10
 CourseDesign: /home/ca1se/Qt5.12.10/5.12.10/gcc_64/lib/libQt5Gui.so.5.12.10
 CourseDesign: /home/ca1se/Qt5.12.10/5.12.10/gcc_64/lib/libQt5Core.so.5.12.10
 CourseDesign: CMakeFiles/CourseDesign.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable CourseDesign"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable CourseDesign"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/CourseDesign.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
