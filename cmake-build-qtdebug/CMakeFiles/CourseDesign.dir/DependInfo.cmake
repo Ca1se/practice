@@ -6,8 +6,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CourseDesign_autogen/mocs_compilation.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/CourseDesign_autogen/mocs_compilation.cpp.o"
   "/home/ca1se/CLionProjects/CourseDesign/GUI/sources/widget.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/GUI/sources/widget.cpp.o"
-  "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/ManageMachine.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/MAIN/sources/ManageMachine.cpp.o"
+  "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/dealmaintain.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o"
   "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/explain.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o"
+  "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/log.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o"
+  "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o"
+  "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o"
   "/home/ca1se/CLionProjects/CourseDesign/main.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles/CourseDesign.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

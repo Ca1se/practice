@@ -15,14 +15,29 @@
 			"GT4ZMTGFRD/moc_widget.cpp"
 		],
 		[
-			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/ManageMachine.h",
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/dealmaintain.h",
 			"MU",
-			"4HGUNJZXZD/moc_ManageMachine.cpp"
+			"4HGUNJZXZD/moc_dealmaintain.cpp"
 		],
 		[
 			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/explain.h",
 			"MU",
 			"4HGUNJZXZD/moc_explain.cpp"
+		],
+		[
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/log.h",
+			"MU",
+			"4HGUNJZXZD/moc_log.cpp"
+		],
+		[
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/machine.h",
+			"MU",
+			"4HGUNJZXZD/moc_machine.cpp"
+		],
+		[
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/managemachine.h",
+			"MU",
+			"4HGUNJZXZD/moc_managemachine.cpp"
 		],
 		[
 			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/temp.h",
@@ -87,11 +102,20 @@
 	[
 		[ "/home/ca1se/CLionProjects/CourseDesign/GUI/sources/widget.cpp", "MU" ],
 		[
-			"/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/ManageMachine.cpp",
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/dealmaintain.cpp",
 			"MU"
 		],
 		[
 			"/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/explain.cpp",
+			"MU"
+		],
+		[ "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/log.cpp", "MU" ],
+		[
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp",
+			"MU"
+		],
+		[
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp",
 			"MU"
 		],
 		[ "/home/ca1se/CLionProjects/CourseDesign/main.cpp", "MU" ]

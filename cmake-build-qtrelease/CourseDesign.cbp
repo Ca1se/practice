@@ -129,19 +129,37 @@
 		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/GUI/sources/widget.ui">
 			<Option target="CourseDesign"/>
 		</Unit>
-		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/ManageMachine.h">
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/dealmaintain.h">
 			<Option target="CourseDesign"/>
 		</Unit>
 		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/explain.h">
 			<Option target="CourseDesign"/>
 		</Unit>
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/log.h">
+			<Option target="CourseDesign"/>
+		</Unit>
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/machine.h">
+			<Option target="CourseDesign"/>
+		</Unit>
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/managemachine.h">
+			<Option target="CourseDesign"/>
+		</Unit>
 		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/temp.h">
 			<Option target="CourseDesign"/>
 		</Unit>
-		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/ManageMachine.cpp">
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/dealmaintain.cpp">
 			<Option target="CourseDesign"/>
 		</Unit>
 		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/explain.cpp">
+			<Option target="CourseDesign"/>
+		</Unit>
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/log.cpp">
+			<Option target="CourseDesign"/>
+		</Unit>
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp">
+			<Option target="CourseDesign"/>
+		</Unit>
+		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp">
 			<Option target="CourseDesign"/>
 		</Unit>
 		<Unit filename="/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CourseDesign_autogen/mocs_compilation.cpp">
