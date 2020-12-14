@@ -18,7 +18,6 @@ FILE(GLOB SOURCES
         "${PROJECT_SOURCE_DIR}/main.cpp"
         "${PROJECT_SOURCE_DIR}/GUI/sources/*.cpp"
         "${PROJECT_SOURCE_DIR}/GUI/headers/*.h"
-        "GUI/sources/widget.ui"
         "MAIN/headers/*.h"
         "MAIN/sources/*.cpp"
         )

@@ -155,18 +155,18 @@ CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s
 
-CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
-CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o: ../MAIN/sources/managemachine.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp
+CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
+CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o: ../MAIN/sources/maintainmachine.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtdebug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o -c /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/maintainmachine.cpp
 
-CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp > CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i
+CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/maintainmachine.cpp > CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.i
 
-CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s
+CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ca1se/CLionProjects/CourseDesign/MAIN/sources/maintainmachine.cpp -o CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.s
 
 CMakeFiles/CourseDesign.dir/main.cpp.o: CMakeFiles/CourseDesign.dir/flags.make
 CMakeFiles/CourseDesign.dir/main.cpp.o: ../main.cpp
@@ -189,7 +189,7 @@ CourseDesign_OBJECTS = \
 "CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o" \
 "CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o" \
 "CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o" \
-"CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o" \
+"CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o" \
 "CMakeFiles/CourseDesign.dir/main.cpp.o"
 
 # External object files for target CourseDesign
@@ -201,7 +201,7 @@ CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/dealmaintain.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o
-CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o
+CourseDesign: CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/main.cpp.o
 CourseDesign: CMakeFiles/CourseDesign.dir/build.make
 CourseDesign: /home/ca1se/Qt5.12.10/5.12.10/gcc_64/lib/libQt5Widgets.so.5.12.10

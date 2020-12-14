@@ -35,14 +35,9 @@
 			"4HGUNJZXZD/moc_machine.cpp"
 		],
 		[
-			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/managemachine.h",
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/maintainmachine.h",
 			"MU",
-			"4HGUNJZXZD/moc_managemachine.cpp"
-		],
-		[
-			"/home/ca1se/CLionProjects/CourseDesign/MAIN/headers/temp.h",
-			"MU",
-			"4HGUNJZXZD/moc_temp.cpp"
+			"4HGUNJZXZD/moc_maintainmachine.cpp"
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -115,7 +110,7 @@
 			"MU"
 		],
 		[
-			"/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp",
+			"/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/maintainmachine.cpp",
 			"MU"
 		],
 		[ "/home/ca1se/CLionProjects/CourseDesign/main.cpp", "MU" ]
