@@ -1,7 +1,7 @@
 #include "widget.h"
 #include "maintainmachine.h"
 #include <QApplication>
-#include <queue>
+
 
 int main(int argc, char *argv[])
 {
