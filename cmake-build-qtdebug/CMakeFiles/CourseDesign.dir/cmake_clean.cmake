@@ -8,7 +8,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o"
   "CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o"
   "CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o"
-  "CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o"
+  "CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o"
   "CMakeFiles/CourseDesign.dir/main.cpp.o"
   "CourseDesign"
   "CourseDesign.pdb"

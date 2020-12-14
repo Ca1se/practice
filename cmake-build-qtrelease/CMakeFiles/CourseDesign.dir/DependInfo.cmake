@@ -10,7 +10,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/explain.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign.dir/MAIN/sources/explain.cpp.o"
   "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/log.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign.dir/MAIN/sources/log.cpp.o"
   "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/machine.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.o"
-  "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/managemachine.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o"
+  "/home/ca1se/CLionProjects/CourseDesign/MAIN/sources/maintainmachine.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o"
   "/home/ca1se/CLionProjects/CourseDesign/main.cpp" "/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

@@ -318,32 +318,32 @@ MAIN/sources/machine.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/machine.cpp.s
 .PHONY : MAIN/sources/machine.cpp.s
 
-MAIN/sources/managemachine.o: MAIN/sources/managemachine.cpp.o
+MAIN/sources/maintainmachine.o: MAIN/sources/maintainmachine.cpp.o
 
-.PHONY : MAIN/sources/managemachine.o
+.PHONY : MAIN/sources/maintainmachine.o
 
 # target to build an object file
-MAIN/sources/managemachine.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.o
-.PHONY : MAIN/sources/managemachine.cpp.o
+MAIN/sources/maintainmachine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.o
+.PHONY : MAIN/sources/maintainmachine.cpp.o
 
-MAIN/sources/managemachine.i: MAIN/sources/managemachine.cpp.i
+MAIN/sources/maintainmachine.i: MAIN/sources/maintainmachine.cpp.i
 
-.PHONY : MAIN/sources/managemachine.i
+.PHONY : MAIN/sources/maintainmachine.i
 
 # target to preprocess a source file
-MAIN/sources/managemachine.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.i
-.PHONY : MAIN/sources/managemachine.cpp.i
+MAIN/sources/maintainmachine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.i
+.PHONY : MAIN/sources/maintainmachine.cpp.i
 
-MAIN/sources/managemachine.s: MAIN/sources/managemachine.cpp.s
+MAIN/sources/maintainmachine.s: MAIN/sources/maintainmachine.cpp.s
 
-.PHONY : MAIN/sources/managemachine.s
+.PHONY : MAIN/sources/maintainmachine.s
 
 # target to generate assembly for a file
-MAIN/sources/managemachine.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/managemachine.cpp.s
-.PHONY : MAIN/sources/managemachine.cpp.s
+MAIN/sources/maintainmachine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CourseDesign.dir/build.make CMakeFiles/CourseDesign.dir/MAIN/sources/maintainmachine.cpp.s
+.PHONY : MAIN/sources/maintainmachine.cpp.s
 
 main.o: main.cpp.o
 
@@ -400,9 +400,9 @@ help:
 	@echo "... MAIN/sources/machine.o"
 	@echo "... MAIN/sources/machine.i"
 	@echo "... MAIN/sources/machine.s"
-	@echo "... MAIN/sources/managemachine.o"
-	@echo "... MAIN/sources/managemachine.i"
-	@echo "... MAIN/sources/managemachine.s"
+	@echo "... MAIN/sources/maintainmachine.o"
+	@echo "... MAIN/sources/maintainmachine.i"
+	@echo "... MAIN/sources/maintainmachine.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
