@@ -20,6 +20,7 @@ enum coin {
 };//实际面额要除10
 
 struct Goods {
+    Goods() = default;
     Goods(Gname&& name, double cost): name(name), cost(cost) {}
     std::string name;
     double cost;

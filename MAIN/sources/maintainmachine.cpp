@@ -36,5 +36,5 @@ void MaintainMachine::InitMachine(std::string&& addr) {
 }
 
 size_t MaintainMachine::GetGoodsRemain(const Gname& g) const {
-    _pMachine->GoodsRemain(g);
+    return _pMachine->GoodsRemain(g);
 }

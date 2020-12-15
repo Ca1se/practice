@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     m.InitMachine("/home/ca1se/CLionProjects/CourseDesign/list/goods.json");
 
     QApplication a(argc, argv);
-    Widget w(nullptr, m);
+    Widget w(nullptr, &m);
     w.show();
     return a.exec();
 }

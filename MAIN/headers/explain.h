@@ -20,6 +20,7 @@ struct tpair {
     T3 third;
 };
 
+
 class explain {
 public:
     explain(const std::string &addr, std::string&& t1, std::string&& t2, std::string&& t3 = "");
@@ -28,15 +29,24 @@ public:
 
     tpair<std::string, std::string, std::string> ExplainInTurn_tpair();
     std::pair<std::string, std::string> ExplainInTurn_pair();
+    void ResetTCounter();
+    void ResetDCounter();
 
 private:
-    std::string FindValue(FILE* fp);
+    static std::string FindValue(FILE* fp);
 
     FILE *_plF;
     std::string _e1;
     std::string _e2;
     std::string _e3;
+
+    size_t* _ptCounter;
+    size_t* _pdCounter;
+    std::vector<std::pair<std::string, std::string>>* _pDPair;
+    std::vector<tpair<std::string, std::string, std::string>>* _pTPair;
+
 };
+
 
 
 #endif //DEMO2_2_EXPLAIN_H

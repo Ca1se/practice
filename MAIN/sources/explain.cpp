@@ -11,9 +11,13 @@ explain::explain(const std::string &addr, std::string &&t1, std::string &&t2, st
         ,_e1(t1)
         ,_e2(t2)
         ,_e3(t3)
+        ,_pTPair(nullptr)
+        ,_pDPair(nullptr)
+        ,_ptCounter(nullptr)
+        ,_pdCounter(nullptr)
 {
     if (_plF == nullptr){
-
+        std::terminate();
     }
 }
 
@@ -21,11 +25,23 @@ explain::~explain() {
     if(_plF){
         fclose(_plF);
     }
+
+    ResetTCounter();
+    ResetDCounter();
+
+    if(_pdCounter){
+        _pdCounter = nullptr;
+    }
+    if(_ptCounter){
+        _ptCounter = nullptr;
+    }
 }
 
 std::pair<std::string, std::string> explain::ExplainInTurn_pair() {
     static size_t counter = 0;
     static std::vector<std::pair<std::string, std::string>> fromList;
+    _pdCounter = &counter;
+    _pDPair = &fromList;
 
     bool foundKey = false;
     std::string elementF;
@@ -58,8 +74,13 @@ std::pair<std::string, std::string> explain::ExplainInTurn_pair() {
 }
 
 tpair<std::string, std::string, std::string> explain::ExplainInTurn_tpair() {
+    if(!(_e3.length())){
+        std::terminate();
+    }
     static size_t counter = 0;
     static std::vector<tpair<std::string, std::string, std::string>> fromList;
+    _ptCounter = &counter;
+    _pTPair = &fromList;
 
     bool foundE1 = false;
     bool foundE2 = false;
@@ -104,4 +125,18 @@ std::string explain::FindValue(FILE *fp) {
     while (fscanf(fp, "%s", buf) && buf[0] != '\"');
     strncpy(t, buf + 1, strchr(buf + 1, '\"') - buf - 1);
     return t;
+}
+
+void explain::ResetDCounter() {
+    if(_pdCounter){
+        *_pdCounter = 0;
+        _pDPair->clear();
+    }
+}
+
+void explain::ResetTCounter() {
+    if(_ptCounter){
+        *_ptCounter = 0;
+        _pTPair->clear();
+    }
 }
