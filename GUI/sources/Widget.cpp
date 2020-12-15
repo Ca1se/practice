@@ -18,6 +18,7 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
         auto it = ex->ExplainInTurn_pair();
         _vGInfo.push_back(Goods(std::move(it.first), strtod(it.second.c_str(), nullptr)));
     }
+    delete ex;
 
     setIconText();
 }
@@ -44,7 +45,7 @@ void Widget::setIconText() {
 
         //LabelText
         auto pLb = findChild<QLabel*>(trUtf8(buf));
-        pLb->setText(t.sprintf("%s 价格:%f 剩余:%d", goods.name.c_str(), goods.cost, 0));
+        pLb->setText(t.sprintf("%s 价格:%.1f 剩余:%d", goods.name.c_str(), goods.cost, 0));
     }
 }
 
@@ -55,7 +56,7 @@ void Widget::UpdateDisplay(QPushButton* pBtn) {
     auto& goods = _vGInfo[pos];
     auto plb = findChild<QLabel*>(pBtn->objectName());
     QString t;
-    plb->setText(t.sprintf("%s 价格:%f 剩余:%zu", goods.name.c_str(), goods.cost, n));
+    plb->setText(t.sprintf("%s 价格:%.1f 剩余:%zu", goods.name.c_str(), goods.cost, n));
 
     pBtn->setEnabled(n);
 }

@@ -56,32 +56,36 @@ public:
         mainGridLyt->addWidget(lGoods0, 1, 0, 1, 1);
         lGoods1 = new QLabel(layoutWidget);
         setUpLabel(lGoods1, "1");
-        mainGridLyt->addWidget(lGoods0, 1, 1, 1, 1);
+        mainGridLyt->addWidget(lGoods1, 1, 1, 1, 1);
         lGoods2 = new QLabel(layoutWidget);
         setUpLabel(lGoods2, "2");
-        mainGridLyt->addWidget(lGoods0, 1, 2, 1, 1);
+        mainGridLyt->addWidget(lGoods2, 1, 2, 1, 1);
         lGoods3 = new QLabel(layoutWidget);
         setUpLabel(lGoods3, "3");
-        mainGridLyt->addWidget(lGoods0, 3, 0, 1, 1);
+        mainGridLyt->addWidget(lGoods3, 3, 0, 1, 1);
         lGoods4 = new QLabel(layoutWidget);
         setUpLabel(lGoods4, "4");
-        mainGridLyt->addWidget(lGoods0, 3, 1, 1, 1);
+        mainGridLyt->addWidget(lGoods4, 3, 1, 1, 1);
         lGoods5 = new QLabel(layoutWidget);
         setUpLabel(lGoods5, "5");
-        mainGridLyt->addWidget(lGoods0, 3, 2, 1, 1);
+        mainGridLyt->addWidget(lGoods5, 3, 2, 1, 1);
         lGoods6 = new QLabel(layoutWidget);
         setUpLabel(lGoods6, "6");
-        mainGridLyt->addWidget(lGoods0, 5, 0, 1, 1);
+        mainGridLyt->addWidget(lGoods6, 5, 0, 1, 1);
         lGoods7 = new QLabel(layoutWidget);
         setUpLabel(lGoods7, "7");
-        mainGridLyt->addWidget(lGoods0, 5, 1, 1, 1);
+        mainGridLyt->addWidget(lGoods7, 5, 1, 1, 1);
         lGoods8 = new QLabel(layoutWidget);
         setUpLabel(lGoods8, "8");
-        mainGridLyt->addWidget(lGoods0, 5, 2, 1, 1);
+        mainGridLyt->addWidget(lGoods8, 5, 2, 1, 1);
 
         pBtnAdmin = new QPushButton(widget);
         pBtnAdmin->setGeometry(QRect(30, 900, 85, 35));
         pBtnAdmin->setText(QApplication::trUtf8("补货"));
+
+        pBtnAdmin = new QPushButton(widget);
+        pBtnAdmin->setGeometry(QRect(30, 840, 85, 35));
+        pBtnAdmin->setText(QApplication::trUtf8("补硬币"));
 
         pBtnSelect0 = new QPushButton(widget);
         setUpButton(pBtnSelect0, "background-color: rgba(40, 20, 10, 1)", "0");
@@ -117,6 +121,7 @@ private:
 
     static void setUpButton(QPushButton* pBtn, const char* styleSheet, const char* pos) {
         pBtn->setObjectName(QApplication::trUtf8(pos));
+        pBtn->setMaximumSize(140, 140);
         pBtn->setMinimumSize(140, 140);
         pBtn->setStyleSheet(styleSheet);
     }
@@ -124,6 +129,8 @@ private:
     static void setUpLabel(QLabel* lb, const char* pos) {
         lb->setObjectName(QApplication::trUtf8(pos));
         lb->setMinimumSize(140, 30);
+        lb->setMaximumSize(140, 30);
+        lb->setWordWrap(true);
     }
 };
 // Sub Widget class description class
