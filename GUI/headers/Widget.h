@@ -6,19 +6,28 @@
 #define UNTITLED2_WIDGET_H
 
 #include "UIset.h"
+#include "maintainmachine.h"
+#include <QVector>
 
-namespace UI {  class MainWidget; }
+namespace UI {
+    class MainWidget;
+    class SubWidget;
+}
 
 class Widget: public QWidget {
 public:
-    Widget(QWidget* parent = nullptr);
+    Widget(QWidget* parent, MaintainMachine* manager);
     ~Widget();
 
 
 private:
     UI::MainWidget* ui;
+    MaintainMachine* _pM;
+    QVector<Goods> _vGInfo;
+    QMap<QString, size_t> _mGtoPos;
 
-    void setPushButtonIcon();
+    void UpdateDisplay(QPushButton* pBtn);
+    void setIconText();
 };
 
 

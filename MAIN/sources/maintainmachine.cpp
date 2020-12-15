@@ -35,9 +35,6 @@ void MaintainMachine::InitMachine(std::string&& addr) {
     delete pC;
 }
 
-
-
-size_t MaintainMachine::GoodsCost(const Gname& g) const {
-    size_t pos = _pMachine->_gToPos[g];
-    return (*(_pMachine->_pGoods))[pos].first.cost;
+size_t MaintainMachine::GetGoodsRemain(const Gname& g) const {
+    _pMachine->GoodsRemain(g);
 }

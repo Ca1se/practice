@@ -30,7 +30,7 @@ public:
 
 class Time {
 public:
-    static const char* GetTimeNow();            //静态常量函数，好让所有其他的一起公用
+    static std::string GetTimeNow();            //静态常量函数，好让所有其他的一起公用
 };
 
 #endif //COURSEDESIGN_DEAL_MAINTAIN_H
