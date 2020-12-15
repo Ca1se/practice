@@ -33,14 +33,13 @@ public:
 
     static Machine& Get();
 
-    size_t GoodsRemain(Gname) const;
+    size_t GoodsRemain(Gname);
     size_t CoinRemain(coin) const;
 
     void SetGoods(Gname, size_t);
     void SetCoins(coin, size_t);
 private:
-    Machine(): _pGoods(new std::vector<std::pair<Goods, size_t> >)
-            , _pCoins(new std::vector<std::pair<coin, size_t> >) {}
+    Machine();
 
     std::vector<std::pair<Goods, size_t> >* _pGoods;
     std::vector<std::pair<coin, size_t> >* _pCoins;
