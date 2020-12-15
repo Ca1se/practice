@@ -1,4 +1,0 @@
-/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/edit_cache.dir
-/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/rebuild_cache.dir
-/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign.dir
-/home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease/CMakeFiles/CourseDesign_autogen.dir

@@ -1,4 +1,0 @@
-/home/ca1se/clion-2020.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/ca1se/Qt5.12.10/5.12.10/gcc_64/lib/cmake/ -G "CodeBlocks - Unix Makefiles" /home/ca1se/CLionProjects/CourseDesign
--- Configuring done
--- Generating done
--- Build files have been written to: /home/ca1se/CLionProjects/CourseDesign/cmake-build-qtrelease
