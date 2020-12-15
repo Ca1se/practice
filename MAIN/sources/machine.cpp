@@ -28,6 +28,7 @@ size_t Machine::CoinRemain(coin c) const {
         if(it.first == c)
             return it.second;
     }
+    std::terminate();
 }
 
 void Machine::SetGoods(Gname g, size_t n) {

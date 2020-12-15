@@ -13,9 +13,9 @@ public:
     explicit MaintainMachine(Machine* pM);
     ~MaintainMachine() = default;
 
-    size_t GoodsCost(const Gname&) const; //for GUI
     void InitMachine(std::string&& addr);
 
+    size_t GetGoodsRemain(const Gname& name) const;
 private:
     Machine* _pMachine;
 

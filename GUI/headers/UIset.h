@@ -52,31 +52,31 @@ public:
         mainGridLyt->setVerticalSpacing(10);
 
         lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        setUpLabel(lGoods0, "0");
         mainGridLyt->addWidget(lGoods0, 1, 0, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods1 = new QLabel(layoutWidget);
+        setUpLabel(lGoods1, "1");
         mainGridLyt->addWidget(lGoods0, 1, 1, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods2 = new QLabel(layoutWidget);
+        setUpLabel(lGoods2, "2");
         mainGridLyt->addWidget(lGoods0, 1, 2, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods3 = new QLabel(layoutWidget);
+        setUpLabel(lGoods3, "3");
         mainGridLyt->addWidget(lGoods0, 3, 0, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods4 = new QLabel(layoutWidget);
+        setUpLabel(lGoods4, "4");
         mainGridLyt->addWidget(lGoods0, 3, 1, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods5 = new QLabel(layoutWidget);
+        setUpLabel(lGoods5, "5");
         mainGridLyt->addWidget(lGoods0, 3, 2, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods6 = new QLabel(layoutWidget);
+        setUpLabel(lGoods6, "6");
         mainGridLyt->addWidget(lGoods0, 5, 0, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods7 = new QLabel(layoutWidget);
+        setUpLabel(lGoods7, "7");
         mainGridLyt->addWidget(lGoods0, 5, 1, 1, 1);
-        lGoods0 = new QLabel(layoutWidget);
-        lGoods0->setMinimumSize(140, 30);
+        lGoods8 = new QLabel(layoutWidget);
+        setUpLabel(lGoods8, "8");
         mainGridLyt->addWidget(lGoods0, 5, 2, 1, 1);
 
         pBtnAdmin = new QPushButton(widget);
@@ -84,40 +84,46 @@ public:
         pBtnAdmin->setText(QApplication::trUtf8("补货"));
 
         pBtnSelect0 = new QPushButton(widget);
-        setUpButton(pBtnSelect0, "background-color: rgba(40, 20, 10, 1)");
+        setUpButton(pBtnSelect0, "background-color: rgba(40, 20, 10, 1)", "0");
         mainGridLyt->addWidget(pBtnSelect0, 0, 0, 1, 1);
         pBtnSelect1 = new QPushButton(widget);
-        setUpButton(pBtnSelect1, "background-color: rgba(80, 20, 10, 1)");
+        setUpButton(pBtnSelect1, "background-color: rgba(80, 20, 10, 1)", "1");
         mainGridLyt->addWidget(pBtnSelect1, 0, 1, 1, 1);
         pBtnSelect2 = new QPushButton(widget);
-        setUpButton(pBtnSelect2, "background-color: rgba(40, 90, 10, 1)");
+        setUpButton(pBtnSelect2, "background-color: rgba(40, 90, 10, 1)", "2");
         mainGridLyt->addWidget(pBtnSelect2, 0, 2, 1, 1);
         pBtnSelect3 = new QPushButton(widget);
-        setUpButton(pBtnSelect3, "background-color: rgba(20, 50, 10, 1)");
+        setUpButton(pBtnSelect3, "background-color: rgba(20, 50, 10, 1)", "3");
         mainGridLyt->addWidget(pBtnSelect3, 2, 0, 1, 1);
         pBtnSelect4 = new QPushButton(widget);
-        setUpButton(pBtnSelect4, "background-color: rgba(70, 80, 10, 1)");
+        setUpButton(pBtnSelect4, "background-color: rgba(70, 80, 10, 1)", "4");
         mainGridLyt->addWidget(pBtnSelect4, 2, 1, 1, 1);
         pBtnSelect5 = new QPushButton(widget);
-        setUpButton(pBtnSelect5, "background-color: rgba(40, 50, 30, 1)");
+        setUpButton(pBtnSelect5, "background-color: rgba(40, 50, 30, 1)", "5");
         mainGridLyt->addWidget(pBtnSelect5, 2, 2, 1, 1);
         pBtnSelect6 = new QPushButton(widget);
-        setUpButton(pBtnSelect6, "background-color: rgba(70, 90, 10, 1)");
+        setUpButton(pBtnSelect6, "background-color: rgba(70, 90, 10, 1)", "6");
         mainGridLyt->addWidget(pBtnSelect6, 4, 0, 1, 1);
         pBtnSelect7 = new QPushButton(widget);
-        setUpButton(pBtnSelect7, "background-color: rgba(40, 60, 10, 1)");
+        setUpButton(pBtnSelect7, "background-color: rgba(40, 60, 10, 1)", "7");
         mainGridLyt->addWidget(pBtnSelect7, 4, 1, 1, 1);
         pBtnSelect8 = new QPushButton(widget);
-        setUpButton(pBtnSelect8, "background-color: rgba(40, 70, 70, 1)");
+        setUpButton(pBtnSelect8, "background-color: rgba(40, 70, 70, 1)", "8");
         mainGridLyt->addWidget(pBtnSelect8, 4, 2, 1, 1);
 
     }
 
 private:
 
-    static void setUpButton(QPushButton* pBtn, const char* styleSheet) {
+    static void setUpButton(QPushButton* pBtn, const char* styleSheet, const char* pos) {
+        pBtn->setObjectName(QApplication::trUtf8(pos));
         pBtn->setMinimumSize(140, 140);
         pBtn->setStyleSheet(styleSheet);
+    }
+
+    static void setUpLabel(QLabel* lb, const char* pos) {
+        lb->setObjectName(QApplication::trUtf8(pos));
+        lb->setMinimumSize(140, 30);
     }
 };
 // Sub Widget class description class
