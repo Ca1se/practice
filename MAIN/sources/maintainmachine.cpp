@@ -24,9 +24,9 @@ void MaintainMachine::InitMachine(std::string&& addr) {
     for(size_t i = 0; i < 2; i++){
         auto it = pC->ExplainInTurn_pair();
         coin c;
-        if(it.first == "five_dime"){
+        if(it.first == "dime_five"){
             c = coin::dime_five;
-        }else if(it.first == "one_yuan"){
+        }else if(it.first == "yuan_one"){
             c = coin::yuan_one;
         }
         _pMachine->_pCoins->emplace_back(std::make_pair(c, strtol(it.second.c_str(), nullptr, 10)));

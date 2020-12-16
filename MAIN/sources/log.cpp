@@ -4,10 +4,10 @@
 
 #include "log.h"
 
-Log::Log():_logDeal("/log/deal.log"), _logMaintain("/log/maintain.log") {}
+Log::Log():_logDeal("log/deal.log", std::ios::app), _logMaintain("log/maintain.log", std::ios::app) {}
 Log::~Log() {
     _logDeal.close();
-    _logDeal.close();
+    _logMaintain.close();
 }
 
 std::ofstream & Log::GetStream(int c) {

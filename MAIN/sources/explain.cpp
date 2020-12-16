@@ -30,10 +30,14 @@ explain::~explain() {
     ResetDCounter();
 
     if(_pdCounter){
+        _pDPair->clear();
         _pdCounter = nullptr;
+        _pDPair = nullptr;
     }
     if(_ptCounter){
+        _pTPair->clear();
         _ptCounter = nullptr;
+        _pTPair = nullptr;
     }
 }
 
@@ -130,13 +134,11 @@ std::string explain::FindValue(FILE *fp) {
 void explain::ResetDCounter() {
     if(_pdCounter){
         *_pdCounter = 0;
-        _pDPair->clear();
     }
 }
 
 void explain::ResetTCounter() {
     if(_ptCounter){
         *_ptCounter = 0;
-        _pTPair->clear();
     }
 }
