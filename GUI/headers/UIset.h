@@ -39,6 +39,7 @@ public:
     QLabel* lGoods7;
     QLabel* lGoods8;
 
+
     void initUI(QWidget* widget) {
         widget->setMinimumSize(720, 960);
         widget->setMaximumSize(720, 960);
@@ -154,6 +155,7 @@ public:
     QRadioButton* rBtnWechat;
     QRadioButton* rBtnAlipay;
     QRadioButton* rBtnCoin;
+    QSplashScreen* lPrompt;
 
     void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
 
@@ -214,6 +216,17 @@ public:
         pBtnConfirm->setText(trUtf8("确定"));
         pBtnCancel->setText(trUtf8("取消"));
         pBtnConfirm->setEnabled(false);
+
+        QFont f;
+        f.setPointSize(15);
+        lPrompt = new QSplashScreen(this);
+        lPrompt->setGeometry(QRect(720, 400, 360, 240));
+        QLabel* tLb = new QLabel(lPrompt);
+        tLb->setGeometry(QRect(70, 90, 200, 60));
+        tLb->setObjectName(trUtf8("promptText"));
+        tLb->setAlignment(Qt::AlignCenter);
+        tLb->setWordWrap(true);
+        tLb->setFont(f);
     }
 };
 
