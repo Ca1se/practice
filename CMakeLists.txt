@@ -8,11 +8,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(GUI/headers)
 include_directories(MAIN/headers)
-if(CMAKE_BUILD_TYPE EQUAL Debug)
-    include_directories(cmake-build-qtdebug/CourseDesign_autogen/include)
-else()
-    include_directories(cmake-build-qtrelease/CourseDesign_autogen/include)
-endif()
 
 FILE(GLOB SOURCES
         "${PROJECT_SOURCE_DIR}/main.cpp"

@@ -6,6 +6,7 @@
 #include "explain.h"
 #include "dealmaintain.h"
 #include <cstring>
+#include <iostream>
 
 Widget::Widget(QWidget *parent, MaintainMachine* manager)
                 :QWidget(parent)
@@ -18,7 +19,9 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
     ui->initUI(this);
 
     //init Goods info
-    auto* ex = new explain("/home/ca1se/CLionProjects/CourseDesign/list/goods.json", "name", "cost");
+    QString t;
+    auto* ex = new explain(t.sprintf("%s/list/goods.json",\
+                            QApplication::applicationDirPath().toStdString().c_str()).toStdString().c_str(), "name", "cost");
     for(size_t i = 0; i < 9; i++){
         auto it = ex->ExplainInTurn_pair();
         _vGInfo.push_back(Goods(std::move(it.first), strtod(it.second.c_str(), nullptr)));
@@ -29,15 +32,15 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
 
     auto pBtnList = ui->layoutWidget->findChildren<QPushButton*>();
     for(auto pBtn : pBtnList){
-        connect(pBtn, SIGNAL(clicked(bool)), this, SLOT(ShowPurchaseUI()));
+        connect(pBtn, SIGNAL(clicked()), this, SLOT(ShowPurchaseUI()));
     }
 
     //sub_ui
     sub_ui->initSubUI();
-    connect(sub_ui->pBtnConfirm, SIGNAL(clicked(bool)), this, SLOT(Purchase()));
-    connect(sub_ui->pBtnCancel, SIGNAL(clicked(bool)), this, SLOT(ClosePurchaseUI()));
-    connect(sub_ui->pBtnMinus, SIGNAL(clicked(bool)), this, SLOT(PBtnMinusClicked()));
-    connect(sub_ui->pBtnPlus, SIGNAL(clicked(bool)), this, SLOT(PBtnPlusClicked()));
+    connect(sub_ui->pBtnConfirm, SIGNAL(clicked()), this, SLOT(Purchase()));
+    connect(sub_ui->pBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePurchaseUI()));
+    connect(sub_ui->pBtnMinus, SIGNAL(clicked()), this, SLOT(PBtnMinusClicked()));
+    connect(sub_ui->pBtnPlus, SIGNAL(clicked()), this, SLOT(PBtnPlusClicked()));
 }
 
 Widget::~Widget() {
@@ -82,14 +85,8 @@ void Widget::UpdateDisplay() {
 }
 
 void Widget::ShowPurchaseUI() {
-    auto pBtnList = ui->mainGridLyt->findChildren<QPushButton*>();
-    QPushButton* pBtnClicked;
-    for(auto* it: pBtnList){
-        if(it->isChecked()){
-            pBtnClicked = it;
-            break;
-        }
-    }
+    auto* pBtnClicked = qobject_cast<QPushButton*>(sender());
+
     _chooseGoods = pBtnClicked->objectName();
     QString t;
     sub_ui->lbPictureGoods->setPixmap(QPixmap(t.sprintf("image/%s.png",\
@@ -133,12 +130,12 @@ void Widget::ShowPayUI(const char* pixaddr) {
         auto *tPBtnConfirm = new QPushButton(temp_ui);
         tPBtnConfirm->setGeometry(QRect(105, 400, 100, 35));
         tPBtnConfirm->setText(trUtf8("支付"));
-        connect(tPBtnConfirm, SIGNAL(clicked(bool)), this, SLOT(PayOnline()));
+        connect(tPBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOnline()));
 
         auto *tPBtnCancel = new QPushButton(temp_ui);
         tPBtnCancel->setGeometry(QRect(275, 400, 100, 35));
         tPBtnCancel->setText(trUtf8("取消"));
-        connect(tPBtnCancel, SIGNAL(clicked(bool)), this, SLOT(ClosePayUI()));
+        connect(tPBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePayUI()));
     }else{
         auto *tLbNumber = new QLabel(temp_ui);
         tLbNumber->setGeometry(QRect(200, 200, 90, 30));
@@ -148,12 +145,12 @@ void Widget::ShowPayUI(const char* pixaddr) {
         auto *tPBtnConfirm = new QPushButton(temp_ui);
         tPBtnConfirm->setGeometry(QRect(105, 400, 100, 35));
         tPBtnConfirm->setText(trUtf8("支付"));
-        connect(tPBtnConfirm, SIGNAL(clicked(bool)), this, SLOT(PayOffline()));
+        connect(tPBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOffline()));
 
         auto *tPBtnCancel = new QPushButton(temp_ui);
         tPBtnCancel->setGeometry(QRect(275, 400, 100, 35));
         tPBtnCancel->setText(trUtf8("取消"));
-        connect(tPBtnCancel, SIGNAL(clicked(bool)), this, SLOT(ClosePayUI()));
+        connect(tPBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePayUI()));
     }
 }
 
