@@ -4,11 +4,13 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication app(argc, argv);
     MaintainMachine m(&Machine::Get());
-    m.InitMachine("/home/ca1se/CLionProjects/CourseDesign/list/goods.json");
+    QString t;
+    m.InitMachine(t.sprintf("%s/list/goods.json",\
+                            QApplication::applicationDirPath().toStdString().c_str()).toStdString().c_str());
 
-    QApplication a(argc, argv);
     Widget w(nullptr, &m);
     w.show();
-    return a.exec();
+    return app.exec();
 }
