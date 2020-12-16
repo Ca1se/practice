@@ -41,6 +41,7 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
     connect(sub_ui->pBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePurchaseUI()));
     connect(sub_ui->pBtnMinus, SIGNAL(clicked()), this, SLOT(PBtnMinusClicked()));
     connect(sub_ui->pBtnPlus, SIGNAL(clicked()), this, SLOT(PBtnPlusClicked()));
+
 }
 
 Widget::~Widget() {
@@ -101,6 +102,7 @@ void Widget::ClosePurchaseUI() {
     sub_ui->rBtnWechat->setChecked(true);
     sub_ui->pBtnMinus->setEnabled(false);
     sub_ui->pBtnPlus->setEnabled(true);
+    sub_ui->pBtnConfirm->setEnabled(false);
     _chooseGoods.clear();
     this->setEnabled(true);
     sub_ui->close();
@@ -122,36 +124,29 @@ void Widget::Purchase() {
 }
 
 void Widget::ShowPayUI(const char* pixaddr) {
+    auto *tPBtnConfirm = new QPushButton(temp_ui);
+    tPBtnConfirm->setGeometry(QRect(105, 400, 100, 35));
+    tPBtnConfirm->setText(trUtf8("支付"));
+
+    auto *tPBtnCancel = new QPushButton(temp_ui);
+    tPBtnCancel->setGeometry(QRect(275, 400, 100, 35));
+    tPBtnCancel->setText(trUtf8("取消"));
+
     if(sub_ui->rBtnWechat->isChecked() || sub_ui->rBtnAlipay->isChecked()) {
         auto *lb = new QLabel(temp_ui);
         lb->setGeometry(QRect(84, 50, 312, 312));
         lb->setPixmap(QPixmap(trUtf8(pixaddr)));
 
-        auto *tPBtnConfirm = new QPushButton(temp_ui);
-        tPBtnConfirm->setGeometry(QRect(105, 400, 100, 35));
-        tPBtnConfirm->setText(trUtf8("支付"));
         connect(tPBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOnline()));
-
-        auto *tPBtnCancel = new QPushButton(temp_ui);
-        tPBtnCancel->setGeometry(QRect(275, 400, 100, 35));
-        tPBtnCancel->setText(trUtf8("取消"));
-        connect(tPBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePayUI()));
     }else{
         auto *tLbNumber = new QLabel(temp_ui);
         tLbNumber->setGeometry(QRect(200, 200, 90, 30));
         tLbNumber->setFont(QFont(trUtf8("JetBrains Mono NL"), 20));
         tLbNumber->setText(trUtf8("请投币"));
 
-        auto *tPBtnConfirm = new QPushButton(temp_ui);
-        tPBtnConfirm->setGeometry(QRect(105, 400, 100, 35));
-        tPBtnConfirm->setText(trUtf8("支付"));
         connect(tPBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOffline()));
-
-        auto *tPBtnCancel = new QPushButton(temp_ui);
-        tPBtnCancel->setGeometry(QRect(275, 400, 100, 35));
-        tPBtnCancel->setText(trUtf8("取消"));
-        connect(tPBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePayUI()));
     }
+    connect(tPBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePayUI()));
 }
 
 void Widget::ClosePayUI() {
@@ -175,6 +170,8 @@ void Widget::PayOnline() {
     UpdateDisplay();
     ClosePayUI();
     ClosePurchaseUI();
+    sub_ui->lPrompt->findChildren<QLabel*>().front()->setText(trUtf8("支付成功!请及时取走您的货物"));
+    sub_ui->lPrompt->show();
 }
 
 void Widget::PayOffline() {
@@ -183,14 +180,15 @@ void Widget::PayOffline() {
     size_t pos = _mGtoPos[_chooseGoods];
     double cost = _vGInfo[pos].cost;
     std::list<std::pair<coin, size_t> > lCoins;
-    lCoins.emplace_back(std::make_pair(coin::yuan_one, int(cost * 10) / 10));
-    lCoins.emplace_back(std::make_pair(coin::dime_five, (int(cost * 10) % 10) /5));
+    lCoins.emplace_back(std::make_pair(coin::yuan_one, int(_chooseNumber * cost * 10) / 10));
+    lCoins.emplace_back(std::make_pair(coin::dime_five, (int(_chooseNumber * cost * 10) % 10) /5));
     Pay pay(&Machine::Get());
     pay.PaymentOffline(_chooseGoods.toStdString(), _chooseNumber, lCoins);
     UpdateDisplay();
     ClosePayUI();
     ClosePurchaseUI();
-
+    sub_ui->lPrompt->findChildren<QLabel*>().front()->setText(trUtf8("支付成功!请及时取走您的货物"));
+    sub_ui->lPrompt->show();
 }
 
 void Widget::PBtnMinusClicked() {
