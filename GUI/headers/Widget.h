@@ -15,19 +15,36 @@ namespace UI {
 }
 
 class Widget: public QWidget {
-public:
-    Widget(QWidget* parent, MaintainMachine* manager);
-    ~Widget();
+    Q_OBJECT
 
+private slots:
+    void ShowPurchaseUI();
+    void ClosePurchaseUI();
+    void Purchase();
+    void ClosePayUI();
+    void PayOnline();
+    void PayOffline();
+    void PBtnMinusClicked();
+    void PBtnPlusClicked();
 
 private:
     UI::MainWidget* ui;
+    UI::SubWidget* sub_ui;
+    QWidget* temp_ui;
     MaintainMachine* _pM;
     QVector<Goods> _vGInfo;
     QMap<QString, size_t> _mGtoPos;
+    QString _chooseGoods;
+    size_t _chooseNumber;
 
-    void UpdateDisplay(QPushButton* pBtn);
+    void UpdateDisplay();
     void setIconText();
+    void ShowPayUI(const char* pixaddr = nullptr);
+
+
+public:
+    Widget(QWidget* parent, MaintainMachine* manager);
+    ~Widget();
 };
 
 

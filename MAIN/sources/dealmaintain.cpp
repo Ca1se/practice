@@ -16,7 +16,7 @@ void Pay::PaymentOffline(Gname g, size_t n, const std::list<std::pair<coin, size
     }
     for(auto& it: l){
         size_t c = _pM->CoinRemain(it.first);
-        _pM->SetCoins(it.first, it.second);
+        _pM->SetCoins(it.first, it.second + c);
     }
     std::string timeNow = Time::GetTimeNow();       //=后面就是返回的buf这个值
     PLOG << "[" << timeNow << "]: " << "Deal finished: " << g  << " Number: " << n << " Pay way: Offline\n";   //日志，类似于cout输出但是不好直接  函数（参数） 的形式
@@ -30,7 +30,7 @@ void Pay::PaymentOnline(Gname g, size_t n, std::string payway) const {
         _pM->SetGoods(g, t - n);
     }
     std::string timeNow = Time::GetTimeNow();
-    PLOG << "[" << timeNow << "]: " << "Deal finished: " << g << " Number: " << n << "Pay way: " << payway << '\n';
+    PLOG << "[" << timeNow << "]: " << "Deal finished: " << g << " Number: " << n << " Pay way: " << payway << '\n';
 }
 
 
@@ -42,7 +42,7 @@ void ContainUpdate::ReplenishGoods(Gname g, size_t n) const {
     size_t t = _pM->GoodsRemain(g);
     _pM->SetGoods(g, n);
     std::string timeNow = Time::GetTimeNow();
-    MLOG << "[" << timeNow << "]" << "Replenish Goods: " << g << "Number: " << n << '\n';
+    MLOG << "[" << timeNow << "]: " << "Replenish Goods: " << g << " Number: " << n << '\n';
 }
 
 
@@ -50,7 +50,7 @@ void ContainUpdate::ReplenishCoin(coin g, size_t n)const {
     size_t t = _pM->CoinRemain(g);
     _pM->SetCoins(g, n);
     std::string timeNow = Time::GetTimeNow();
-    MLOG << timeNow << "Replenish coin: " << g << "Number: " << n << '\n';
+    MLOG << "[" << timeNow << "]: " << "Replenish coin: " << g << "Number: " << n << '\n';
 }
 
 

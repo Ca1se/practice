@@ -8,6 +8,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QSplashScreen>
+#include <QtWidgets/QRadioButton>
 #include <QApplication>
 
 //  Main Widget description class
@@ -25,7 +27,8 @@ public:
     QPushButton* pBtnSelect6;
     QPushButton* pBtnSelect7;
     QPushButton* pBtnSelect8;
-    QPushButton* pBtnAdmin;
+    QPushButton* pBtnAdminG;
+    QPushButton* pBtnAdminC;
     QLabel* lGoods0;
     QLabel* lGoods1;
     QLabel* lGoods2;
@@ -79,13 +82,13 @@ public:
         setUpLabel(lGoods8, "8");
         mainGridLyt->addWidget(lGoods8, 5, 2, 1, 1);
 
-        pBtnAdmin = new QPushButton(widget);
-        pBtnAdmin->setGeometry(QRect(30, 900, 85, 35));
-        pBtnAdmin->setText(QApplication::trUtf8("补货"));
+        pBtnAdminG = new QPushButton(widget);
+        pBtnAdminG->setGeometry(QRect(30, 900, 85, 35));
+        pBtnAdminG->setText(QApplication::trUtf8("补货"));
 
-        pBtnAdmin = new QPushButton(widget);
-        pBtnAdmin->setGeometry(QRect(30, 840, 85, 35));
-        pBtnAdmin->setText(QApplication::trUtf8("补硬币"));
+        pBtnAdminC = new QPushButton(widget);
+        pBtnAdminC->setGeometry(QRect(30, 840, 85, 35));
+        pBtnAdminC->setText(QApplication::trUtf8("补硬币"));
 
         pBtnSelect0 = new QPushButton(widget);
         setUpButton(pBtnSelect0, "background-color: rgba(40, 20, 10, 1)", "0");
@@ -134,10 +137,84 @@ private:
     }
 };
 // Sub Widget class description class
-// Realize the part of purchase goods and pay
-class sub_widget {
+// Realize the part of purchasing goods and paying
+class sub_widget: public QSplashScreen {
 public:
+    QWidget* layout;
+    QHBoxLayout* hBoxLyt;
+    QLabel* lbPictureGoods;
+    QLabel* lbNumber;
+    QLabel* lbPictureWechat;
+    QLabel* lbPictureAlipay;
+    QLabel* lbTextCoin;
+    QPushButton* pBtnPlus;
+    QPushButton* pBtnMinus;
+    QPushButton* pBtnConfirm;
+    QPushButton* pBtnCancel;
+    QRadioButton* rBtnWechat;
+    QRadioButton* rBtnAlipay;
+    QRadioButton* rBtnCoin;
 
+    void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
+
+    void initSubUI() {
+        this->setGeometry(QRect(720, 400, 480, 540));
+        this->setStyleSheet("background-color: rgba(255, 227, 132, 1)");
+        lbPictureGoods = new QLabel(this);
+        lbPictureWechat = new QLabel(this);
+        lbPictureAlipay = new QLabel(this);
+        lbTextCoin = new QLabel(this);
+        lbNumber = new QLabel(this);
+        pBtnMinus = new QPushButton(this);
+        pBtnPlus = new QPushButton(this);
+        pBtnConfirm = new QPushButton(this);
+        pBtnCancel = new QPushButton(this);
+        rBtnAlipay = new QRadioButton(this);
+        rBtnWechat = new QRadioButton(this);
+        rBtnCoin = new QRadioButton(this);
+        layout = new QWidget(this);
+        hBoxLyt = new QHBoxLayout(layout);
+
+        lbNumber->setGeometry(QRect(205, 250, 70, 50));
+        lbPictureGoods->setGeometry(QRect(170, 50, 140, 140));
+        pBtnPlus->setGeometry(QRect(275, 250, 70, 50));
+        pBtnMinus->setGeometry(QRect(135, 250, 70, 50));
+        pBtnConfirm->setGeometry(QRect(105, 450, 100, 35));
+        pBtnCancel->setGeometry(QRect(275, 450, 100, 35));
+        layout->setGeometry((QRect(130, 350, 280, 35)));
+
+        lbPictureAlipay->setPixmap(QPixmap("image/alipay.png"));
+        lbPictureWechat->setPixmap(QPixmap("image/wechat.png"));
+        lbTextCoin->setText(trUtf8("硬币支付"));
+        rBtnAlipay->setMaximumSize(20, 20);
+        rBtnWechat->setMaximumSize(20, 20);
+        rBtnCoin->setMaximumSize(20, 20);
+        lbPictureAlipay->setMaximumSize(40, 40);
+        lbPictureWechat->setMaximumSize(40, 40);
+        lbPictureAlipay->setMinimumSize(40, 40);
+        lbPictureWechat->setMinimumSize(40, 40);
+
+        rBtnWechat->setChecked(true);
+        hBoxLyt->setContentsMargins(QMargins(0, 0, 0, 0));
+        hBoxLyt->addWidget(rBtnWechat, 0);
+        hBoxLyt->addWidget(lbPictureWechat, 1);
+        hBoxLyt->addWidget(rBtnAlipay, 2);
+        hBoxLyt->addWidget(lbPictureAlipay, 3);
+        hBoxLyt->addWidget(rBtnCoin, 4);
+        hBoxLyt->addWidget(lbTextCoin, 5);
+
+        QFont tFont(trUtf8("JetBrains Mono NL"), 30);
+        pBtnPlus->setFont(tFont);
+        pBtnPlus->setText(trUtf8("+"));
+        pBtnMinus->setFont(tFont);
+        pBtnMinus->setText(trUtf8("-"));
+        pBtnMinus->setEnabled(false);
+        lbNumber->setText(trUtf8("0"));
+        lbNumber->setAlignment(Qt::AlignCenter);
+        pBtnConfirm->setText(trUtf8("确定"));
+        pBtnCancel->setText(trUtf8("取消"));
+        pBtnConfirm->setEnabled(false);
+    }
 };
 
 namespace UI {
