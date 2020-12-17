@@ -10,6 +10,8 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QSplashScreen>
 #include <QtWidgets/QRadioButton>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QComboBox>
 #include <QApplication>
 
 //  Main Widget description class
@@ -138,9 +140,13 @@ private:
     }
 };
 
+class CustomSplash: public QSplashScreen {
+    void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
+};
+
 // Purchase Widget class description class
 // Realize the part of purchasing goods
-class purchase_widget: public QSplashScreen {
+class purchase_widget: public CustomSplash {
 public:
     QWidget* layout;
     QHBoxLayout* hBoxLyt;
@@ -156,8 +162,6 @@ public:
     QRadioButton* rBtnWechat;
     QRadioButton* rBtnAlipay;
     QRadioButton* rBtnCoin;
-
-    void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
 
     void initPurchaseUI() {
         this->setGeometry(QRect(720, 400, 480, 540));
@@ -205,7 +209,8 @@ public:
         hBoxLyt->addWidget(rBtnCoin, 4);
         hBoxLyt->addWidget(lbTextCoin, 5);
 
-        QFont tFont(trUtf8("JetBrains Mono NL"), 30);
+        QFont tFont;
+        tFont.setPointSize(30);
         pBtnPlus->setFont(tFont);
         pBtnPlus->setText(trUtf8("+"));
         pBtnMinus->setFont(tFont);
@@ -220,13 +225,13 @@ public:
     }
 };
 
-class pay_widget: public QSplashScreen {
-    void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
+//pay UI
+class pay_widget: public CustomSplash {
 public:
     QPushButton* pBtnConfirm;
     QPushButton* pBtnCancel;
-    QLabel* lbDisplay;
     QSplashScreen* lsPayPrompt;
+    QLabel* lbDisplay;
     QLabel* lsSubText;
 
     void InitPayUI() {
@@ -254,10 +259,73 @@ public:
     }
 };
 
+//Maintain UI
+class maintain_widget {
+public:
+    CustomSplash* addGoods_widget;
+    QLabel* lbTextGoods;
+    QLabel* lbTextGoodsNumber;
+    QComboBox* cbBoxGoods;
+    QSpinBox* spBoxNumberGoods;
+    QPushButton* pBtnConfirmGoods;
+    QPushButton* pBtnCancelGoods;
+
+    CustomSplash* addCoins_widget;
+    QLabel* lbTextCoins;
+    QLabel* lbTextCoinsNumber;
+    QComboBox* cbBoxCoins;
+    QSpinBox* spBoxNumberCoins;
+    QPushButton* pBtnConfirmCoins;
+    QPushButton* pBtnCancelCoins;
+
+    void InitMaintainUI() {
+        //Add Goods
+        addGoods_widget = new CustomSplash();
+        addGoods_widget->setGeometry(QRect(720, 400, 300, 150));
+        lbTextGoods = new QLabel(addGoods_widget);
+        lbTextGoods->setGeometry(QRect(50, 20, 60, 20));
+        lbTextGoods->setText(QApplication::trUtf8("选择货物:"));
+        cbBoxGoods = new QComboBox(addGoods_widget);
+        cbBoxGoods->setGeometry(QRect(140, 20, 110, 20));
+        lbTextGoodsNumber = new QLabel(addGoods_widget);
+        lbTextGoodsNumber->setGeometry(QRect(50, 60, 60, 20));
+        lbTextGoodsNumber->setText(QApplication::trUtf8("补货个数"));
+        spBoxNumberGoods = new QSpinBox(addGoods_widget);
+        spBoxNumberGoods->setGeometry(QRect(140, 60, 110, 20));
+        pBtnConfirmGoods = new QPushButton(addGoods_widget);
+        pBtnConfirmGoods->setGeometry(QRect(60, 100, 70, 25));
+        pBtnConfirmGoods->setText(QApplication::trUtf8("确定"));
+        pBtnCancelGoods = new QPushButton(addGoods_widget);
+        pBtnCancelGoods->setGeometry(QRect(170, 100, 70, 25));
+        pBtnCancelGoods->setText(QApplication::trUtf8("取消"));
+
+        //Add Coins
+        addCoins_widget = new CustomSplash();
+        addCoins_widget->setGeometry(QRect(720, 400, 300, 150));
+        lbTextCoins = new QLabel(addCoins_widget);
+        lbTextCoins->setGeometry(QRect(50, 20, 60, 20));
+        lbTextCoins->setText(QApplication::trUtf8("选择硬币:"));
+        cbBoxCoins = new QComboBox(addCoins_widget);
+        cbBoxCoins->setGeometry(QRect(140, 20, 110, 20));
+        lbTextCoinsNumber = new QLabel(addCoins_widget);
+        lbTextCoinsNumber->setGeometry(QRect(50, 60, 60, 20));
+        lbTextCoinsNumber->setText(QApplication::trUtf8("补充个数:"));
+        spBoxNumberCoins = new QSpinBox(addCoins_widget);
+        spBoxNumberCoins->setGeometry(QRect(140, 60, 110, 20));
+        pBtnConfirmCoins = new QPushButton(addCoins_widget);
+        pBtnConfirmCoins->setGeometry(QRect(60, 100, 70, 25));
+        pBtnConfirmCoins->setText(QApplication::trUtf8("确定"));
+        pBtnCancelCoins = new QPushButton(addCoins_widget);
+        pBtnCancelCoins->setGeometry(QRect(170, 100, 70, 25));
+        pBtnCancelCoins->setText(QApplication::trUtf8("取消"));
+    }
+};
+
 namespace UI {
     class MainWidget: public surf_widget {};
     class PurchaseWidget: public purchase_widget {};
     class PayWidget: public pay_widget {};
+    class MaintainWidget: public maintain_widget {};
 }
 
 

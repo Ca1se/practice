@@ -13,23 +13,23 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
         ,ui(new UI::MainWidget)
         ,buy_ui(new UI::PurchaseWidget)
         ,pay_ui(new UI::PayWidget)
+        ,mt_ui(new UI::MaintainWidget)
         ,_pM(manager)
         ,_chooseNumber(0)
 {
-    ui->initUI(this);
-
     //init Goods info
     QString t;
     auto* ex = new explain(t.sprintf("%s/list/goods.json",\
-                            QApplication::applicationDirPath().toStdString().c_str()).toStdString().c_str(), "name", "cost");
+                            QApplication::applicationDirPath().toStdString().c_str()).toStdString(), "name", "cost");
     for(size_t i = 0; i < 9; i++){
         auto it = ex->ExplainInTurn_pair();
         _vGInfo.push_back(Goods(std::move(it.first), strtod(it.second.c_str(), nullptr)));
     }
     delete ex;
 
+    //ui
+    ui->initUI(this);
     setIconText();
-
     auto pBtnList = ui->layoutWidget->findChildren<QPushButton*>();
     for(auto pBtn : pBtnList){
         connect(pBtn, SIGNAL(clicked()), this, SLOT(ShowPurchaseUI()));
@@ -45,6 +45,22 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
     //pay_ui
     pay_ui->InitPayUI();
     connect(pay_ui->pBtnCancel, SIGNAL(clicked()), pay_ui, SLOT(close()));
+
+    //maintain
+    mt_ui->InitMaintainUI();
+
+    QStringList goodsNameList;
+    for(auto* itBtn: pBtnList){
+        goodsNameList << itBtn->objectName();
+    }
+    mt_ui->cbBoxGoods->addItems(goodsNameList);
+
+    QStringList coinsNameList;
+    coinsNameList << trUtf8("1元") << trUtf8("5角");
+    mt_ui->cbBoxCoins->addItems(coinsNameList);
+    connect(ui->pBtnAdminC, SIGNAL(clicked()), this, SLOT(ShowAddCoinUI()));
+    connect(ui->pBtnAdminG, SIGNAL(clicked()), this, SLOT(ShowAddGoodsUI()));
+
 }
 
 Widget::~Widget() {
@@ -155,7 +171,6 @@ void Widget::PayOnline() {
 }
 
 void Widget::PayOffline() {
-
     //这里无法做出真正的投币效果, 默认按整数成一元, 0.5成五角投币
     size_t pos = _mGtoPos[_chooseGoods];
     double cost = _vGInfo[pos].cost;
@@ -188,4 +203,12 @@ void Widget::PBtnPlusClicked() {
     buy_ui->pBtnMinus->setEnabled(true);
     buy_ui->pBtnConfirm->setEnabled(_chooseNumber);
     buy_ui->lbNumber->setText(QString::number(_chooseNumber));
+}
+
+void Widget::ShowAddGoodsUI() {
+
+}
+
+void Widget::ShowAddCoinUI() {
+
 }
