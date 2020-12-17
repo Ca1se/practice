@@ -137,9 +137,10 @@ private:
         lb->setWordWrap(true);
     }
 };
-// Sub Widget class description class
-// Realize the part of purchasing goods and paying
-class sub_widget: public QSplashScreen {
+
+// Purchase Widget class description class
+// Realize the part of purchasing goods
+class purchase_widget: public QSplashScreen {
 public:
     QWidget* layout;
     QHBoxLayout* hBoxLyt;
@@ -155,11 +156,10 @@ public:
     QRadioButton* rBtnWechat;
     QRadioButton* rBtnAlipay;
     QRadioButton* rBtnCoin;
-    QSplashScreen* lPrompt;
 
     void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
 
-    void initSubUI() {
+    void initPurchaseUI() {
         this->setGeometry(QRect(720, 400, 480, 540));
         this->setStyleSheet("background-color: rgba(255, 227, 132, 1)");
         lbPictureGoods = new QLabel(this);
@@ -217,22 +217,47 @@ public:
         pBtnCancel->setText(trUtf8("取消"));
         pBtnConfirm->setEnabled(false);
 
+    }
+};
+
+class pay_widget: public QSplashScreen {
+    void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
+public:
+    QPushButton* pBtnConfirm;
+    QPushButton* pBtnCancel;
+    QLabel* lbDisplay;
+    QSplashScreen* lsPayPrompt;
+    QLabel* lsSubText;
+
+    void InitPayUI() {
+        this->setGeometry(QRect(720, 400, 480, 480));
+        pBtnConfirm = new QPushButton(this);
+        pBtnConfirm->setGeometry(QRect(105, 400, 100, 35));
+        pBtnConfirm->setText(trUtf8("支付"));
+
+        pBtnCancel = new QPushButton(this);
+        pBtnCancel->setGeometry(QRect(275, 400, 100, 35));
+        pBtnCancel->setText(trUtf8("取消"));
+
+        lbDisplay = new QLabel(this);
+
         QFont f;
         f.setPointSize(15);
-        lPrompt = new QSplashScreen(this);
-        lPrompt->setGeometry(QRect(720, 400, 360, 240));
-        QLabel* tLb = new QLabel(lPrompt);
-        tLb->setGeometry(QRect(70, 90, 200, 60));
-        tLb->setObjectName(trUtf8("promptText"));
-        tLb->setAlignment(Qt::AlignCenter);
-        tLb->setWordWrap(true);
-        tLb->setFont(f);
+        lsPayPrompt = new QSplashScreen();
+        lsPayPrompt->setGeometry(QRect(720, 400, 360, 240));
+        lsSubText = new QLabel(lsPayPrompt);
+        lsSubText->setGeometry(QRect(70, 90, 200, 60));
+        lsSubText->setObjectName(trUtf8("promptText"));
+        lsSubText->setAlignment(Qt::AlignCenter);
+        lsSubText->setWordWrap(true);
+        lsSubText->setFont(f);
     }
 };
 
 namespace UI {
     class MainWidget: public surf_widget {};
-    class SubWidget: public sub_widget {};
+    class PurchaseWidget: public purchase_widget {};
+    class PayWidget: public pay_widget {};
 }
 
 

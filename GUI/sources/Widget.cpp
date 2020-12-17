@@ -9,12 +9,12 @@
 #include <iostream>
 
 Widget::Widget(QWidget *parent, MaintainMachine* manager)
-                :QWidget(parent)
-                ,ui(new UI::MainWidget)
-                ,sub_ui(new UI::SubWidget)
-                ,_pM(manager)
-                ,temp_ui(nullptr)
-                ,_chooseNumber(0)
+        :QWidget(parent)
+        ,ui(new UI::MainWidget)
+        ,buy_ui(new UI::PurchaseWidget)
+        ,pay_ui(new UI::PayWidget)
+        ,_pM(manager)
+        ,_chooseNumber(0)
 {
     ui->initUI(this);
 
@@ -35,13 +35,16 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
         connect(pBtn, SIGNAL(clicked()), this, SLOT(ShowPurchaseUI()));
     }
 
-    //sub_ui
-    sub_ui->initSubUI();
-    connect(sub_ui->pBtnConfirm, SIGNAL(clicked()), this, SLOT(Purchase()));
-    connect(sub_ui->pBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePurchaseUI()));
-    connect(sub_ui->pBtnMinus, SIGNAL(clicked()), this, SLOT(PBtnMinusClicked()));
-    connect(sub_ui->pBtnPlus, SIGNAL(clicked()), this, SLOT(PBtnPlusClicked()));
+    //buy_ui
+    buy_ui->initPurchaseUI();
+    connect(buy_ui->pBtnConfirm, SIGNAL(clicked()), this, SLOT(ShowPayUI()));
+    connect(buy_ui->pBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePurchaseUI()));
+    connect(buy_ui->pBtnMinus, SIGNAL(clicked()), this, SLOT(PBtnMinusClicked()));
+    connect(buy_ui->pBtnPlus, SIGNAL(clicked()), this, SLOT(PBtnPlusClicked()));
 
+    //pay_ui
+    pay_ui->InitPayUI();
+    connect(pay_ui->pBtnCancel, SIGNAL(clicked()), pay_ui, SLOT(close()));
 }
 
 Widget::~Widget() {
@@ -90,77 +93,54 @@ void Widget::ShowPurchaseUI() {
 
     _chooseGoods = pBtnClicked->objectName();
     QString t;
-    sub_ui->lbPictureGoods->setPixmap(QPixmap(t.sprintf("image/%s.png",\
+    buy_ui->lbPictureGoods->setPixmap(QPixmap(t.sprintf("image/%s.png",\
                                                         pBtnClicked->objectName().toStdString().c_str())));
     this->setEnabled(false);
-    sub_ui->show();
+    buy_ui->show();
 }
 
 void Widget::ClosePurchaseUI() {
     _chooseNumber = 0;
-    sub_ui->lbNumber->setText(trUtf8("0"));
-    sub_ui->rBtnWechat->setChecked(true);
-    sub_ui->pBtnMinus->setEnabled(false);
-    sub_ui->pBtnPlus->setEnabled(true);
-    sub_ui->pBtnConfirm->setEnabled(false);
+    buy_ui->lbNumber->setText(trUtf8("0"));
+    buy_ui->rBtnWechat->setChecked(true);
+    buy_ui->pBtnMinus->setEnabled(false);
+    buy_ui->pBtnPlus->setEnabled(true);
+    buy_ui->pBtnConfirm->setEnabled(false);
     _chooseGoods.clear();
     this->setEnabled(true);
-    sub_ui->close();
+    buy_ui->close();
 }
 
-void Widget::Purchase() {
-    sub_ui->setEnabled(false);
-    temp_ui = new QWidget();
-    temp_ui->setGeometry(QRect(720, 400, 480, 480));
-    temp_ui->setWindowFlag(Qt::FramelessWindowHint);
-    if(sub_ui->rBtnAlipay->isChecked()){
-        ShowPayUI("image/QRalipay.png");
-    }else if(sub_ui->rBtnWechat->isChecked()){
-        ShowPayUI("image/QRwechat.png");
+void Widget::ShowPayUI() {
+    if(buy_ui->rBtnWechat->isChecked() || buy_ui->rBtnAlipay->isChecked()) {
+        pay_ui->lbDisplay->setGeometry(QRect(84, 50, 312, 312));
+        if(buy_ui->rBtnWechat->isChecked()) {
+            pay_ui->lbDisplay->setPixmap(QPixmap(trUtf8("image/QRwechat.png")));
+        }else{
+            pay_ui->lbDisplay->setPixmap(QPixmap(trUtf8("image/QRalipay.png")));
+        }
+        connect(pay_ui->pBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOnline()));
     }else{
-        ShowPayUI();
+        QFont f;
+        f.setPointSize(20);
+        pay_ui->lbDisplay->setGeometry(QRect(200, 200, 90, 30));
+        pay_ui->lbDisplay->setFont(f);
+        pay_ui->lbDisplay->setText(trUtf8("请投币"));
+
+        connect(pay_ui->pBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOffline()));
     }
-    temp_ui->show();
-}
-
-void Widget::ShowPayUI(const char* pixaddr) {
-    auto *tPBtnConfirm = new QPushButton(temp_ui);
-    tPBtnConfirm->setGeometry(QRect(105, 400, 100, 35));
-    tPBtnConfirm->setText(trUtf8("支付"));
-
-    auto *tPBtnCancel = new QPushButton(temp_ui);
-    tPBtnCancel->setGeometry(QRect(275, 400, 100, 35));
-    tPBtnCancel->setText(trUtf8("取消"));
-
-    if(sub_ui->rBtnWechat->isChecked() || sub_ui->rBtnAlipay->isChecked()) {
-        auto *lb = new QLabel(temp_ui);
-        lb->setGeometry(QRect(84, 50, 312, 312));
-        lb->setPixmap(QPixmap(trUtf8(pixaddr)));
-
-        connect(tPBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOnline()));
-    }else{
-        auto *tLbNumber = new QLabel(temp_ui);
-        tLbNumber->setGeometry(QRect(200, 200, 90, 30));
-        tLbNumber->setFont(QFont(trUtf8("JetBrains Mono NL"), 20));
-        tLbNumber->setText(trUtf8("请投币"));
-
-        connect(tPBtnConfirm, SIGNAL(clicked()), this, SLOT(PayOffline()));
-    }
-    connect(tPBtnCancel, SIGNAL(clicked()), this, SLOT(ClosePayUI()));
+    pay_ui->show();
 }
 
 void Widget::ClosePayUI() {
-    sub_ui->setEnabled(true);
-    temp_ui->close();
-    if(temp_ui){
-        delete temp_ui;
-        temp_ui = nullptr;
-    }
+    buy_ui->setEnabled(true);
+    pay_ui->close();
+    pay_ui->pBtnConfirm->disconnect();
 }
 
 void Widget::PayOnline() {
     std::string payway;
-    if(sub_ui->rBtnWechat->isChecked()){
+    if(buy_ui->rBtnWechat->isChecked()){
         payway = "Wechat-Pay";
     }else{
         payway = "Alipay";
@@ -170,8 +150,8 @@ void Widget::PayOnline() {
     UpdateDisplay();
     ClosePayUI();
     ClosePurchaseUI();
-    sub_ui->lPrompt->findChildren<QLabel*>().front()->setText(trUtf8("支付成功!请及时取走您的货物"));
-    sub_ui->lPrompt->show();
+    pay_ui->lsSubText->setText(trUtf8("支付成功!请及时取走您的货物"));
+    pay_ui->lsPayPrompt->show();
 }
 
 void Widget::PayOffline() {
@@ -187,25 +167,25 @@ void Widget::PayOffline() {
     UpdateDisplay();
     ClosePayUI();
     ClosePurchaseUI();
-    sub_ui->lPrompt->findChildren<QLabel*>().front()->setText(trUtf8("支付成功!请及时取走您的货物"));
-    sub_ui->lPrompt->show();
+    pay_ui->lsSubText->setText(trUtf8("支付成功!请及时取走您的货物"));
+    pay_ui->lsPayPrompt->show();
 }
 
 void Widget::PBtnMinusClicked() {
     _chooseNumber--;
-    sub_ui->pBtnMinus->setEnabled(_chooseNumber);
-    sub_ui->pBtnPlus->setEnabled(true);
-    sub_ui->pBtnConfirm->setEnabled(_chooseNumber);
-    sub_ui->lbNumber->setText(QString::number(_chooseNumber));
+    buy_ui->pBtnMinus->setEnabled(_chooseNumber);
+    buy_ui->pBtnPlus->setEnabled(true);
+    buy_ui->pBtnConfirm->setEnabled(_chooseNumber);
+    buy_ui->lbNumber->setText(QString::number(_chooseNumber));
 }
 
 void Widget::PBtnPlusClicked() {
     size_t remain = _pM->GetGoodsRemain(_chooseGoods.toStdString());
     _chooseNumber++;
     if(remain == _chooseNumber){
-        sub_ui->pBtnPlus->setEnabled(false);
+        buy_ui->pBtnPlus->setEnabled(false);
     }
-    sub_ui->pBtnMinus->setEnabled(true);
-    sub_ui->pBtnConfirm->setEnabled(_chooseNumber);
-    sub_ui->lbNumber->setText(QString::number(_chooseNumber));
+    buy_ui->pBtnMinus->setEnabled(true);
+    buy_ui->pBtnConfirm->setEnabled(_chooseNumber);
+    buy_ui->lbNumber->setText(QString::number(_chooseNumber));
 }
