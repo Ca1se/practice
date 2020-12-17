@@ -278,6 +278,9 @@ public:
     QPushButton* pBtnConfirmCoins;
     QPushButton* pBtnCancelCoins;
 
+    QSplashScreen* lsMTPrompt;
+    QLabel* lsSubText;
+
     void InitMaintainUI() {
         //Add Goods
         addGoods_widget = new CustomSplash();
@@ -295,6 +298,7 @@ public:
         pBtnConfirmGoods = new QPushButton(addGoods_widget);
         pBtnConfirmGoods->setGeometry(QRect(60, 100, 70, 25));
         pBtnConfirmGoods->setText(QApplication::trUtf8("确定"));
+        pBtnConfirmGoods->setEnabled(false);
         pBtnCancelGoods = new QPushButton(addGoods_widget);
         pBtnCancelGoods->setGeometry(QRect(170, 100, 70, 25));
         pBtnCancelGoods->setText(QApplication::trUtf8("取消"));
@@ -307,6 +311,9 @@ public:
         lbTextCoins->setText(QApplication::trUtf8("选择硬币:"));
         cbBoxCoins = new QComboBox(addCoins_widget);
         cbBoxCoins->setGeometry(QRect(140, 20, 110, 20));
+        QStringList coinsNameList;
+        coinsNameList << QApplication::trUtf8("选择硬币") << QApplication::trUtf8("1元") << QApplication::trUtf8("5角");
+        cbBoxCoins->addItems(coinsNameList);
         lbTextCoinsNumber = new QLabel(addCoins_widget);
         lbTextCoinsNumber->setGeometry(QRect(50, 60, 60, 20));
         lbTextCoinsNumber->setText(QApplication::trUtf8("补充个数:"));
@@ -315,9 +322,21 @@ public:
         pBtnConfirmCoins = new QPushButton(addCoins_widget);
         pBtnConfirmCoins->setGeometry(QRect(60, 100, 70, 25));
         pBtnConfirmCoins->setText(QApplication::trUtf8("确定"));
+        pBtnConfirmCoins->setEnabled(false);
         pBtnCancelCoins = new QPushButton(addCoins_widget);
         pBtnCancelCoins->setGeometry(QRect(170, 100, 70, 25));
         pBtnCancelCoins->setText(QApplication::trUtf8("取消"));
+
+        QFont f;
+        f.setPointSize(15);
+        lsMTPrompt = new QSplashScreen();
+        lsMTPrompt->setGeometry(QRect(720, 400, 360, 240));
+        lsSubText = new QLabel(lsMTPrompt);
+        lsSubText->setGeometry(QRect(70, 90, 200, 60));
+        lsSubText->setObjectName(QApplication::trUtf8("promptText"));
+        lsSubText->setAlignment(Qt::AlignCenter);
+        lsSubText->setWordWrap(true);
+        lsSubText->setFont(f);
     }
 };
 

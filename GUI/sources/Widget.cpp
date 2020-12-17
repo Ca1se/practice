@@ -50,17 +50,24 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
     mt_ui->InitMaintainUI();
 
     QStringList goodsNameList;
+    goodsNameList << trUtf8("选择货物");
     for(auto* itBtn: pBtnList){
         goodsNameList << itBtn->objectName();
     }
     mt_ui->cbBoxGoods->addItems(goodsNameList);
 
-    QStringList coinsNameList;
-    coinsNameList << trUtf8("1元") << trUtf8("5角");
-    mt_ui->cbBoxCoins->addItems(coinsNameList);
-    connect(ui->pBtnAdminC, SIGNAL(clicked()), this, SLOT(ShowAddCoinUI()));
-    connect(ui->pBtnAdminG, SIGNAL(clicked()), this, SLOT(ShowAddGoodsUI()));
-
+    connect(ui->pBtnAdminC, SIGNAL(clicked()), mt_ui->addCoins_widget, SLOT(show()));
+    connect(ui->pBtnAdminG, SIGNAL(clicked()), mt_ui->addGoods_widget, SLOT(show()));
+    connect(ui->pBtnAdminC, SIGNAL(clicked(bool)), this, SLOT(setEnabled(bool)));
+    connect(ui->pBtnAdminG, SIGNAL(clicked(bool)), this, SLOT(setEnabled(bool)));
+    connect(mt_ui->cbBoxGoods, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(UpdateSpainBoxGoods(const QString &)));
+    connect(mt_ui->cbBoxCoins, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateSpainBoxCoins(int)));
+    connect(mt_ui->spBoxNumberGoods, SIGNAL(valueChanged(int)), this, SLOT(SpainBoxGoodsChanged(int)));
+    connect(mt_ui->spBoxNumberCoins, SIGNAL(valueChanged(int)), this, SLOT(SpainBoxCoinsChanged(int)));
+    connect(mt_ui->pBtnCancelGoods, SIGNAL(clicked()), this, SLOT(CloseAddGoodsUI()));
+    connect(mt_ui->pBtnCancelCoins, SIGNAL(clicked()), this, SLOT(CloseAddCoinsUI()));
+    connect(mt_ui->pBtnConfirmGoods, SIGNAL(clicked()), this, SLOT(AddGoods()));
+    connect(mt_ui->pBtnConfirmCoins, SIGNAL(clicked()), this, SLOT(AddCoins()));
 }
 
 Widget::~Widget() {
@@ -205,10 +212,68 @@ void Widget::PBtnPlusClicked() {
     buy_ui->lbNumber->setText(QString::number(_chooseNumber));
 }
 
-void Widget::ShowAddGoodsUI() {
-
+void Widget::UpdateSpainBoxGoods(const QString &objectName) {
+    size_t index = mt_ui->cbBoxGoods->currentIndex();
+    if(index) {
+        size_t n = _pM->GetGoodsRemain(objectName.toStdString());
+        mt_ui->spBoxNumberGoods->setMaximum(20 - n);
+    }
+    mt_ui->spBoxNumberGoods->setValue(0);
+    mt_ui->pBtnConfirmGoods->setEnabled(false);
 }
 
-void Widget::ShowAddCoinUI() {
+void Widget::UpdateSpainBoxCoins(int index) {
+    mt_ui->spBoxNumberCoins->setValue(0);
+    mt_ui->pBtnConfirmCoins->setEnabled(false);
+}
 
+void Widget::SpainBoxGoodsChanged(int value) {
+    mt_ui->pBtnConfirmGoods->setEnabled(value && mt_ui->cbBoxGoods->currentIndex());
+}
+
+void Widget::SpainBoxCoinsChanged(int value) {
+    mt_ui->pBtnConfirmCoins->setEnabled(value && mt_ui->cbBoxCoins->currentIndex());
+}
+
+void Widget::CloseAddGoodsUI() {
+    _chooseGoods.clear();
+    mt_ui->spBoxNumberGoods->setValue(0);
+    mt_ui->pBtnConfirmGoods->setEnabled(false);
+    mt_ui->cbBoxGoods->setCurrentIndex(0);
+    mt_ui->addGoods_widget->close();
+    this->setEnabled(true);
+}
+
+void Widget::CloseAddCoinsUI() {
+    mt_ui->spBoxNumberCoins->setValue(0);
+    mt_ui->pBtnConfirmCoins->setEnabled(false);
+    mt_ui->cbBoxCoins->setCurrentIndex(0);
+    mt_ui->addCoins_widget->close();
+    this->setEnabled(true);
+}
+
+void Widget::AddGoods() {
+    QString goodsName = mt_ui->cbBoxGoods->currentText();
+    size_t n = mt_ui->spBoxNumberGoods->value();
+    ContainUpdate c(&Machine::Get());
+    c.ReplenishGoods(goodsName.toStdString(), n);
+    _chooseGoods = goodsName;
+    UpdateDisplay();
+    CloseAddGoodsUI();
+    mt_ui->lsSubText->setText(trUtf8("补货成功!"));
+    mt_ui->lsMTPrompt->show();
+}
+
+void Widget::AddCoins() {
+    QString coinName = mt_ui->cbBoxCoins->currentText();
+    size_t n = mt_ui->spBoxNumberCoins->value();
+    ContainUpdate c(&Machine::Get());
+    if(coinName == trUtf8("1元")){
+        c.ReplenishCoin(coin::yuan_one, n);
+    }else{
+        c.ReplenishCoin(coin::dime_five, n);
+    }
+    CloseAddCoinsUI();
+    mt_ui->lsSubText->setText(trUtf8("补硬币成功!"));
+    mt_ui->lsMTPrompt->show();
 }
