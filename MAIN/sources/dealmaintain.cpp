@@ -19,7 +19,7 @@ void Pay::PaymentOffline(Gname g, size_t n, const std::list<std::pair<coin, size
         _pM->SetCoins(it.first, it.second + c);
     }
     std::string timeNow = Time::GetTimeNow();       //=后面就是返回的buf这个值
-    PLOG << "[" << timeNow << "]: " << "Deal finished: " << g  << " Number: " << n << " Pay way: Offline\n";   //日志，类似于cout输出但是不好直接  函数（参数） 的形式
+    PLOG << "[" << timeNow << "]: " << "Deal finished: " << g  << " Number: " << n << " Payway: Offline\n";   //日志，类似于cout输出但是不好直接  函数（参数） 的形式
 }
 
 
@@ -30,7 +30,7 @@ void Pay::PaymentOnline(Gname g, size_t n, std::string payway) const {
         _pM->SetGoods(g, t - n);
     }
     std::string timeNow = Time::GetTimeNow();
-    PLOG << "[" << timeNow << "]: " << "Deal finished: " << g << " Number: " << n << " Pay way: " << payway << '\n';
+    PLOG << "[" << timeNow << "]: " << "Deal finished: " << g << " Number: " << n << " Payway: " << payway << '\n';
 }
 
 
