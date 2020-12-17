@@ -27,11 +27,14 @@ private slots:
     void PayOffline();
     void PBtnMinusClicked();
     void PBtnPlusClicked();
+    void ShowAddGoodsUI();
+    void ShowAddCoinUI();
 
 private:
     UI::MainWidget* ui;
     UI::PurchaseWidget* buy_ui;
     UI::PayWidget* pay_ui;
+    UI::MaintainWidget* mt_ui;
     MaintainMachine* _pM;
     QVector<Goods> _vGInfo;
     QMap<QString, size_t> _mGtoPos;
