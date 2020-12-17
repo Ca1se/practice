@@ -40,7 +40,7 @@ ContainUpdate::ContainUpdate(Machine *pM): _pM(pM) {}
 
 void ContainUpdate::ReplenishGoods(Gname g, size_t n) const {
     size_t t = _pM->GoodsRemain(g);
-    _pM->SetGoods(g, n);
+    _pM->SetGoods(g, n + t);
     std::string timeNow = Time::GetTimeNow();
     MLOG << "[" << timeNow << "]: " << "Replenish Goods: " << g << " Number: " << n << '\n';
 }
@@ -48,9 +48,9 @@ void ContainUpdate::ReplenishGoods(Gname g, size_t n) const {
 
 void ContainUpdate::ReplenishCoin(coin g, size_t n)const {
     size_t t = _pM->CoinRemain(g);
-    _pM->SetCoins(g, n);
+    _pM->SetCoins(g, n + t);
     std::string timeNow = Time::GetTimeNow();
-    MLOG << "[" << timeNow << "]: " << "Replenish coin: " << g << "Number: " << n << '\n';
+    MLOG << "[" << timeNow << "]: " << "Replenish coin: " << (g == coin::yuan_one? "1元" : "5角") << " Number: " << n << '\n';
 }
 
 

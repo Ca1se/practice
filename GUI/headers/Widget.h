@@ -27,8 +27,14 @@ private slots:
     void PayOffline();
     void PBtnMinusClicked();
     void PBtnPlusClicked();
-    void ShowAddGoodsUI();
-    void ShowAddCoinUI();
+    void UpdateSpainBoxGoods(const QString& objectName);
+    void UpdateSpainBoxCoins(int index);
+    void SpainBoxGoodsChanged(int value);
+    void SpainBoxCoinsChanged(int value);
+    void CloseAddGoodsUI();
+    void CloseAddCoinsUI();
+    void AddGoods();
+    void AddCoins();
 
 private:
     UI::MainWidget* ui;
