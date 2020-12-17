@@ -11,16 +11,17 @@
 
 namespace UI {
     class MainWidget;
-    class SubWidget;
+    class PurchaseWidget;
+    class PayWidget;
 }
 
 class Widget: public QWidget {
-    Q_OBJECT
+Q_OBJECT
 
 private slots:
     void ShowPurchaseUI();
     void ClosePurchaseUI();
-    void Purchase();
+    void ShowPayUI();
     void ClosePayUI();
     void PayOnline();
     void PayOffline();
@@ -29,8 +30,8 @@ private slots:
 
 private:
     UI::MainWidget* ui;
-    UI::SubWidget* sub_ui;
-    QWidget* temp_ui;
+    UI::PurchaseWidget* buy_ui;
+    UI::PayWidget* pay_ui;
     MaintainMachine* _pM;
     QVector<Goods> _vGInfo;
     QMap<QString, size_t> _mGtoPos;
@@ -39,8 +40,6 @@ private:
 
     void UpdateDisplay();
     void setIconText();
-    void ShowPayUI(const char* pixaddr = nullptr);
-
 
 public:
     Widget(QWidget* parent, MaintainMachine* manager);
