@@ -141,6 +141,10 @@ private:
 };
 
 class CustomSplash: public QSplashScreen {
+public:
+    CustomSplash(QWidget* parent = nullptr): QSplashScreen(parent) {}
+
+private:
     void mousePressEvent(QMouseEvent*) override {}//cancel base class's "press to close the SplashScreen" action
 };
 
@@ -233,6 +237,7 @@ public:
     QSplashScreen* lsPayPrompt;
     QLabel* lbDisplay;
     QLabel* lsSubText;
+    QWidget toDelete;
 
     void InitPayUI() {
         this->setGeometry(QRect(720, 400, 480, 480));
@@ -248,7 +253,7 @@ public:
 
         QFont f;
         f.setPointSize(15);
-        lsPayPrompt = new QSplashScreen();
+        lsPayPrompt = new QSplashScreen(&toDelete);
         lsPayPrompt->setGeometry(QRect(720, 400, 360, 240));
         lsSubText = new QLabel(lsPayPrompt);
         lsSubText->setGeometry(QRect(70, 90, 200, 60));
@@ -281,9 +286,10 @@ public:
     QSplashScreen* lsMTPrompt;
     QLabel* lsSubText;
 
+    QWidget toDelete;
     void InitMaintainUI() {
         //Add Goods
-        addGoods_widget = new CustomSplash();
+        addGoods_widget = new CustomSplash(&toDelete);
         addGoods_widget->setGeometry(QRect(720, 400, 300, 150));
         lbTextGoods = new QLabel(addGoods_widget);
         lbTextGoods->setGeometry(QRect(50, 20, 60, 20));
@@ -304,7 +310,7 @@ public:
         pBtnCancelGoods->setText(QApplication::trUtf8("取消"));
 
         //Add Coins
-        addCoins_widget = new CustomSplash();
+        addCoins_widget = new CustomSplash(&toDelete);
         addCoins_widget->setGeometry(QRect(720, 400, 300, 150));
         lbTextCoins = new QLabel(addCoins_widget);
         lbTextCoins->setGeometry(QRect(50, 20, 60, 20));
@@ -329,7 +335,7 @@ public:
 
         QFont f;
         f.setPointSize(15);
-        lsMTPrompt = new QSplashScreen();
+        lsMTPrompt = new QSplashScreen(&toDelete);
         lsMTPrompt->setGeometry(QRect(720, 400, 360, 240));
         lsSubText = new QLabel(lsMTPrompt);
         lsSubText->setGeometry(QRect(70, 90, 200, 60));
