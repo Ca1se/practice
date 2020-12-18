@@ -72,6 +72,9 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
 
 Widget::~Widget() {
     delete ui;
+    delete buy_ui;
+    delete pay_ui;
+    delete mt_ui;
 }
 
 void Widget::setIconText() {
