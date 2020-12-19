@@ -42,6 +42,7 @@ private:
     UI::PayWidget* pay_ui;
     UI::MaintainWidget* mt_ui;
     MaintainMachine* _pM;
+
     QVector<Goods> _vGInfo;
     QMap<QString, size_t> _mGtoPos;
     QString _chooseGoods;

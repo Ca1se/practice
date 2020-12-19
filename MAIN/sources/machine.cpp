@@ -40,7 +40,7 @@ void Machine::SetCoins(coin c, size_t n) {
     for(auto& it: *_pCoins){
         if(it.first == c){
             it.second = n;
-            return;;
+            return;
         }
     }
 }
