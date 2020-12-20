@@ -39,6 +39,8 @@ public:
 
     void SetGoods(Gname, size_t);
     void SetCoins(coin, size_t);
+
+    void StateOutput() const;
 private:
     Machine();
 
