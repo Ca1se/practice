@@ -18,7 +18,6 @@ public:
     Log();
     ~Log();
     static std::ofstream& GetStream(int);
-    void DropListJson(std::vector<std::pair<Goods, size_t> >, std::vector<std::pair<coin, size_t> >);
 private:
     std::ofstream _logDeal;
     std::ofstream _logMaintain;
