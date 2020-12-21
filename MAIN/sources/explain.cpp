@@ -26,15 +26,14 @@ explain::~explain() {
         fclose(_plF);
     }
 
-    ResetTCounter();
-    ResetDCounter();
-
     if(_pdCounter){
+        *_pdCounter = 0;
         _pDPair->clear();
         _pdCounter = nullptr;
         _pDPair = nullptr;
     }
     if(_ptCounter){
+        *_ptCounter = 0;
         _pTPair->clear();
         _ptCounter = nullptr;
         _pTPair = nullptr;
@@ -78,6 +77,9 @@ std::pair<std::string, std::string> explain::ExplainInTurn_pair() {
 }
 
 tpair<std::string, std::string, std::string> explain::ExplainInTurn_tpair() {
+    if(_e3.empty())
+        return tpair<std::string, std::string, std::string>("", "", "");
+
     if(!(_e3.length())){
         std::terminate();
     }
@@ -129,16 +131,4 @@ std::string explain::FindValue(FILE *fp) {
     while (fscanf(fp, "%s", buf) && buf[0] != '\"');
     strncpy(t, buf + 1, strchr(buf + 1, '\"') - buf - 1);
     return t;
-}
-
-void explain::ResetDCounter() {
-    if(_pdCounter){
-        *_pdCounter = 0;
-    }
-}
-
-void explain::ResetTCounter() {
-    if(_ptCounter){
-        *_ptCounter = 0;
-    }
 }

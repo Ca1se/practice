@@ -1,6 +1,7 @@
 //
-// Created by ca1se on 2020/12/14.
+//  This is file contain four classes, all of them describe UI part
 //
+
 
 #ifndef UNTITLED2_UI_WIDGET_H
 #define UNTITLED2_UI_WIDGET_H
@@ -140,6 +141,7 @@ private:
     }
 };
 
+
 class CustomSplash: public QSplashScreen {
 public:
     CustomSplash(QWidget* parent = nullptr): QSplashScreen(parent) {}
@@ -229,7 +231,7 @@ public:
     }
 };
 
-//pay UI
+//pay UI part
 class pay_widget: public CustomSplash {
 public:
     QPushButton* pBtnConfirm;
@@ -264,7 +266,7 @@ public:
     }
 };
 
-//Maintain UI
+//Maintain UI part
 class maintain_widget {
 public:
     CustomSplash* addGoods_widget;

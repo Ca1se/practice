@@ -1,5 +1,5 @@
 //
-// Created by ca1se on 2020/12/14.
+// This file contain one class, the class defined all UI interface logic.
 //
 
 #ifndef UNTITLED2_WIDGET_H
@@ -16,8 +16,12 @@ namespace UI {
 }
 
 class Widget: public QWidget {
-Q_OBJECT
+    Q_OBJECT
 
+// all following functions are called slot function,
+// it can be connect with signal function , when signal
+// function being called, the corresponding slot function
+// be called too
 private slots:
     void ShowPurchaseUI();
     void ClosePurchaseUI();
@@ -41,6 +45,7 @@ private:
     UI::PurchaseWidget* buy_ui;
     UI::PayWidget* pay_ui;
     UI::MaintainWidget* mt_ui;
+
     MaintainMachine* _pM;
 
     QVector<Goods> _vGInfo;
@@ -48,7 +53,9 @@ private:
     QString _chooseGoods;
     size_t _chooseNumber;
 
+    //This function will get the number of goods remain and Update the MainWidget display.
     void UpdateDisplay();
+    //Init MainWidget PushButtons' icon and Labels' text.
     void setIconText();
 
 public:
