@@ -32,6 +32,7 @@ public:
     QPushButton* pBtnSelect8;
     QPushButton* pBtnAdminG;
     QPushButton* pBtnAdminC;
+    QPushButton* pBtnAdminS;
     QLabel* lGoods0;
     QLabel* lGoods1;
     QLabel* lGoods2;
@@ -93,6 +94,10 @@ public:
         pBtnAdminC = new QPushButton(widget);
         pBtnAdminC->setGeometry(QRect(30, 840, 85, 35));
         pBtnAdminC->setText(QApplication::trUtf8("补硬币"));
+
+        pBtnAdminS = new QPushButton(widget);
+        pBtnAdminS->setGeometry(QRect(130, 840, 85, 35));
+        pBtnAdminS->setText(QApplication::trUtf8("本机状态"));
 
         pBtnSelect0 = new QPushButton(widget);
         setUpButton(pBtnSelect0, "background-color: rgba(40, 20, 10, 1)", "0");
@@ -288,6 +293,9 @@ public:
     QSplashScreen* lsMTPrompt;
     QLabel* lsSubText;
 
+    QSplashScreen* lsState;
+    QLabel* lbState;
+
     QWidget toDelete;
     void InitMaintainUI() {
         //Add Goods
@@ -345,6 +353,14 @@ public:
         lsSubText->setAlignment(Qt::AlignCenter);
         lsSubText->setWordWrap(true);
         lsSubText->setFont(f);
+
+        lsState = new QSplashScreen(&toDelete);
+        lsState->setGeometry(QRect(720, 400, 360, 240));
+        lbState = new QLabel(lsState);
+        lbState->setGeometry(QRect(70, 90, 200, 60));
+        lbState->setAlignment(Qt::AlignCenter);
+        lbState->setWordWrap(true);
+        lbState->setFont(f);
     }
 };
 

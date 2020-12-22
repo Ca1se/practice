@@ -38,3 +38,22 @@ void MaintainMachine::InitMachine(std::string&& addr) {
 size_t MaintainMachine::GetGoodsRemain(const Gname& g) const {
     return _pMachine->GoodsRemain(g);
 }
+
+std::vector<state> MaintainMachine::GetMachineState() const {
+    auto& vCoins = *(_pMachine->_pCoins);
+    std::vector<state> vS;
+    for(auto& it: vCoins){
+        if(it.first == coin::yuan_one){
+            if(it.second == 0)
+                vS.push_back(state::no_one_yuan);
+            else if(it.second < 20)
+                vS.push_back(state::lack_one_yuan);
+        }else{
+            if(it.second == 0)
+                vS.push_back(state::no_five_dime);
+            else if(it.second < 20)
+                vS.push_back(state::lack_five_dime);
+        }
+    }
+    return vS;
+}
