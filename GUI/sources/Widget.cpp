@@ -68,6 +68,9 @@ Widget::Widget(QWidget *parent, MaintainMachine* manager)
     connect(mt_ui->pBtnCancelCoins, SIGNAL(clicked()), this, SLOT(CloseAddCoinsUI()));
     connect(mt_ui->pBtnConfirmGoods, SIGNAL(clicked()), this, SLOT(AddGoods()));
     connect(mt_ui->pBtnConfirmCoins, SIGNAL(clicked()), this, SLOT(AddCoins()));
+
+    //state
+    connect(ui->pBtnAdminS, SIGNAL(clicked()), this, SLOT(ShowState()));
 }
 
 Widget::~Widget() {
@@ -279,4 +282,26 @@ void Widget::AddCoins() {
     CloseAddCoinsUI();
     mt_ui->lsSubText->setText(trUtf8("补硬币成功!"));
     mt_ui->lsMTPrompt->show();
+}
+
+void Widget::ShowState() {
+    auto s = _pM->GetMachineState();
+    QString text;
+
+    if(!(s.size())){
+        text.append(trUtf8("机器状态正常\n"));
+    }
+    for(auto& it: s){
+        if(it == state::no_one_yuan){
+            text.append(trUtf8("已无一元硬币\n"));
+        }else if(it == state::lack_one_yuan){
+            text.append(trUtf8("缺少一元硬币\n"));
+        }else if(it == state::no_five_dime){
+            text.append(trUtf8("已无五角硬币\n"));
+        }else{
+            text.append(trUtf8("缺少五角硬币\n"));
+        }
+    }
+    mt_ui->lbState->setText(text);
+    mt_ui->lsState->show();
 }

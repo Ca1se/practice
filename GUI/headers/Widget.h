@@ -39,6 +39,7 @@ private slots:
     void CloseAddCoinsUI();
     void AddGoods();
     void AddCoins();
+    void ShowState();
 
 private:
     UI::MainWidget* ui;
