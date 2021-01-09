@@ -18,6 +18,8 @@ int main() {
         memcpy(mn, mp, sizeof(mp));
         memset(op, 0, sizeof(op));
         for(int i = 0; i < N; i++) {
+            //这里搜索顺序和操作顺序是反的，只有这样才能ac， 感觉是poj的测试数据有问题， 正反向的差别只有在输入数据是对称的情况下才体现
+            //if(k >> i & 1)
             if((1 << i) & k) {
                 op[0][i] = 1;
                 mn[1][i + 1] = !mn[1][i + 1];
