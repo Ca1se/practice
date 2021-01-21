@@ -23,6 +23,11 @@ template <class T, class Sequence = deque<T> >
 class stack {
     friend bool operator== <> (const stack<T>& x, const stack<T>& y);
     friend bool operator< <> (const stack<T>& x, const stack<T>& y);
+
+public:
+    stack() {
+        cout << "stack" << endl;
+    }
 };
 
 template<class T, class Sequence>
@@ -40,4 +45,5 @@ int main() {
     cout << (t == t) << endl;
     stack<double> t1;
     cout << (t1 < t1) << endl;
+    return 0;
 }
