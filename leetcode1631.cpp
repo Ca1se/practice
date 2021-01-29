@@ -1,3 +1,11 @@
+//主要的麻烦点在每条路的代价是整条路上的每相邻两点差值的最大值
+//普通搜索能过但较慢
+//把寻找最大差值最小的路变成能否找出一条路使这条路上每相邻节点差值最大值不超过x
+//然后二分查找这个x
+
+
+#include<bits/stdc++.h>
+using namespace std;
 class Solution {
 public:
     int minimumEffortPath(vector<vector<int>>& heights) {
