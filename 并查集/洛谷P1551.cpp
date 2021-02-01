@@ -1,6 +1,9 @@
+//路径压缩与按秩合并
 #include<bits/stdc++.h>
 using namespace std;
-int mp[5000] = {0};
+const int maxn = 5000 + 5;
+int mp[maxn] = {0};
+int deep[maxn] = {0};
 inline int Find(int pos) {
     if(!mp[pos])    return pos;
     int p = Find(mp[pos]);
@@ -10,10 +13,14 @@ inline int Find(int pos) {
 inline void Union(int a, int b) {
     int ra = Find(a), rb = Find(b);
     if(ra == rb)    return;
-    mp[ra] = rb;
+    else if(deep[ra] <= deep[rb]) {
+        mp[ra] = rb;
+    }else {
+        mp[rb] = ra;
+    }
+    if(deep[ra] == deep[rb])    deep[rb]++;
 }
 int main() {
-    memset(mp, 0, sizeof(mp));
     int n, m, p, a, b;
     cin >> n >> m >> p;
     while(m--) {
