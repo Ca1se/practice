@@ -3,7 +3,9 @@ using namespace std;
 int mp[5000] = {0};
 int Find(int pos) {
     if(!mp[pos])    return pos;
-    return Find(mp[pos]);
+    int p = Find(mp[pos]);
+    mp[pos] = p;
+    return p;
 }
 void Union(int a, int b) {
     int ra = Find(a), rb = Find(b);
