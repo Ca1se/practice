@@ -1,68 +1,45 @@
-#include<iostream>
-#include<cstring>
-#include<algorithm>
-#include<vector>
-#include<string>
+#include<bits/stdc++.h>
 using namespace std;
 const int maxn = 25 + 5;
-
-vector<string> rem;
-int d[maxn][maxn];
-int mark[maxn];
-int n, m, cnt = 1;
-
-void floyd() {
-    for (int k = 0; k < n; k++) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                d[i][j] = d[i][j] || (d[i][k] && d[k][j]);
-            }
-        }
-    }
-}
-
-void pic(int s, int c) {
-    if (c)   cout << ", ";
-    cout << rem[s];
-    mark[s] = 1;
-    for (int i = s + 1; i < n; i++) {
-        if (d[s][i] && d[i][s] && !mark[i]) {
-            pic(i, c + 1);
-        }
-    }
-}
-
+unordered_map<string, int> y;
+unordered_map<int, string> x;
+int mp[maxn][maxn];
+bool vis[maxn];
 int main() {
-    //freopen("test.in", "r", stdin);
-    //freopen("test.out", "w+", stdout);
-    while (cin >> n >> m && n && m) {
-        if(cnt != 1)    cout << endl;
-        string name[2];
-        rem.clear();
-        memset(d, 0, sizeof(d));
-        memset(mark, 0, sizeof(mark));
-        for (int i = 0; i < m && cin >> name[0] >> name[1]; i++) {
-            int t[2];
-            for (int j = 0; j < 2; j++) {
-                vector<string>::iterator tmp = find(rem.begin(), rem.end(), name[j]);
-                if (tmp == rem.end()) {
-                    rem.push_back(name[j]);
-                    t[j] = rem.size() - 1;
-                }
-                else {
-                    t[j] = tmp - rem.begin();
+    int m, n;
+    int cnt = 0;
+    string chara, charb;
+    while(cin >> m >> n && m && n) {
+        memset(mp, 0, sizeof mp);
+        memset(vis, 0, sizeof vis);
+        for(int i = 0; i < maxn; i++)   mp[i][i] = 1;
+        y.clear(); x.clear();
+        for(int i = 0; i < n; i++) {
+            cin >> chara >> charb;
+            int siz = y.size();
+            if(y.find(chara) == y.end())   y[chara] = ++siz, x[siz] = chara;
+            if(y.find(charb) == y.end())   y[charb] = ++siz, x[siz] = charb;
+            mp[y[chara]][y[charb]] = 1;
+        } 
+        for(int k = 1; k <= m; k++) {
+            for(int i = 1; i <= m; i++) {
+                for(int j = 1; j <= m; j++) {
+                    mp[i][j] = (mp[i][j] || (mp[i][k] && mp[k][j]));
                 }
             }
-            d[t[0]][t[1]] = 1;
         }
-        floyd();
-        cout << "Calling circles for data set " << cnt++ << ":" << endl;
-        for (int i = 0; i < n; i++) {
-            if (!mark[i]) {
-                pic(i, 0);
-                cout << endl;
+        cout << "Calling circles for data set " << ++cnt << ":" << endl;
+        for(int i = 1; i <= m; i++) {
+            if(vis[i])  continue;
+            vis[i] = true;
+            cout << x[i];
+            for(int j = i + 1; j <= m; j++) {
+                if(vis[j] || !mp[i][j] || !mp[j][i])  continue;
+                vis[j] = true;
+                cout << ", " << x[j];
             }
-        }
+            cout << endl;
+        } 
     }
     return 0;
 }
