@@ -23,4 +23,5 @@ int main()
     ende = (1 << N) - 1;
     queenplan(0, 0, 0);
     cout << ans << endl;
+    return 0;
 }
