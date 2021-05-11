@@ -82,6 +82,7 @@ if 1 == 1:
         differences = calculate_difference(i, y_set)
         newton_ys = []
         print_interval_newton_lx(i, differences)
+        
         for x in xs:
             newton_ys.append(interval_newton(i, differences, x, -5, 10 / i))
         plt.plot(xs, newton_ys, label=f'L{i}x')
