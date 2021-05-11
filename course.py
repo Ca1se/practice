@@ -47,6 +47,15 @@ def interval_newton(n, diffs, x, x0, h):
     return res
 
 
+def print_interval_newton_lx(n, diffs):
+    newton = f"L{n}x = {diffs[0]}"
+    now_t = "t"
+    for i in range(1, n + 1):
+        newton += f" + ({diffs[i] / ank(i, i)}) * " + now_t
+        now_t += f"(t-{i})"
+    print(newton)
+
+
 # 题中给定的fx
 def pre_func_fx(x):
     return 1 / (1 + x * x)
@@ -72,6 +81,7 @@ if 1 == 1:
         # fx0 的n阶差分
         differences = calculate_difference(i, y_set)
         newton_ys = []
+        print_interval_newton_lx(i, differences)
         for x in xs:
             newton_ys.append(interval_newton(i, differences, x, -5, 10 / i))
         plt.plot(xs, newton_ys, label=f'L{i}x')
