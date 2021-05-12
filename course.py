@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy
 
-
+# 求不同n的等距插值点
 def create_interval_points(n, func_fx, func_dist):
     xs = []
     ys = []
@@ -13,6 +13,7 @@ def create_interval_points(n, func_fx, func_dist):
     return xs, ys
 
 
+# 求不同n的0到n阶差分
 def calculate_difference(n, ys):
     diffs = []
     for i in range(0, n + 1):
@@ -36,6 +37,7 @@ def ank(n, k):
     return res
 
 
+# 求确定点的预测值
 def interval_newton(n, diffs, x, x0, h):
     t = (x - x0) / h
     res = diffs[0]
@@ -47,6 +49,7 @@ def interval_newton(n, diffs, x, x0, h):
     return res
 
 
+#打印插值函数
 def print_interval_newton_lx(n, diffs):
     newton = f"L{n}x = {diffs[0]}"
     now_t = "t"
@@ -71,18 +74,20 @@ if 1 == 1:
 
     # 绘制图像所需的x集合
     xs = [i for i in numpy.arange(-10.0, 10.001, 0.001)]
+    # 绘制图像所需的y集合
     fx_ys = []
     for x in xs:
         fx_ys.append(pre_func_fx(x))
+    # 画图
     plt.plot(xs, fx_ys, label="f(x)")
 
+    # 具体求解过程
     for i in n_set:
         x_set, y_set = create_interval_points(i, pre_func_fx, pre_func_dist)
         # fx0 的n阶差分
         differences = calculate_difference(i, y_set)
         newton_ys = []
         print_interval_newton_lx(i, differences)
-        
         for x in xs:
             newton_ys.append(interval_newton(i, differences, x, -5, 10 / i))
         plt.plot(xs, newton_ys, label=f'L{i}x')
