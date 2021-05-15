@@ -3,6 +3,7 @@ using namespace std;
 const int maxn = 200000 + 5;
 int score[maxn];
 int d[maxn << 2] = {0};
+
 void build(int s, int t, int p) {
     if(s == t) {
         d[p] = score[s];
@@ -13,6 +14,7 @@ void build(int s, int t, int p) {
     if(m < t)   build(m + 1, t, (p << 1) | 1);
     d[p] = max(d[p << 1], d[(p << 1) | 1]);
 }
+
 int getMax(int l, int r, int s, int t, int p) {
     if(l <= s && t <= r) {
         return d[p];
@@ -22,6 +24,7 @@ int getMax(int l, int r, int s, int t, int p) {
     if(m < r)   maxx = max(maxx, getMax(l, r, m + 1, t, (p << 1) | 1));
     return maxx;
 }
+
 void update(int f, int v, int s, int t, int p) {
     if(s == t) {
         d[p] = v;
