@@ -48,6 +48,7 @@ public:
     }
 
 };
+
 int main() {
     int T, n = 0, cnt = 0, l, r;
     char choose[10];
