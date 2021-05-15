@@ -3,6 +3,9 @@ import numpy
 
 
 # 求不同n的等距插值点
+from matplotlib import pylab
+
+
 def create_interval_points(n, func_fx, func_dist):
     xs = []
     ys = []
@@ -74,7 +77,7 @@ def pre_func_dist(k, n):
     return -5 + 10 / n * k
 
 
-if 1 == 1:
+if __name__ == "__main__":
     n_set = [2, 4, 6, 8, 10]
 
     # 绘制图像所需的x集合
@@ -100,4 +103,9 @@ if 1 == 1:
     plt.ylabel("y")
     plt.legend()
     plt.ylim(ymin=-2, ymax=2)
+    axis = pylab.gca()
+    axis.spines['right'].set_visible(False)
+    axis.spines['top'].set_visible(False)
+    axis.spines['left'].set_position('center')
+    axis.spines['bottom'].set_position('center')
     plt.show()
