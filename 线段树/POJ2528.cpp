@@ -1,3 +1,4 @@
+//离散化使用左闭右开区间
 #include <cstdio>
 #include <set>
 #include <cstring>
