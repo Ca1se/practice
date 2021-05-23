@@ -51,7 +51,7 @@ if __name__ == "__main__":
     # gauss_seidel
     jacobi_gauss_seidel(1, gs_B, gs_f)
 
-    omega = 1
+    omega = 1.15
     SOR_L = (D - omega * L).I.dot((1 - omega) * D + omega * U)
     SOR_f = omega * (D - omega * L).I.dot(b)
 
