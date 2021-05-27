@@ -1,0 +1,1 @@
+-average Math:0.0, Chinese:0.0, English:0.0, -max Math:0, Chinese:0, English:0, -min Math:0, Chinese:0, English:0
