@@ -1,2 +1,0 @@
-1234123123 wuye 1 1 1 100 100 100
--average Math:100.0, Chinese:100.0, English:100.0, -max Math:100, Chinese:100, English:100, -min Math:100, Chinese:100, English:100
