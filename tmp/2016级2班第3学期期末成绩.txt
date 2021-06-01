@@ -1,2 +1,0 @@
-1234324 asffsa 2 3 1 1000 100 1923
--average Math:1000.0, Chinese:100.0, English:1923.0, -max Math:1000, Chinese:100, English:1923, -min Math:1000, Chinese:100, English:1923
