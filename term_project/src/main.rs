@@ -1,8 +1,8 @@
-type float_44 = [[f64; 4]; 4];
-type float_14 = [f64; 4];
-type int_44 = [[i32; 4]; 4];
-fn calculate_matrix_lu(matrix_a: &float_44, 
-    matrix_l: &mut float_44, matrix_u: &mut float_44) {
+type FloatM44 = [[f64; 4]; 4];
+type FloatM14 = [f64; 4];
+type IntM44 = [[i32; 4]; 4];
+fn calculate_matrix_lu(matrix_a: &FloatM44, 
+    matrix_l: &mut FloatM44, matrix_u: &mut FloatM44) {
     
     for r in 0..4 {
         for i in r..4 {
@@ -23,7 +23,7 @@ fn calculate_matrix_lu(matrix_a: &float_44,
     }         
 }
 
-fn convert_f64_matrix(ori: &int_44) -> float_44 {
+fn convert_f64_matrix(ori: &IntM44) -> FloatM44 {
     let mut a = [[0.0; 4]; 4];
     for i in 0..4 {
         for j in 0..4 {
@@ -33,8 +33,8 @@ fn convert_f64_matrix(ori: &int_44) -> float_44 {
     a
 }
 
-fn calculate_matrix_x(matrix_l: &mut float_44, 
-    matrix_u: &mut float_44, matrix_b: &float_14) -> float_14{
+fn calculate_matrix_x(matrix_l: &mut FloatM44, 
+    matrix_u: &mut FloatM44, matrix_b: &FloatM14) -> FloatM14{
     let mut m_x = [0.0; 4];
     let mut m_y = [0.0; 4];
     for i in 0..4 {
@@ -67,6 +67,7 @@ fn main() {
     let matrix_b = [200.0, 250.0, 210.0, 340.0];
     calculate_matrix_lu(&matrix_a, &mut matrix_l, &mut matrix_u);
     let matrix_x = calculate_matrix_x(&mut matrix_l, &mut matrix_u, &matrix_b);
-    println!("matrix X:\n{:?}T", matrix_x);
-    
+    for i in 0..4 {
+        println!("x{} = {}", i + 1, matrix_x[i]);
+    }
 }
