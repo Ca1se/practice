@@ -40,10 +40,10 @@ int main() {
         }
         if(false) {
 failed:
-            cout << "NO" << endl;
+            cout << "NO\n";
             continue;
         }
-        cout << "YES" << endl;
+        cout << "YES\n";
         if(flagC == 0 || (flagC == 'R' && ((flagX + flagY) & 1) == 0) || 
                 (flagC == 'W' && ((flagX + flagY) & 1) == 1)) {
             for(int i = 0; i < m; i++) {
@@ -58,7 +58,7 @@ failed:
         }
         mp[0][m] = mp[1][m] = 0;
         for(int i = 0; i < n; i++) {
-            cout << mp[i & 1] << endl;
+            cout << mp[i & 1] << '\n';
         }
     }
     return 0;
