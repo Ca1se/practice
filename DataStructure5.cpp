@@ -151,17 +151,15 @@ public:
 };
 
 int main() {
-    /*
     int n;
     cin >> n;
     AdjacencyList a(n);
     a.dfs();
     a.bfs();
-    */
 
-    int n;
-    cin >> n;
-    AdjacencyMatrix m(n + 1);
+    int r;
+    cin >> r;
+    AdjacencyMatrix m(r + 1);
     cout << m.prim();
     return 0;
 }

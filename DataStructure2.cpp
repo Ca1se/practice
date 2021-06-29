@@ -37,8 +37,21 @@ private:
         }
     }
 
+    void release_list() {
+        Node* t = nullptr;
+        while(head != nullptr) {
+            t = head; 
+            head = head->next;
+            delete t;
+        }
+    }
+
 public:
     List(): head(nullptr) {}
+
+    ~List() {
+        release_list();
+    }
 
     void create_list(const T* arr, size_t size) {
         if(size > 0) {
