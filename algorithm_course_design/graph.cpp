@@ -2,43 +2,69 @@
 #include <cstddef>
 #include <cmath>
 #include <stack>
+#include <set>
 #include "graph.h"
+#include "bfs.h"
 #include "min_priority_queue.h"
+#include "quick_sort.h"
+#include "union_find.h"
+
+Graph::Edge::Edge(int u, int v, int w): u(u), v(v), w(w) {}
+
+bool Graph::Edge::operator>= (const Edge& rhs) const {
+    return this->w >= rhs.w;
+}
+
+bool Graph::Edge::operator<= (const Edge& rhs) const {
+    return this->w <= rhs.w;
+}
+
+void Graph::PrintPoint(int pos) const {
+    std::cout << "(" << _points[pos].first << ", " << _points[pos].second << ")\n";
+}
 
 //从文件读取数据构造图
 void Graph::CreateGraph() {
     int n, d, x, y;
     std::cin >> n >> d;
 
-    points.push_back(std::make_pair(0, 0));
+    _points.push_back(std::make_pair(0, 0));
 
     // 输入鳄鱼所在的点
     for(int i = 0; i < n; i++) {
         std::cin >> x >> y;
-        int pos = points.size();
-        points.push_back(std::make_pair(x, y));
-        const auto& p = points.back();
+        int pos = _points.size();
+        _points.push_back(std::make_pair(x, y));
 
         // 输入的点与现有的点构成的边
-        for(size_t k = 1; k < points.size() - 1; k++) {
-            const auto& it = points[k];
+        for(size_t k = 1; k < _points.size() - 1; k++) {
+            const auto& it = _points[k];
             if(abs(it.first) == 50 || abs(it.second) == 50) continue;
-            double dist = sqrt((p.first - it.first) * (p.first - it.first) + (p.second - it.second) * (p.second - it.second));
+            double dist = sqrt((x - it.first) * (x - it.first) + (y - it.second) * (y - it.second));
             if(dist <= d) {
-                edges[pos].push_back(std::make_pair(k, dist));
-                edges[k].push_back(std::make_pair(pos, dist));
+                _edges[pos].push_back(std::make_pair(k, dist));
+                _edges[k].push_back(std::make_pair(pos, dist));
+
+                _unionEdges.push_back(Edge(pos, k, dist));
             }
         }
 
-        double dist = sqrt(p.first * p.first + p.second * p.second) - 7.5;
+        double dist = sqrt(x * x + y * y) - 7.5;
+        if(dist < 0 || x >= 50 || y >= 50) {
+            throw "invalid data";
+        }
+        _pointDist.push_back(std::make_pair(dist, pos));
         if(dist <= d) {
-            edges[0].push_back(std::make_pair(pos, dist));
-            edges[pos].push_back(std::make_pair(0, dist));
+            _edges[0].push_back(std::make_pair(pos, dist));
+            _edges[pos].push_back(std::make_pair(0, dist));
+
+            _unionEdges.push_back(Edge(0, pos, dist));
         }
         
         auto insert_edge = [&](double py1, int px2, int py2) {
-            edges[pos].push_back(std::make_pair(points.size(), py1));
-            points.push_back(std::make_pair(px2, py2));
+            _edges[pos].push_back(std::make_pair(_points.size(), py1));
+            _borderPoint.push_back(_points.size());
+            _points.push_back(std::make_pair(px2, py2));
         };
         
         // 检查此点是否有上拓展点, 下同, 为 右 下 左 拓展点
@@ -49,11 +75,11 @@ void Graph::CreateGraph() {
     }
 }
 
-std::pair<double, size_t> Graph::ShortestPath() {
-    memset(path, -1, sizeof path);
-    memset(vis, 0, sizeof vis);
-    for(int i = 0; i < MAX_POINT_NUM; i++) dist[i] = INF;
-    dist[0] = 0;
+size_t Graph::ShortestPath() {
+    memset(_path, -1, sizeof _path);
+    memset(_vis, 0, sizeof _vis);
+    for(int i = 0; i < MAX_POINT_NUM; i++) _dist[i] = INF;
+    _dist[0] = 0;
 
     using pdi = std::pair<double, int>;
     MinPriorityQueue<pdi> q;
@@ -61,15 +87,15 @@ std::pair<double, size_t> Graph::ShortestPath() {
 
     while(!q.empty()) {
         pdi t = q.top(); q.pop();
-        if(vis[t.second])   continue;
-        vis[t.second] = true;
+        if(_vis[t.second])   continue;
+        _vis[t.second] = true;
 
-        for(size_t i = 0; i < edges[t.second].size(); i++) {
-            const auto& it = edges[t.second][i];
-            if(dist[it.first] > dist[t.second] + it.second) {
-                dist[it.first] = dist[t.second] + it.second;
-                path[it.first] = t.second;
-                q.push(std::make_pair(dist[it.first], it.first));
+        for(size_t i = 0; i < _edges[t.second].size(); i++) {
+            const auto& it = _edges[t.second][i];
+            if(_dist[it.first] > _dist[t.second] + it.second) {
+                _dist[it.first] = _dist[t.second] + it.second;
+                _path[it.first] = t.second;
+                q.push(std::make_pair(_dist[it.first], it.first));
             }
         }
     }
@@ -77,22 +103,57 @@ std::pair<double, size_t> Graph::ShortestPath() {
     double minn = INF;
     size_t minPos;
     //sort
-    for(size_t i = 0; i < points.size(); i++) {
-        if((abs(points[i].first) == 50 || abs(points[i].second) == 50) && dist[i] < minn)
-            minn = dist[i], minPos = i;
-    }
+    for(size_t i = 0; i < _borderPoint.size(); i++) {
+        if(_dist[_borderPoint[i]] < minn) {
+            minn = _dist[_borderPoint[i]];
+            minPos = _borderPoint[i];
+        }
+    } 
 
-    return (minn != INF ? std::make_pair(minn, minPos) : std::make_pair(-1.0, (size_t) 0));
+    std::cout << minn << "\n";
+
+    return minn != INF ? minPos : -1;
 }
 
 void Graph::ShowPath(int pos) const {
     std::stack<size_t> s;
-    while(pos >= 0) {
+    while(pos > 0) {
         s.push(pos);
-        pos = path[pos];
+        pos = _path[pos];
     }
     while(!s.empty()) {
-        std::cout << "(" << points[s.top()].first << ", " << points[s.top()].second << ")\n";
+        PrintPoint(s.top());
         s.pop();
     }
+    std::cout << "\n";
+}
+
+void Graph::MinJumpNum() const {
+    BFS b;    
+    b.bfs(0, _points, _edges);
+    std::cout << "\n";
+}
+
+void Graph::MinimumSpanningTree() {
+    UnionFind u(MAX_POINT_NUM);
+    std::set<int> s;
+    int ans = 0;
+
+    quicksort(_unionEdges, 0, _unionEdges.size() - 1);
+    for(size_t i = 0; i < _unionEdges.size(); i++) {
+        const auto& it = _unionEdges[i];
+        int p = u.Find(it.u), q = u.Find(it.v);
+        if(p != q) {
+            ans += it.w;
+            s.insert(it.u);
+            s.insert(it.v);
+            u.Union(p, q);
+        }
+    }
+    
+    std::cout << ans << "\n";
+    for(auto it: s) {
+        PrintPoint(it);
+    }
+    std::cout << "\n";
 }

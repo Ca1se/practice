@@ -12,21 +12,22 @@ private:
     size_t _capacity;
     size_t _size;
 
-    void expand_capacity(size_t capacity) {
-        ElemType* t = new ElemType[capacity];
-        memmove(t, _listHead, sizeof(ElemType) * _size);
+    void expand_capacity() {
+        _capacity += expandLength;
+        ElemType* t = new ElemType[_capacity];
+        memcpy(t, _listHead, sizeof(ElemType) * _size);
         delete[] _listHead;
         _listHead = t;
     }
     
 public:
-    explicit Vector(int initialCapacity = 500): _listHead(nullptr), _capacity(initialCapacity), _size(0) {
+    explicit Vector(size_t initialCapacity = 500): _listHead(nullptr), _capacity(initialCapacity), _size(0) {
         _listHead = new ElemType[initialCapacity];
     }
 
     Vector(const Vector& v): _listHead(nullptr), _capacity(v._capacity), _size(v._size) {
         _listHead = new ElemType[v._capacity];
-        memmove(_listHead, v._listHead, sizeof(ElemType) * v._size);
+        memcpy(_listHead, v._listHead, sizeof(ElemType) * v._size);
     }
 
     ~Vector() {
@@ -42,8 +43,7 @@ public:
 
     void push_back(const ElemType& elem) {
         if(_size == _capacity) {
-            _capacity = _capacity + expandLength;
-            expand_capacity(_capacity);
+            expand_capacity();
         }
 
         _listHead[_size++] = elem;
@@ -69,6 +69,17 @@ public:
 
     const ElemType& operator[] (size_t pos) const {
         return _listHead[pos];
+    }
+
+    const Vector<ElemType>& operator= (const Vector<ElemType>& rhs) {
+        this->_size = rhs._size;
+        if(this->_capacity < rhs._size) {
+            ElemType* t = new ElemType[rhs._capacity];
+            delete[] this->_listHead;
+            _listHead = t;
+        }
+        memcpy(this->_listHead, rhs._listHead, sizeof(ElemType) * rhs._size);
+        return *this;
     }
 };
 

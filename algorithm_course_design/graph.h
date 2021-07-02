@@ -6,19 +6,36 @@
 class Graph {
     using pii = std::pair<int, int>;
     using pid = std::pair<int, double>;
-    static const int MAX_POINT_NUM = 100 * 5;
+    static const int MAX_POINT_NUM = 100 * 3;
     static const int INF = 0x3f3f3f3f;
+
+    struct Edge {
+        Edge() = default;
+        Edge(int u, int v, int w);
+        int u, v, w;
+        bool operator>= (const Edge& rhs) const;
+        bool operator<= (const Edge& rhs) const;
+    };
+
+    void PrintPoint(int pos) const;
+
 private:
-    Vector<pii> points;
-    Vector<pid> edges[MAX_POINT_NUM];
-    bool vis[MAX_POINT_NUM];
-    double dist[MAX_POINT_NUM];
-    int path[MAX_POINT_NUM];
+    Vector<pii> _points;
+    Vector<Vector<pid>> _edges;
+    Vector<int> _borderPoint;
+    Vector<std::pair<double, int>> _pointDist;
+    Vector<Edge> _unionEdges;
+
+    bool _vis[MAX_POINT_NUM];
+    double _dist[MAX_POINT_NUM];
+    int _path[MAX_POINT_NUM];
 
 public:
     void CreateGraph();
-    std::pair<double, size_t> ShortestPath();
+    size_t ShortestPath();
     void ShowPath(int pos) const;
+    void MinJumpNum() const;
+    void MinimumSpanningTree();
 };
 
 #endif
