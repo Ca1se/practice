@@ -5,10 +5,15 @@ int main() {
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w+", stdout); // 输入输出重定向到文件
 
-    Graph g;
-    g.CreateGraph();
-    auto [ans, pos] = g.ShortestPath();
-    std::cout << ans << "\n";
-    if(ans != -1) g.ShowPath((int) pos);
+    try {
+        Graph g;
+        g.CreateGraph();
+        int pos = g.ShortestPath();
+        if(pos != -1) g.ShowPath((int) pos);
+        g.MinJumpNum();
+        g.MinimumSpanningTree();
+    }catch(const char* errMsg) {
+        std::cout << errMsg << "\n";
+    };
     return 0;
 }
