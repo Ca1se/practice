@@ -49,6 +49,34 @@ _uninitialized_fill_n_aux(ForwardIterator begin, size_t n,
     return begin;
 }
 
+template<typename ForwardIterator, typename RawT>
+inline ForwardIterator
+_uninitialized_fill_n(ForwardIterator begin, size_t n, RawT*) {
+    using is_POD = typename _type_traits<RawT>::is_POD_type;
+    return _uninitialized_fill_n_aux(begin, n, is_POD());
+}
+
+template<typename ForwardIterator>
+inline ForwardIterator
+uninitialized_fill_n(ForwardIterator begin, size_t n) {
+    return _uninitialized_fill_n(begin, n, value_type(begin));
+}
+
+template<typename ForwardIterator>
+inline ForwardIterator
+_uninitialized_fill_n_aux(ForwardIterator begin, size_t n, _true_type) {
+    return begin + n;
+}
+
+template<typename ForwardIterator>
+inline ForwardIterator
+_uninitialized_fill_n_aux(ForwardIterator begin, size_t n, _false_type) {
+    for(; n > 0; n--, begin++) {
+        construct(&*begin);
+    }
+    return begin;
+}
+
 
 template<typename ForwardIterator, typename ValueT, typename RawT>
 inline void
@@ -69,7 +97,7 @@ template<typename ForwardIterator, typename ValueT>
 inline void
 _uninitialized_fill_aux(ForwardIterator begin, ForwardIterator end,
         const ValueT& val, _true_type) {
-    for(; begin != end; begin++) {
+    for(; begin < end; begin++) {
         *begin = val;
     }
 }
@@ -78,7 +106,7 @@ template<typename ForwardIterator, typename ValueT>
 inline void
 _uninitialized_fill_aux(ForwardIterator begin, ForwardIterator end,
         const ValueT& val, _false_type) {
-    for(; begin != end; begin++) {
+    for(; begin < end; begin++) {
         construct(&*begin, val);
     }
 }
@@ -110,7 +138,7 @@ inline ForwardIterator
 _uninitialized_copy_aux(InputIterator begin, InputIterator end,
         ForwardIterator result, _false_type) {
     ForwardIterator cur = result;
-    for(; begin != end; begin++, cur++) {
+    for(; begin < end; begin++, cur++) {
         construct(&*cur, *begin);
     }
     return cur;
