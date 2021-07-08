@@ -36,28 +36,22 @@ private:
     template<typename... Args>
     void insert_aux(const_iterator pos, Args&&... args) {
         difference_type offset = pos - this->m_start;
-        if(this->m_finish != this->m_end_of_storage) {
-            this->m_finish = uninitialized_copy(this->m_start + offset, this->m_finish, this->m_start + offset + 1);
-        }else {
+        if(this->m_finish == this->m_end_of_storage) {
             size_type old_size = size();
             size_type new_size = (old_size == 0 ? 1 : 2 * old_size);
 
             iterator new_start;
             if(old_size == 0) {
                 new_start = allocator::allocate(new_size);
-                this->m_finish = new_start + 1;
             }else {
                 new_start = allocator::reallocate(this->m_start, old_size, new_size);
-                this->m_finish = uninitialized_copy(this->m_start + offset, this->m_finish,
-                        new_start + offset + 1);
-                if(new_start != this->m_start) {
-                    uninitialized_copy(this->m_start, this->m_start + offset, new_start);
-                    allocator::deallocate(this->m_start, static_cast<size_type>(old_size));
-                }
             }
             this->m_start = new_start;
+            this->m_finish = this->m_start + old_size;
             this->m_end_of_storage = this->m_start + new_size;
         }
+
+        this->m_finish = my::uninitialized_copy(this->m_start + offset, this->m_finish, this->m_start + offset + 1);
         construct(this->m_start + offset, std::forward<Args>(args)...);
     }
 
@@ -74,8 +68,8 @@ public:
     }
 
     vector(const vector& rhs) {
-        allocator::allocate(this->m_start, static_cast<size_type>(rhs.m_end_of_storage - rhs.m_start));
-        this->m_finish = uninitialized_copy(rhs.m_start, rhs.m_finish, this->m_start);
+        this->m_start = allocator::allocate(static_cast<size_type>(rhs.m_end_of_storage - rhs.m_start));
+        this->m_finish = my::uninitialized_copy(rhs.m_start, rhs.m_finish, this->m_start);
         this->m_end_of_storage = this->m_start + (rhs.m_end_of_storage - rhs.m_start);
     }
 
@@ -88,13 +82,13 @@ public:
     explicit vector(size_type size, const Alloc& alloc = Alloc()) {
         this->m_start = allocator::allocate(size);
         this->m_finish = this->m_end_of_storage = this->m_start + size;
-        uninitialized_fill_n(this->m_start, size, ValueT());
+        my::uninitialized_fill_n(this->m_start, size);
     }
 
     vector(size_type size, const value_type& val, const Alloc& alloc = Alloc()) {
         this->m_start = allocator::allocate(size);
         this->m_finish = this->m_end_of_storage = this->m_start + size;
-        uninitialized_fill_n(this->m_start, size, val);
+        my::uninitialized_fill_n(this->m_start, size, val);
     }
     
     vector& operator=(const vector& rhs) {
@@ -249,7 +243,7 @@ public:
     iterator erase(const_iterator pos) {
         iterator p = this->m_start + (pos - this->m_start);
         destroy(p);
-        this->m_finish = uninitialized_copy(p + 1, this->m_finish, p);
+        this->m_finish = my::uninitialized_copy(p + 1, this->m_finish, p);
         return pos;
     }
 
@@ -257,7 +251,7 @@ public:
         iterator f = this->m_start + (first - this->m_start),
                  l = this->m_start + (last - this->m_start);
         destroy(f, l);
-        this->m_finish = uninitialized_copy(l, this->m_finish, f);
+        this->m_finish = my::uninitialized_copy(l, this->m_finish, f);
         return f;
     }
 
@@ -272,6 +266,7 @@ public:
     template<class... Args>
     reference emplace_back(Args&&... args) {
         insert_aux(this->m_finish, std::forward<Args>(args)...);
+        return *(this->m_finish - 1);
     }
 
     void pop_back() {
