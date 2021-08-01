@@ -5,7 +5,7 @@ struct C {
     char ch;
     long long val;
 }arr[maxn];
-long long pre_n[maxn], pre_p[maxn], pn = 0, nn = 0, P = 0, N = 0;
+long long pn = 0, nn = 0, P = 0, N = 0;
 map<double, double> m;
 int main() {
     int n;
