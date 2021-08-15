@@ -41,7 +41,7 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float z
 						0, 0, zNear + zFar, -zNear * zFar,
 						0, 0, 1, 0;
 
-	float top = tan(eye_fov / 180 * MY_PI) * zNear;
+	float top = -tan(eye_fov / 180 * MY_PI / 2) * zNear;
     float bottom = -top;
     float left = bottom * aspect_ratio;
     float right = -left;
@@ -136,7 +136,7 @@ int main(int argc, const char** argv)
         image.convertTo(image, CV_8UC3, 1.0f);
         cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
         cv::imshow("image", image);
-        key = cv::waitKey(10);
+        key = cv::waitKey(1000);
 
         std::cout << "frame count: " << frame_count++ << '\n';
     }

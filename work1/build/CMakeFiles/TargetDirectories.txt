@@ -1,3 +1,0 @@
-/home/ca1se/Downloads/work1/build/CMakeFiles/rebuild_cache.dir
-/home/ca1se/Downloads/work1/build/CMakeFiles/edit_cache.dir
-/home/ca1se/Downloads/work1/build/CMakeFiles/Rasterizer.dir
