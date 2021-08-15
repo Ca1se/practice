@@ -4,6 +4,7 @@
 //
 
 #include <algorithm>
+#include <iostream>
 #include <vector>
 #include "rasterizer.hpp"
 #include <opencv2/opencv.hpp>
@@ -142,18 +143,23 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     //float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
     //z_interpolated *= w_reciprocal;
 
+	static bool had = false;
 	for(int y = bound_box[0].y(); y <= bound_box[1].y(); y++) {
 		for(int x = bound_box[0].x(); x <= bound_box[1].x(); x++) {
 			if(insideTriangle(x, y, v)) {
 				auto[alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
 				float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+				if(!had) {
+					had = true;
+					std::cout << w_reciprocal << std::endl;
+				}
 				float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
 				z_interpolated *= w_reciprocal;	
 
 				int index = get_index(x, y);
 				if(depth_buf[index] > z_interpolated) {
 					depth_buf[index] = z_interpolated;
-					set_pixel(Eigen::Vector3f{width - x, height - y, 0.0f}, t.getColor());
+					set_pixel(Eigen::Vector3f{x, y, 0.0f}, t.getColor());
 				}
 			}
 		}
