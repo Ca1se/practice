@@ -15,6 +15,21 @@ int tot, n, l, r, c;
 int deep[maxn], sub_size[maxn], father[maxn], heavy_son[maxn], dfn[maxn], id[maxn], top[maxn];
 int seg[maxn << 2];
 
+inline void fast_scanf(int& x) {
+	x = 0;
+	int s = 1;
+	int ch = getchar();
+	while(ch < '0' || ch > '9') {
+		if(ch == '-') s = -1;
+		ch = getchar();
+	}
+	while(ch >= '0' && ch <= '9') {
+		x = x * 10 + ch - '0';
+		ch = getchar();
+	}
+	x *= s;
+}
+
 void Add(int x, int y) {
 	int r = edges.size();
 	efrom[x].push_back(r);
@@ -106,7 +121,7 @@ ll Ask(int x, int y) {
 
 int main() {
 	int t, m, pre = 0, choose;
-	scanf("%d", &t);
+	fast_scanf(t);
 	for(int k = 1; k <= t; k++) {
 		printf("Case %d:\n", k);
 		tot = 0;
@@ -114,13 +129,13 @@ int main() {
 		for(int i = 1; i <= pre; i++) {
 			efrom[i].clear();
 		}
-		scanf("%d", &n);
+		fast_scanf(n);
 		pre = n;
 		for(int i = 1; i <= n; i++) {
-			scanf("%d", w + i);
+			fast_scanf(w[i]);
 		}
 		for(int i = 0; i < n - 1; i++) {
-			scanf("%d%d", &l, &r);
+			fast_scanf(l), fast_scanf(r);
 			l++, r++;
 			Add(l, r);
 		}
@@ -130,16 +145,16 @@ int main() {
 		TreeBuild(1, 1);
 		TreeDecomposition(1, 1);
 		Build(1, tot, 1);
-		scanf("%d", &m);
+		fast_scanf(m);
 		while(m--) {
-			scanf("%d", &choose);
+			fast_scanf(choose);
 			if(choose) {
-				scanf("%d%d", &l, &c);
+				fast_scanf(l), fast_scanf(c);
 				l++;
 				l = id[l];
 				Update(1, tot, 1);
 			}else {
-				scanf("%d%d", &l, &r);
+				fast_scanf(l), fast_scanf(r);
 				l++, r++;
 				printf("%lld\n", Ask(l, r));
 			}
