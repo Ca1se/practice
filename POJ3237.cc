@@ -79,6 +79,7 @@ void PushUp(int p) {
 void Build(int f, int t, int p) {
 	if(f == t) {
 		segmax[p] = segmin[p] = dfw[f];
+		lazy[p] = 0;
 		return;
 	}
 
@@ -86,6 +87,7 @@ void Build(int f, int t, int p) {
 	Build(f, m, p << 1);
 	Build(m + 1, t, (p << 1) | 1);
 	PushUp(p);
+	lazy[p] = 0;
 }
 
 inline void Exchange(int& x, int& y) {
@@ -175,7 +177,6 @@ int main() {
 	char str[10];
 	scanff(t);
 	while(t--) {
-		memset(lazy, 0, sizeof lazy);
 		tot = 0;
 		edges.clear();
 		for(int i = 1; i <= pre; i++) {
