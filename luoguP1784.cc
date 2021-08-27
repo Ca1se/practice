@@ -45,32 +45,23 @@ void insert(int r, int c) {
 	}
 }
 
-bool dance(int dep) {
-	if(R[0] == 0) {
-		for(int i = 0; i < dep; i++) {
-			int v = stk[i];
-			int rr = (v - 1) / 81;
-			int cc = (v - rr * 81 - 1) / 9;
-			int w = v - rr * 81 - cc * 9;
-			ans[rr][cc] = w;	
-		}
-		return true;
-	}
+bool dance() {
+	if(R[0] == 0) return true;
 	int c = R[0];
 	for(int i = R[c]; i != 0; i = R[i]) if(siz[c] > siz[i]) c = i;
 	remove(c);
 	for(int i = D[c]; i != c; i = D[i]) {
-		stk[dep] = row[i];
+		int v = row[i];
+		int rr = (v - 1) / 81;
+		int cc = (v - rr * 81 - 1) / 9;
+		int w = v - rr * 81 - cc * 9;
+		ans[rr][cc] = w;
 		for(int j = R[i]; j != i; j = R[j]) remove(col[j]);
-		if(dance(dep + 1)) return true;
+		if(dance()) return true;
 		for(int j = L[i]; j != i; j = L[j]) recover(col[j]);
 	}
 	recover(c);
 	return false;
-}
-
-int GetId(int row, int col, int num) {
-  return (row - 1) * 9 * 9 + (col - 1) * 9 + num;
 }
 
 void insert(int row, int col, int num) {
@@ -91,13 +82,14 @@ int main() {
 	for(int i = 1; i <= 9; i++) {
 		for(int j = 1; j <= 9; j++) {
 			scanf("%d", &ch);
-			for(int k = 1; k <= 9; k++) {
-				if(ch && ch != k) continue;
-				insert(i, j, k);
+			if(ch) {
+				insert(i, j, ch);
+			}else {
+				for(int k = 1; k <= 9; k++) insert(i, j, k);
 			}
 		}
 	}
-	dance(0);
+	dance();
 	for(int i = 0; i < 9; i++) {
 		printf("%d", ans[i][0]);
 		for(int j = 1; j < 9; j++) {
