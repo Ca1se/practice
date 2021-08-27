@@ -3,8 +3,8 @@ using namespace std;
 const int maxl = 330 * 735;
 int col[maxl], row[maxl];
 int L[maxl], R[maxl], U[maxl], D[maxl];
-int first[maxl], siz[maxl], idx, cnt;
-int ans[10][10], stk[maxl];
+int first[maxl], siz[maxl], idx;
+int ans[10][10];
 
 void build(int r, int c) {
 	for(int i = 0; i <= c; i++) {
