@@ -61,17 +61,17 @@ void remove(int c) {
 void recover(int c) {
     for(int i = U[c]; i != c; i = U[i]) {
         for(int j = L[i]; j != i; j = L[j]) {
-            U[j] = D[j] = j, siz[col[j]]++;
+            U[D[j]] = D[U[j]] = j, siz[col[j]]++;
         }
     }
-    R[c] = L[c] = c;
+    R[L[c]] = L[R[c]] = c;
 }
 
 void insert(int r, int c) {
     col[++idx] = c, row[idx] = r, siz[c]++;
     U[idx] = c, D[idx] = D[c], U[D[c]] = idx, D[c] = idx;
     if(front[r] == 0) front[r] = R[idx] = L[idx] = idx;
-    else  {
+    else {
         L[idx] = front[r], R[idx] = R[front[r]];
         L[R[front[r]]] = idx, R[front[r]] = idx;
     }
@@ -104,7 +104,7 @@ bool dance() {
     return false;
 }
 
-inline void insert(int pos, int wh, int an, int re, const vector<Point>& vec) {
+void insert(int pos, int wh, int an, int re, const vector<Point>& vec) {
     int r = (pos - 1) * 96 + wh * 8 + an * 2 + re + 1;
     insert(r, pos);
     for(const auto& it: vec) {
@@ -142,7 +142,6 @@ int main() {
                             }
                             if(jug) {
                                 insert(y * (y - 1) / 2 + x, i, j, k, vec);
-                                cnt++;
                             }
                             vec.clear();
                         }
@@ -167,7 +166,6 @@ int main() {
                             insert(y * (y - 1) / 2 + x, mp[y][x] - 'A', j, k, vec);
                             g1[mp[y][x] - 'A'] = true;
                             ju = false;
-                            cnt++;
                         }
                         vec.clear();
                     }
@@ -175,7 +173,6 @@ int main() {
             }
         }
     }
-    cout << cnt << endl;
     if(dance()) {
         for(int i = 0; i < 10; i++) {
             for(int j = 0; j <= i; j++) {
