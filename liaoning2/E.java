@@ -14,7 +14,7 @@ public class Main {
     public static BigInteger cnm(int n, int m) {
         return anm(n, m).divide(anm(n, n));
     }
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         int n, m, t;
         Scanner scan = new Scanner(System.in);
         n = scan.nextInt();
@@ -22,9 +22,9 @@ public class Main {
         t = scan.nextInt();
         long ans = 0;
         for(int i = 4; i < Math.min(n + 1, t); i++) {
-		    if(t - i > m) continue;
-		    ans += (cnm(i, n).multiply(cnm(t - i, m))).longValue();
-	    }
+            if(t - i > m) continue;
+            ans += (cnm(i, n).multiply(cnm(t - i, m))).longValue();
+        }
         System.out.println(ans);
-	}
+    }
 }
