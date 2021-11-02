@@ -1,0 +1,191 @@
+#!/usr/bin/bash
+
+PrintUsage() {
+    echo "schedule      -h                                                    display this help text"
+    echo "              -a {YYYY-MM-DD hh:mm:ss} {schedule massage}           add a schedule massage, massage can be none"
+    echo "              -d {serial number}                                    delete the schedule of the specified serial number"
+    echo "              -m {serial number} : --date {YYYY-MM-DD hh:mm:ss}     modify the schedule date of the specified serial number"
+    echo "                                   --massage {schedule number}      modify the schedule massage of the specified massage"
+    echo "              -s                                                    display schedule table"
+    echo "              -b                                                    begin the schedule alarm"
+}
+
+AddScheduleMassage() {
+    time_format="$1 $2"
+    schedule_massage="$3"
+
+    timestamp=$(date -d "$time_format" +%s)
+    now_timestamp=$(date -d "$(date "+%Y-%m-%d %H:%M:%S")" +%s)
+
+    if [ $timestamp -lt $now_timestamp ]
+    then
+        echo "premature time"
+        exit 0
+    elif test -n "$(grep $timestamp $HOME/.schedule)"
+    then
+        echo "this time already have a schedule"
+        exit 0
+    fi
+
+    echo "$timestamp $schedule_massage" >> $HOME/.schedule
+    sort $HOME/.schedule -o $HOME/.schedule
+    echo "schedule massage added"
+}
+
+DeleteScheduleMassage() {
+    line_count=$(wc -l ~/.schedule | awk '{print $1}')
+    line_number=$1
+    if [ $line_count -lt $line_number ] || [ $line_number -lt 1 ]
+    then
+        echo "wrong arguments"
+        exit 0
+    fi
+    sed -i "${line_number}d" $HOME/.schedule
+    echo "schedule massage deleted"
+}
+
+DisplayScheduleTable() {
+    line_count=$(wc -l ~/.schedule | awk '{print $1}')
+    i=0
+    while [ $i -lt $line_count ]
+    do
+        line=$(sed -n "$[$i+1]p" $HOME/.schedule)
+        echo "$[$i+1]. $(date -d @$(echo $line | awk '{print $1}') "+%F %T") $(echo $line | awk '{print $2}')"
+        i=$[$i+1]
+    done
+}
+
+ModifyScheduleInfo() {
+    line_count=$(wc -l ~/.schedule | awk '{print $1}')
+    line_number=$1
+    if [ $line_count -lt $line_number ] || [ $line_number -lt 1 ]
+    then
+        echo "wrong arguments"
+        exit 0
+    fi
+
+    line=$(sed -n "${line_number}p" $HOME/.schedule)
+
+    if test -z "$4"
+    then
+        if [ $2 != "--massage" ]
+        then
+            PrintUsage
+            exit 0
+        fi
+
+        sed -i "${line_number}d" $HOME/.schedule
+        echo "$(echo $line | awk '{print $1}') $3" >> $HOME/.schedule
+    else
+        if [ $2 != "--date" ]
+        then
+            PrintUsage
+            exit 0
+        fi
+
+        time_format="$3 $4"
+        timestamp=$(date -d "$time_format" +%s)
+        now_timestamp=$(date -d "$(date "+%Y-%m-%d %H:%M:%S")" +%s)
+        
+        if [ $timestamp -lt $now_timestamp ]
+        then
+            echo "premature time"
+            exit 0
+        elif test -n "$(grep $timestamp $HOME/.schedule)"
+        then
+            echo "this time already have a schedule"
+            exit 0
+        fi
+
+        sed -i "${line_number}d" $HOME/.schedule
+        echo "$timestamp $(echo $line | awk '{print $2}')" >> $HOME/.schedule
+    fi
+
+    sort $HOME/.schedule -o $HOME/.schedule
+    echo "schedule massage modified"
+}
+
+BeginAlert() {
+    line_count=$(wc -l ~/.schedule | awk '{print $1}')
+
+    if [ $line_count -eq 0 ]
+    then
+        echo "schedule is finished"
+        exit 0
+    fi
+
+    line=$(sed -n '1p' $HOME/.schedule)
+    timestamp=$(echo $line | awk '{print $1}')
+
+    while true
+    do
+        now_timestamp=$(date -d "$(date "+%Y-%m-%d %H:%M:%S")" +%s)
+        if [ $timestamp -eq $now_timestamp ]
+        then
+            i=0
+            while [ $i -lt 5 ]
+            do
+                echo "Scheduled time is up! $(date -d @$timestamp "+%F %T") $(echo $line | awk '{print $2}')"
+                i=$[$i+1]
+            done
+
+            sed -i "1d" $HOME/.schedule
+            line_count=$[$line_count-1]
+
+            if [ $line_count -eq 0 ]
+            then
+                echo "schedule is finished"
+                exit 0
+            fi
+
+            line=$(sed -n '1p' $HOME/.schedule)
+            timestamp=$(echo $line | awk '{print $1}')
+        fi
+        sleep 0.1
+    done
+}
+
+touch $HOME/.schedule
+
+case $1 in
+-a)
+    if [ $# -eq 4 ] 
+    then
+        AddScheduleMassage $2 $3 $4
+    else
+        PrintUsage
+        exit 0
+    fi
+    ;;
+-d)
+    if [ $# -eq 2 ]
+    then
+        DeleteScheduleMassage $2
+    else
+        PrintUsage
+        exit 0
+    fi
+    ;;
+-s)
+    DisplayScheduleTable
+    ;;
+-m)
+    if [ $# -eq 4 ] || [ $# -eq 5 ]
+    then
+        ModifyScheduleInfo $2 $3 $4 $5
+    else
+        PrintUsage
+        exit 0
+    fi
+    ;;
+-h)
+    PrintUsage
+    ;;
+-b)
+    BeginAlert
+    ;;
+*)
+    DisplayScheduleTable
+    exit 0
+    ;;
+esac
