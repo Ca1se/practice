@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="694e884f-02bd-4ce5-b420-8963d45fe9ba" name="变更" comment="">
+      <change beforePath="$PROJECT_DIR$/lib/mariadb-java-client-2.7.4.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sut/edu/db/Database.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sut/edu/log/FileUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sut/edu/log/Logger.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sut/edu/system/MainSystem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sut/edu/system/Manager.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="21I5SYwjodeATLrbSkXEXXoDdk5" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../IdeaProjects/java_test_project1" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RunManager">
+    <configuration name="未命名" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="11" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="sut.edu.test.Test" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="694e884f-02bd-4ce5-b420-8963d45fe9ba" name="变更" comment="" />
+      <created>1637615762434</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1637615762434</updated>
+      <workItem from="1637615764348" duration="99000" />
+      <workItem from="1637615875378" duration="446000" />
+      <workItem from="1637616343630" duration="145000" />
+      <workItem from="1637616504864" duration="60000" />
+      <workItem from="1637616578830" duration="97000" />
+      <workItem from="1637616690865" duration="26000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+</project>

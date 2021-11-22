@@ -20,6 +20,7 @@ public class MainSystem {
 
     private Manager manager;
 
+    /*
     static {
         userMethod = new HashMap<>();
         adminMethod = new HashMap<>();
@@ -123,11 +124,5 @@ public class MainSystem {
         return manager.getUserPassword(name).equals(passwd);
     }
 
-    public static void main(String[] args) {
-        Database.connect(URL, NAME, PASSWD);
-        MainSystem system = new MainSystem();
-        system.start();
-        Logger.getSingleton().stop();
-        Database.disconnect();
-    }
+    */
 }
