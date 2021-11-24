@@ -5,7 +5,7 @@ public class DBConnectionInfo {
     private final String userName;
     private final String password;
 
-    public DBConnectionInfo(String url, String userName, String password, String tableName) {
+    public DBConnectionInfo(String url, String userName, String password) {
         this.url = url;
         this.userName = userName;
         this.password = password;
