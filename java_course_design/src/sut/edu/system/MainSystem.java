@@ -20,7 +20,8 @@ public class MainSystem {
         OK("done"),
         CMD_NOT_FOUND("command not found, check your input"),
         SYNTAX_ERROR("syntax error, check your input"),
-        WRONG_ARGS("wrong arguments, check your input");
+        WRONG_ARGS("wrong arguments, check your input"),
+        NO_AUTHOR("your are not admin");
 
         private String message;
         STATUS(String msg) {
@@ -33,7 +34,7 @@ public class MainSystem {
     }
 
     private static final int kServerPort = 55533;
-    private static final String kUrl = "jdbc:mysql://localhost:3306/manager_system";
+    private static final String kUrl = "jdbc:mysql://localhost:3306/java_course";
     private static final String kUserName = "root";
     private static final String kPassword = "123456789";
     private static final String kHelpInfo =
@@ -86,11 +87,18 @@ public class MainSystem {
             interactive.PushMessage("wrong password");
         }
 
+        String identity = manager.GetUserIdentity(name);
+
         interactive.PushMessage("welcome");
         interactive.PushMessage(kHelpInfo);
+        Logger.getSingleton().appendLog(String.format("%s %s login", identity, name));
+
 
         while(true) {
             String commandLine = interactive.PullMessage();
+
+            if(commandLine == null) break;
+
             String[] commands = commandLine.split("\\s+");
             if(commands[0].equals("exit")) break;
             else if(commands[0].equals("help")) {
@@ -103,17 +111,17 @@ public class MainSystem {
                 }
                 interactive.PushMessage(s.toString());
             }else {
-                STATUS res = executeCommand(commands[0], Arrays.copyOfRange(commands, 1, commands.length));
+                STATUS res = executeCommand(commands[0], Arrays.copyOfRange(commands, 1, commands.length), identity.equals("admin"));
                 interactive.PushMessage(res.getMessage());
             }
-
+            Logger.getSingleton().appendLog(String.format("user %s execute: %s", name, commandLine));
         }
-        interactive.Close();
-        
+
     }
 
-    private STATUS executeCommand(String command, Object[] args) {
+    private STATUS executeCommand(String command, Object[] args, boolean isAdmin) {
         Method method = adminCall.get(command);
+        if(!isAdmin && method != null) return STATUS.NO_AUTHOR;
 
         if(method != null) {
             try {
@@ -132,6 +140,7 @@ public class MainSystem {
     }
 
     public static void main(String[] args) {
+        System.out.println();
         try {
             final Manager manager = new Manager(new Database(new DBConnectionInfo(kUrl, kUserName, kPassword)));
             Thread tRemote = new Thread(
@@ -149,15 +158,14 @@ public class MainSystem {
                                 }
                             ).start();
                         }
-                    }catch(Exception e) {
-
-                    }
+                    }catch(Exception e) {}
                 }
             );
             tRemote.start();
 
             MainSystem localSys = new MainSystem(manager, new StdIOInteractive());
             localSys.Start();
+            System.exit(0);
         }catch(SQLException e) {
             System.exit(-1);
         }

@@ -46,7 +46,7 @@ public class Manager {
     public boolean ChangeUserIdentity(String name, String identity) {
         try {
             database.UpdateStringValueRowByPrimaryKey(
-                kTableName, kPrimaryKey, name, "user_indentity", identity);
+                kTableName, kPrimaryKey, name, "user_identity", identity);
             return true;
         }catch(SQLException e) {
             return false;
@@ -67,6 +67,15 @@ public class Manager {
         try {
             return database.RetrieveStringValueByPrimaryKey(
                 kTableName, kPrimaryKey, name, "user_password");
+        }catch(SQLException e) {
+            return null;
+        }
+    }
+
+    public String GetUserIdentity(String name) {
+        try {
+            return database.RetrieveStringValueByPrimaryKey(
+                    kTableName, kPrimaryKey, name, "user_identity");
         }catch(SQLException e) {
             return null;
         }

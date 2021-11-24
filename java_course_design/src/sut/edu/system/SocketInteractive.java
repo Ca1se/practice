@@ -24,7 +24,9 @@ public class SocketInteractive implements Interactive {
     public String PullMessage() {
         try {
             int first = input.read();
-            if(first == -1) return null;
+            if(first == -1) {
+                return null;
+            }
             int second = input.read();
             int length = (first << 8) + second;
             input.read(buffer, 0, length);
@@ -38,7 +40,6 @@ public class SocketInteractive implements Interactive {
     public void PushMessage(String msg) {
         try {
             byte[] bytes = msg.getBytes(StandardCharsets.UTF_8);
-            output.write(bytes.length);
             output.write(bytes.length >> 8);
             output.write(bytes.length & 0xff);
             output.write(bytes);
