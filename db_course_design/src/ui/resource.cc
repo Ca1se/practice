@@ -2,7 +2,7 @@
 #include "resource.hh"
 #include <fstream>
 
-const std::string Resource::kNoResource = "No such resource.";
+const oatpp::String Resource::kNoResource = "No such resource.";
 
 Resource::Resource(const std::string& res_dir_path) {
     setResDirPath(res_dir_path);
@@ -15,13 +15,9 @@ bool Resource::loadResource(const std::string &res_name) {
     ifstream file(full_name, ios::in | ios::binary | ios::ate);
     
     if(file.is_open()) {
-        string result;
-
-        uint32_t length = file.tellg();
-        result.resize(length);
-
+        oatpp::String result((int32_t) file.tellg());
         file.seekg(0, ios::beg);
-        file.read((char*) result.data(), length);
+        file.read((char*) result->data(), result->size());
         file.close();
 
         res_map_[res_name] = std::move(result);
