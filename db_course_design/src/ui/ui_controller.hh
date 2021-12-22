@@ -6,6 +6,7 @@
 #include <oatpp/web/server/api/ApiController.hpp>
 #include <oatpp/core/macro/codegen.hpp>
 #include <oatpp/core/macro/component.hpp>
+#include <oatpp/web/protocol/http/outgoing/StreamingBody.hpp>
 
 #include "resource.hh"
 
@@ -40,11 +41,17 @@ public:
 #include OATPP_CODEGEN_BEGIN(ApiController) // codegen begin
 
     ENDPOINT("GET", "/", getUIRoot) {
-        return createResponse(Status::CODE_200, resource_->getResource("index.html"));
+        auto body = std::make_shared<oatpp::web::protocol::http::outgoing::StreamingBody>(
+            resource_->getResourceStream("index.html")
+        );
+        return OutgoingResponse::createShared(Status::CODE_200, body);
     }
 
     ENDPOINT("GET", "/{filename}", getUIResource, PATH(String, filename)) {
-        return createResponse(Status::CODE_200, resource_->getResource(filename->c_str()));
+        auto body = std::make_shared<oatpp::web::protocol::http::outgoing::StreamingBody>(
+            resource_->getResourceStream(filename)
+        );
+        return OutgoingResponse::createShared(Status::CODE_200, body);
     }
 
 #include OATPP_CODEGEN_END(ApiController) // codegen end
