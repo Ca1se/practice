@@ -2,9 +2,6 @@
 #define _RESOURCE_HH_
 
 #include <memory>
-#include <oatpp-1.3.0/oatpp/oatpp/core/IODefinitions.hpp>
-#include <oatpp-1.3.0/oatpp/oatpp/core/base/Environment.hpp>
-#include <oatpp/core/Types.hpp>
 #include <oatpp/core/data/stream/BufferStream.hpp>
 #include <oatpp/core/data/stream/FileStream.hpp>
 #include <stdexcept>
@@ -14,16 +11,6 @@
 static const char* const kResDirPath = "/home/ca1se/Documents/practice/db_course_design/res/";
 
 class Resource {
-private:
-    class ReadCallback: public oatpp::data::stream::ReadCallback {
-    private:
-        oatpp::String file_;
-        oatpp::data::stream::FileInputStream stream_;
-    public:
-        ReadCallback(const oatpp::String& file);
-        oatpp::v_io_size read(void* buffer, v_buff_size count, oatpp::async::Action& action) override;
-    };
-
 public:
     Resource(const std::string& res_dir);
 
@@ -58,20 +45,6 @@ public:
         }
 
         throw std::runtime_error("no such resource");
-    }
-
-    /**
-    * return resource stream by its name
-    * @param res - resource name
-    * @return - resource stream
-    */
-    std::shared_ptr<Resource::ReadCallback> getResourceStream(
-            const std::string& res) const {
-        try {
-            return std::make_shared<Resource::ReadCallback>(res_dir_path_ + res);
-        }catch(std::runtime_error& e) {
-            throw std::runtime_error("no such resource");
-        }
     }
 
 private:

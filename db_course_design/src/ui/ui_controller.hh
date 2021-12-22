@@ -41,17 +41,11 @@ public:
 #include OATPP_CODEGEN_BEGIN(ApiController) // codegen begin
 
     ENDPOINT("GET", "/", getUIRoot) {
-        auto body = std::make_shared<oatpp::web::protocol::http::outgoing::StreamingBody>(
-            resource_->getResourceStream("index.html")
-        );
-        return OutgoingResponse::createShared(Status::CODE_200, body);
+        return createResponse(Status::CODE_200, resource_->getResource("index.html"));
     }
 
     ENDPOINT("GET", "/{filename}", getUIResource, PATH(String, filename)) {
-        auto body = std::make_shared<oatpp::web::protocol::http::outgoing::StreamingBody>(
-            resource_->getResourceStream(filename)
-        );
-        return OutgoingResponse::createShared(Status::CODE_200, body);
+        return createResponse(Status::CODE_200, resource_->getResource(filename));
     }
 
 #include OATPP_CODEGEN_END(ApiController) // codegen end
