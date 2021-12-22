@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 11)
 FILE(GLOB SRC
     ${PROJECT_SOURCE_DIR}/src/ui/*.cc 
     ${PROJECT_SOURCE_DIR}/src/ui/*.hh
+    ${PROJECT_SOURCE_DIR}/src/*.cc
+    ${PROJECT_SOURCE_DIR}/src/*.hh
     )
 
 find_package(oatpp REQUIRED)

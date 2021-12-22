@@ -1,10 +1,12 @@
+#include <oatpp/core/base/Environment.hpp>
 #include "resource.hh"
 #include <fstream>
 
-const std::string Resource::kNoResource = "";
+const std::string Resource::kNoResource = "No such resource.";
 
-Resource::Resource(const std::string& res_dir_path):
-        res_dir_path_(res_dir_path) {}
+Resource::Resource(const std::string& res_dir_path) {
+    setResDirPath(res_dir_path);
+}
 
 bool Resource::loadResource(const std::string &res_name) {
     using namespace std;
