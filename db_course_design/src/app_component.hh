@@ -2,13 +2,9 @@
 #define _APP_COMPONENT_HH_
 
 #include <memory>
-#include <oatpp-1.3.0/oatpp/oatpp/network/ConnectionHandler.hpp>
-#include <oatpp/network/Address.hpp>
-#include <oatpp/network/ConnectionProvider.hpp>
-#include <oatpp/core/macro/component.hpp>
-#include <oatpp/web/server/HttpConnectionHandler.hpp>
 #include <oatpp/web/server/HttpRouter.hpp>
 #include <oatpp/network/tcp/server/ConnectionProvider.hpp>
+#include <oatpp/web/server/HttpConnectionHandler.hpp>
 #include "ui/ui_component.hh"
 
 class AppComponent {

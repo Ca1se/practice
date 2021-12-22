@@ -35,6 +35,7 @@ public:
         
         auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared(serializerConfig, deserializerConfig);
        
+
         return std::make_shared<UIController>(objectMapper, resource);
     }
 
