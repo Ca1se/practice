@@ -31,7 +31,14 @@ public:
     * @param res_name - resource name
     * @return - returns True if the resource is loaded successfully
     */
-    bool loadResource(const std::string& res_name);
+    bool loadResourceFromFile(const std::string& res_name);
+
+    /**
+    * load all resources from resource directory
+    * @param res_dir_path - resource directory path
+    * @return - shared_ptr to Resource
+    */
+    static std::shared_ptr<Resource> loadResources(const std::string& res_dir_path);
 
     /**
     * find resource by its name

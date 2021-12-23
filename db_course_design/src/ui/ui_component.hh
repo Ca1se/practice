@@ -10,11 +10,7 @@ public:
     * UI Resource ({project_path}/res/)
     */
     OATPP_CREATE_COMPONENT(std::shared_ptr<Resource>, ui_resource)([] {
-        auto resource = std::make_shared<Resource>(kResDirPath);
-        resource->loadResource("index.html");
-        resource->loadResource("test.png");
-        resource->loadResource("style.css");
-        return resource;
+        return Resource::loadResources(kResDirPath);
     }());
 };
 
