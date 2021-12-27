@@ -2,14 +2,29 @@
 #define _APP_COMPONENT_HH_
 
 #include <memory>
+#include <oatpp/core/data/mapping/ObjectMapper.hpp>
+#include <oatpp/core/macro/component.hpp>
+#include <oatpp/parser/json/mapping/ObjectMapper.hpp>
 #include <oatpp/web/server/HttpRouter.hpp>
 #include <oatpp/network/tcp/server/ConnectionProvider.hpp>
 #include <oatpp/web/server/HttpConnectionHandler.hpp>
 #include "ui/ui_component.hh"
+#include "db/db_component.hh"
 
 class AppComponent {
 public:
     UIComponent ui_component;
+
+    DbComponent db_component;
+
+    /**
+    * create objectMapper component
+    */
+    OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper)([]() {
+        auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared();
+        objectMapper->getDeserializer()->getConfig()->allowUnknownFields = false;
+        return objectMapper;
+    }());
 
     /**
     * create http router component

@@ -10,7 +10,7 @@ public:
     * UI Resource ({project_path}/res/)
     */
     OATPP_CREATE_COMPONENT(std::shared_ptr<Resource>, ui_resource)([] {
-        return Resource::loadResources(kResDirPath);
+        return Resource::loadResources(RESOURCE_DIR_PATH);
     }());
 };
 

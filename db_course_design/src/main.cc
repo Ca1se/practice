@@ -7,12 +7,14 @@
 #include <oatpp/network/Server.hpp>
 #include "app_component.hh"
 #include "ui/ui_controller.hh"
+#include "user_controller.hh"
 
 inline void run() {
     AppComponent component;
 
     OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
     router->addController(UIController::createShared());
+    router->addController(UserController::createShared());
 
     OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);
 
