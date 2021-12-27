@@ -8,8 +8,6 @@
 #include <unordered_map>
 #include <string>
 
-static const char* const kResDirPath = "/home/ca1se/Documents/practice/db_course_design/res/";
-
 class Resource {
 public:
     Resource(const std::string& res_dir);

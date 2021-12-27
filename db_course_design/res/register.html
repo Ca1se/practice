@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <title>校友问卷调查系统</title>
+        <link rel="icon" href="favicon-64x64.ico">
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="login.css">
+        <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+        <script src="register.js"></script>
+        <script src="user_info.js"></script>
+    </head>
+    <body>
+        <header>
+            <ul style="display: flex;">
+                <li>
+                    <button class="hlink_button" id="icon_button" onclick="window.location.href='/'">主</button>
+                    <button class="hlink_button" style="margin-left: 10px;">创建问卷</button>
+                </li>
+                <li style="margin: auto;"></li>
+                <li style="margin-right: 20px;">
+                    <button class="hlink_button" id="login_href" onclick="window.location.href='login.html'">登录</button>
+                    <button class="hlink_button" onclick="window.location.href='register.html'">注册</button>
+                </li>
+            </ul>
+        </header>
+        <section style="height: 1080px;">
+            <div id="login_frame">
+                <h1 style="margin-bottom: 30px;">注册</h1>
+                <form id="register_form">
+                    <p><label class="label_input">用户名</label><input type="text" id="username" class="text_field"/></p>
+                    <p><label class="label_input">密码</label><input type="password" id="password" class="text_field"/></p>
+                    <p><label class="label_input">重复密码</label><input type="password" id="rpassword" class="text_field"/></p>
+                    <p><button id="btn_register">注册</button></p>
+                </form>
+            </div>
+        </section>
+    </body>
+</html>

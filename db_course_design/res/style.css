@@ -1,10 +1,39 @@
-button {
-    width: 512px;
-    height: 256px;
-    background-color: red;
-    font-size: 64px;
+ul {
+    list-style-type: none;
 }
 
-button:active {
-    background-color: blue;
+button {
+    cursor: pointer;
+}
+
+#icon_button {
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-image: url("main-icon.png");
+    color: rgba(0, 0, 0, 0);
+    margin-right: 5px;
+}
+
+.hlink_button {
+    border: none;
+    height: 32px;
+    background-color: inherit;
+    font-weight: bold;
+    font-size: large;
+}
+
+body {
+    background-image: url("background-pic.jpg");
+}
+
+header {
+    background-color: rgba(127, 255, 212, 0.5);
+    padding: 5px;
+}
+
+section {
+    background-size: 100%;
+    background-repeat: no-repeat;
 }
