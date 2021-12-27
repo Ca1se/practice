@@ -22,7 +22,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "/signin",
+            url: "/register",
             data: JSON.stringify(form_data),
             success: function (response) {
                 alert(response);

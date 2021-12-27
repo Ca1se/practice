@@ -7,6 +7,7 @@
 #include <oatpp-sqlite/Executor.hpp>
 #include <oatpp/core/macro/component.hpp>
 #include <oatpp/core/provider/Provider.hpp>
+#include "quzl_db.hh"
 #include "user_db.hh"
 
 class DbComponent {
@@ -19,12 +20,20 @@ public:
                                                            std::chrono::seconds(5));
     }());
 
-    OATPP_CREATE_COMPONENT(std::shared_ptr<UserDb>, db)([] {
+    OATPP_CREATE_COMPONENT(std::shared_ptr<UserDb>, user_db)([] {
         OATPP_COMPONENT(std::shared_ptr<oatpp::provider::Provider<oatpp::sqlite::Connection>>, provider);
 
         auto executor = std::make_shared<oatpp::sqlite::Executor>(provider);
 
         return std::make_shared<UserDb>(executor);
+    }());
+
+    OATPP_CREATE_COMPONENT(std::shared_ptr<QuzlDb>, quzl_db)([] {
+        OATPP_COMPONENT(std::shared_ptr<oatpp::provider::Provider<oatpp::sqlite::Connection>>, provider);
+
+        auto executor = std::make_shared<oatpp::sqlite::Executor>(provider);
+
+        return std::make_shared<QuzlDb>(executor);
     }());
 };
 
