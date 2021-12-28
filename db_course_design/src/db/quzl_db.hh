@@ -17,6 +17,18 @@ public:
             "(quzlname, ownerid) values"
             "(:name, :id);",
             PARAM(oatpp::String, name), PARAM(oatpp::Int32, id))
+        
+    QUERY(createQuz,
+            "insert into quz_table"
+            "(quzcontent, quzlid) values"
+            "(:content, :id);",
+            PARAM(oatpp::String, content), PARAM(oatpp::Int32, id))
+
+    QUERY(createOption,
+            "insert into option_table"
+            "(optcontent, quzid) values"
+            "(:content, :id);",
+            PARAM(oatpp::String, content), PARAM(oatpp::Int32, id))
 
 #include OATPP_CODEGEN_END(DbClient) // codegen end
 };

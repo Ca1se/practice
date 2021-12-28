@@ -14,6 +14,7 @@ class UserDto: public oatpp::DTO {
     DTO_FIELD(String, password, "password");
 };
 
+
 #include OATPP_CODEGEN_END(DTO) // codegen end
 
 #endif
