@@ -21,6 +21,8 @@ public:
 
     std::shared_ptr<oatpp::Object<UserDto>> getUserById(const oatpp::Int32& id);
 
+    void deleteSessionId(int64_t session);
+
 private:
     typedef oatpp::web::protocol::http::Status Status;
 

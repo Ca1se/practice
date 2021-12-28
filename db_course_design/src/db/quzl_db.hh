@@ -29,6 +29,13 @@ public:
             "(optcontent, quzid) values"
             "(:content, :id);",
             PARAM(oatpp::String, content), PARAM(oatpp::Int32, id))
+        
+    QUERY(getAllQuzlName,
+            "select quzlname from quzl_table;");
+
+    QUERY(getAllQuzlNameById,
+            "select quzlname from quzl_table where ownerid=:id",
+            PARAM(oatpp::Int32, id))
 
 #include OATPP_CODEGEN_END(DbClient) // codegen end
 };
