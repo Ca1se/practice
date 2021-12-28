@@ -11,22 +11,26 @@
 #include "service/quzl_service.hh"
 #include "service/user_service.hh"
 #include "dto/quzl_dto.hh"
+#include "ui/resource.hh"
 #include "utils.hh"
 
 class Controller: public oatpp::web::server::api::ApiController {
 public:
-    Controller(const std::shared_ptr<ObjectMapper>& objectMapper);
+    Controller(const std::shared_ptr<ObjectMapper>& objectMapper,
+            const std::shared_ptr<Resource>& resource);
 
 private:
     UserService user_service_;
     QuzlService quzl_service_;
 
+    std::shared_ptr<Resource> resource_;
+
 public:
 
     static std::shared_ptr<Controller> createShared(
-        OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper)
-    ) {
-        return std::make_shared<Controller>(objectMapper);
+            OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper),
+            OATPP_COMPONENT(std::shared_ptr<Resource>, resource)) {
+        return std::make_shared<Controller>(objectMapper, resource);
     }
 
 #include OATPP_CODEGEN_BEGIN(ApiController) // codegen begin
@@ -35,7 +39,7 @@ public:
              BODY_DTO(Object<UserDto>, user)) {
         auto session_id = user_service_.checkUser(user);
         auto ret = createResponse(Status::CODE_200, "登录成功");
-        ret->putHeader("Set-Cookie", "session_id=" + std::to_string(session_id));
+        ret->putHeader("Set-Cookie", "session_id=" + std::to_string(session_id) + "; path=/;");
         return ret;
     }
 
@@ -81,6 +85,12 @@ public:
 
     ENDPOINT("GET", "/quzl/all", getAllQuzl) {
         return createDtoResponse(Status::CODE_200, quzl_service_.getAllQuzl());
+    }
+
+    ENDPOINT("GET", "/quzl/getquzl/id/{id}",
+            getQuzlById, PATH(Int32, id)) {
+        OATPP_LOGD("get", "%d", id.getValue(0));
+        return createResponse(Status::CODE_200);
     }
 
 #include OATPP_CODEGEN_END(ApiController) // codegen end
