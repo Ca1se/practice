@@ -1,3 +1,5 @@
+#include <oatpp/core/Types.hpp>
+#include <oatpp/core/base/Environment.hpp>
 #include <oatpp/web/protocol/http/Http.hpp>
 #include <oatpp-sqlite/Utils.hpp>
 #include "quzl_service.hh"
@@ -16,4 +18,15 @@ void QuzlService::createQuzlist(
             db_->createOption(opt_vec[k]->option_content, quz_id);
         }
     }
+}
+
+oatpp::Vector<oatpp::String> QuzlService::getAllQuzl() {
+    auto result = db_->getAllQuzlName();
+    OATPP_ASSERT_HTTP(result->isSuccess(), Status::CODE_500, "Unknown error");
+    if(!result->hasMoreToFetch()) {
+        return oatpp::Vector<oatpp::String>::createShared();
+    }
+
+    auto ret = result->fetch<oatpp::Vector<oatpp::String>>();
+    return ret;
 }

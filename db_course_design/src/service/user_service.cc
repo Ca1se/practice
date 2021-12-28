@@ -65,3 +65,10 @@ oatpp::Object<UserDto> UserService::getUserByCookie(int64_t session) {
 
     return *user;
 }
+
+void UserService::deleteSessionId(int64_t session) {
+    auto it = session_map_.find(session);
+    if(it != session_map_.end()) {
+        session_map_.erase(it);
+    }
+}

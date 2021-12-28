@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>校友问卷调查系统</title>
+    <link rel="icon" href="favicon-64x64.ico">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            if(document.cookie == '') {
+                alert('你还未登录');
+                window.location.href='login.html';
+            }
+        });
+    </script>
+    <script src="user_info.js"></script>
+    <script src="create_quzl.js"></script>
+    <style>
+        #cquzl_frame {
+            width: 1000px;
+            min-height: 1000px;
+
+            position: absolute;
+            left: 50%;
+            top: 10%;
+            margin-left: -500px;
+
+            background-color: rgba(240, 255, 255, 0.5);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .quz_field {
+            width: 500px;
+            height: 28px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border: 0;
+            margin: 1px;
+        }
+
+        #quzl_name {
+            margin-top: 10px;
+            width: 300px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <ul style="display: flex;">
+            <li>
+                <button class="hlink_button" id="icon_button" onclick="window.location.href='/'">主</button>
+                <button class="hlink_button" style="margin-left: 10px;">创建问卷</button>
+            </li>
+            <li style="margin: auto;"></li>
+            <li style="margin-right: 20px;">
+                <button class="hlink_button" id="login_href" onclick="window.location.href='login.html'">登录</button>
+                <button class="hlink_button" onclick="window.location.href='register.html'">注册</button>
+            </li>
+        </ul>
+    </header>
+    <section>
+        <div id="cquzl_frame">
+            <form>
+                <input type="text" class="quz_field" placeholder="问卷名" id="quzl_name">
+                <p class="quz_p">
+                    <label>问题1</label>
+                    <p class="quz">
+                        <input type="text" class="quz_field" placeholder="问题内容"></br>
+                        <input type="text" class="quz_field" placeholder="选项内容"></br>
+                        <input type="text" class="quz_field" placeholder="选项内容"></br>
+                        <input type="text" class="quz_field" placeholder="选项内容"></br>
+                        <input type="text" class="quz_field" placeholder="选项内容"></br>
+                    <p>
+                </p>
+            </form>
+            <button id="btn_add_quz" style="margin-bottom: 10px;">添加问题</button></br>
+            <button id="btn_quzl_submit" style="margin-bottom: 100px;">提交</button>
+        </div>
+    </section>
+</body>
+
+</html>

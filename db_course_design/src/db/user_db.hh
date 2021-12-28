@@ -28,7 +28,6 @@ public:
             "select * from user_table where id=:id;",
             PARAM(oatpp::Int32, id));
 
-
 #include OATPP_CODEGEN_END(DbClient) // codegen end
 
 };

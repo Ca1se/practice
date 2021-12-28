@@ -39,7 +39,7 @@ public:
         return ret;
     }
 
-    ENDPOINT("POST", "/signin", signIn,
+    ENDPOINT("POST", "/user/signin", signIn,
              BODY_DTO(Object<UserDto>, user)) {
         user_service_.createUser(user);
         
@@ -51,6 +51,12 @@ public:
         int64_t session_id = getSessionId(cookie);
         auto user = user_service_.getUserByCookie(session_id);
         return createDtoResponse(Status::CODE_200, user);
+    }
+
+    ENDPOINT("GET", "/user/quit", quitLogin, HEADER(oatpp::String, cookie, "Cookie")) {
+        int64_t session_id = getSessionId(cookie);
+        user_service_.deleteSessionId(session_id);
+        return createResponse(Status::CODE_200);
     }
 
     /*
@@ -69,7 +75,12 @@ public:
             HEADER(oatpp::String, cookie, "Cookie")) {
         int64_t session_id = getSessionId(cookie);
         auto user = user_service_.getUserByCookie(session_id);
-        
+        quzl_service_.createQuzlist(quzl, user->id);
+        return createResponse(Status::CODE_200, "创建成功");
+    }
+
+    ENDPOINT("GET", "/quzl/all", getAllQuzl) {
+        return createDtoResponse(Status::CODE_200, quzl_service_.getAllQuzl());
     }
 
 #include OATPP_CODEGEN_END(ApiController) // codegen end

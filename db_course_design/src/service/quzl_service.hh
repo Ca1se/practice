@@ -11,6 +11,8 @@ class QuzlService {
 public:
     void createQuzlist(const oatpp::Object<QuzlDto>& quzl, const oatpp::Int32& user_id);
 
+    oatpp::Vector<oatpp::String> getAllQuzl();
+
 private:
     typedef oatpp::web::protocol::http::Status Status;
 
