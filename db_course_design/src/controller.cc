@@ -1,6 +1,6 @@
-#include "user_controller.hh"
+#include "controller.hh"
 #include <oatpp/web/server/api/ApiController.hpp>
 
-UserController::UserController(
+Controller::Controller(
         const std::shared_ptr<ObjectMapper>& objectMapper):
         oatpp::web::server::api::ApiController(objectMapper) {}

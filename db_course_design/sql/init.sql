@@ -13,5 +13,11 @@ create table quzl_table(
 create table quz_table(
     id          integer primary key,
     quzcontent  varchar,
-    quzlid      
+    quzlid      integer
+);
+
+create table option_table(
+    id          integer primary key,
+    optcontent  varchar,
+    quzid       integer
 );

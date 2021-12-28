@@ -1,5 +1,5 @@
-#ifndef _USER_CONTROLLER_HH_
-#define _USER_CONTROLLER_HH_
+#ifndef _CONTROLLER_HH_
+#define _CONTROLLER_HH_
 
 #include <memory>
 #include <oatpp/core/Types.hpp>
@@ -8,22 +8,25 @@
 #include <oatpp/web/server/api/ApiController.hpp>
 #include <string>
 #include <iostream>
+#include "service/quzl_service.hh"
 #include "service/user_service.hh"
 #include "dto/quzl_dto.hh"
+#include "utils.hh"
 
-class UserController: public oatpp::web::server::api::ApiController {
+class Controller: public oatpp::web::server::api::ApiController {
 public:
-    UserController(const std::shared_ptr<ObjectMapper>& objectMapper);
+    Controller(const std::shared_ptr<ObjectMapper>& objectMapper);
 
 private:
     UserService user_service_;
+    QuzlService quzl_service_;
 
 public:
 
-    static std::shared_ptr<UserController> createShared(
+    static std::shared_ptr<Controller> createShared(
         OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper)
     ) {
-        return std::make_shared<UserController>(objectMapper);
+        return std::make_shared<Controller>(objectMapper);
     }
 
 #include OATPP_CODEGEN_BEGIN(ApiController) // codegen begin
@@ -45,11 +48,12 @@ public:
     }
 
     ENDPOINT("GET", "/user/username", userName, HEADER(oatpp::String, cookie, "Cookie")) {
-        int64_t session_id = std::atoi(cookie->substr(cookie->find("session_id") + 11).c_str());
+        int64_t session_id = getSessionId(cookie);
         auto user = user_service_.getUserByCookie(session_id);
         return createDtoResponse(Status::CODE_200, user);
     }
 
+    /*
     ENDPOINT("POST", "/user/test", test, BODY_DTO(Object<QuzlDto>, quzl)) {
         using namespace std;
         cout << quzl->quzl_name->c_str() << "\n";
@@ -57,6 +61,15 @@ public:
         cout << quzl->quz_list[0]->option_list[0]->option_content->c_str() << "\n";
 
         return createResponse(Status::CODE_200, "ok");
+    }
+    */
+
+    ENDPOINT("POST", "/quzl/create", createQuzlist,
+            BODY_DTO(Object<QuzlDto>, quzl),
+            HEADER(oatpp::String, cookie, "Cookie")) {
+        int64_t session_id = getSessionId(cookie);
+        auto user = user_service_.getUserByCookie(session_id);
+        
     }
 
 #include OATPP_CODEGEN_END(ApiController) // codegen end
