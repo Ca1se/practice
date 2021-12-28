@@ -6,12 +6,13 @@
 #include <oatpp/core/macro/component.hpp>
 #include <oatpp/web/protocol/http/Http.hpp>
 #include "../db/quzl_db.hh"
+#include "../dto/db_quzl_dto.hh"
 
 class QuzlService {
 public:
     void createQuzlist(const oatpp::Object<QuzlDto>& quzl, const oatpp::Int32& user_id);
 
-    oatpp::Vector<oatpp::String> getAllQuzl();
+    oatpp::Vector<oatpp::Object<DbQuzlDto>> getAllQuzl();
 
 private:
     typedef oatpp::web::protocol::http::Status Status;

@@ -1,3 +1,5 @@
+var g_hello = 'hello';
+
 $(document).ready(function () {
     $('#btn_register').click(function () {
         var user_name = $('#username').val();

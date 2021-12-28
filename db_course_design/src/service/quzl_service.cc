@@ -20,13 +20,13 @@ void QuzlService::createQuzlist(
     }
 }
 
-oatpp::Vector<oatpp::String> QuzlService::getAllQuzl() {
+oatpp::Vector<oatpp::Object<DbQuzlDto>> QuzlService::getAllQuzl() {
     auto result = db_->getAllQuzlName();
     OATPP_ASSERT_HTTP(result->isSuccess(), Status::CODE_500, "Unknown error");
     if(!result->hasMoreToFetch()) {
-        return oatpp::Vector<oatpp::String>::createShared();
+        return oatpp::Vector<oatpp::Object<DbQuzlDto>>::createShared();
     }
 
-    auto ret = result->fetch<oatpp::Vector<oatpp::String>>();
+    auto ret = result->fetch<oatpp::Vector<oatpp::Object<DbQuzlDto>>>();
     return ret;
 }

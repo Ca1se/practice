@@ -31,10 +31,10 @@ public:
             PARAM(oatpp::String, content), PARAM(oatpp::Int32, id))
         
     QUERY(getAllQuzlName,
-            "select quzlname from quzl_table;");
+            "select quzl_table.id, quzlname, username from quzl_table, user_table where quzl_table.ownerid=user_table.id;");
 
     QUERY(getAllQuzlNameById,
-            "select quzlname from quzl_table where ownerid=:id",
+            "select id, quzlname from quzl_table where ownerid=:id",
             PARAM(oatpp::Int32, id))
 
 #include OATPP_CODEGEN_END(DbClient) // codegen end
