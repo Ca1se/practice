@@ -5,9 +5,11 @@
 #include <oatpp/core/macro/component.hpp>
 #include <oatpp/core/base/Environment.hpp>
 #include <oatpp/network/Server.hpp>
+#include <string>
 #include "app_component.hh"
 #include "ui/ui_controller.hh"
 #include "controller.hh"
+#include "log/AsyncLogging.h"
 
 inline void run() {
     AppComponent component;
@@ -30,6 +32,9 @@ inline void run() {
 
 int main() {
     oatpp::base::Environment::init();
+    AsyncLogging asyn("log.txt", 1);
+    std::string s = "hello";
+    asyn.append(s.c_str(), s.size());
 
     run();
 

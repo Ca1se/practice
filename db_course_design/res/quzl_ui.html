@@ -7,16 +7,28 @@
     <link rel="icon" href="favicon-64x64.ico">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="user_info.js"></script>
     <script>
         $(document).ready(function() {
-            if(document.cookie == '') {
-                alert('你还未登录');
-                window.location.href='login.html';
-            }
+            $.ajax({
+                type: "GET",
+                url: "/quzl/getquzl/get",
+                success: function (response) {
+                    $('#cquzl_frame').append(`<div class=\"dd\"><h2>${response.quzlname}</h2></div>`);
+                    var quz_list = response.quzlist;
+                    for(var i = 0; i < quz_list.length; i++) {
+                        var f = $(`<form class=\"quz${i}\"></form>`);
+                        $('#cquzl_frame').append(`<div class=\"dd\"><h4>${i + 1}.${quz_list[i].quzcontent}</h4></div>`);
+                        $('#cquzl_frame').append(f);
+                        var opt_list = quz_list[i].optlist;
+                        for(var k = 0; k < opt_list.length; k++) {
+                            f.append(`<input type=\"radio\" name=\"quz${i}opt\">${String.fromCharCode(65 + k)}.${opt_list[k].optcontent}</br>`);
+                        }
+                    }
+                }
+            });
         });
     </script>
-    <script src="user_info.js"></script>
-    <script src="create_quzl.js"></script>
     <style>
         #cquzl_frame {
             width: 1000px;
@@ -26,26 +38,18 @@
             left: 50%;
             top: 10%;
             margin-left: -500px;
+            padding: 20px;
 
             background-color: rgba(240, 255, 255, 0.5);
             border-radius: 10px;
             text-align: center;
+            display: block;
         }
 
-        .quz_field {
-            width: 500px;
-            height: 28px;
-            border-top-right-radius: 5px;
-            border-bottom-right-radius: 5px;
-            border: 0;
-            margin: 1px;
-        }
-
-        #quzl_name {
+        .dd {
             margin-top: 10px;
-            width: 300px;
+            margin-bottom: 10px;
         }
-
     </style>
 </head>
 
@@ -65,21 +69,9 @@
     </header>
     <section>
         <div id="cquzl_frame">
+            <button id="btn_ans_submit" style="margin-bottom: 10px;" onclick="alert('提交成功'); window.location.href='/';">提交</button>
             <form>
-                <input type="text" class="quz_field" placeholder="问卷名" id="quzl_name">
-                <p class="quz_p">
-                    <label>问题1</label>
-                    <p class="quz">
-                        <input type="text" class="quz_field" placeholder="问题内容"></br>
-                        <input type="text" class="quz_field" placeholder="选项内容"></br>
-                        <input type="text" class="quz_field" placeholder="选项内容"></br>
-                        <input type="text" class="quz_field" placeholder="选项内容"></br>
-                        <input type="text" class="quz_field" placeholder="选项内容"></br>
-                    <p>
-                </p>
             </form>
-            <button id="btn_add_quz" style="margin-bottom: 10px;">添加问题</button></br>
-            <button id="btn_quzl_submit" style="margin-bottom: 100px;">提交</button>
         </div>
     </section>
 </body>

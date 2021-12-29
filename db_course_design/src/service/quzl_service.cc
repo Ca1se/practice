@@ -2,7 +2,9 @@
 #include <oatpp/core/base/Environment.hpp>
 #include <oatpp/web/protocol/http/Http.hpp>
 #include <oatpp-sqlite/Utils.hpp>
+#include <iostream>
 #include "quzl_service.hh"
+#include "../dto/util_dto.hh"
 
 void QuzlService::createQuzlist(
         const oatpp::Object<QuzlDto>& quzl, 
@@ -28,5 +30,19 @@ oatpp::Vector<oatpp::Object<DbQuzlDto>> QuzlService::getAllQuzl() {
     }
 
     auto ret = result->fetch<oatpp::Vector<oatpp::Object<DbQuzlDto>>>();
+    return ret;
+}
+
+oatpp::Object<QuzlDto> QuzlService::getQuzlById(const oatpp::Int32& id) {
+    auto ret = oatpp::Object<QuzlDto>::createShared();
+    ret->quzl_name = db_->getQuzlNameById(id)->fetch<oatpp::Vector<oatpp::Object<QuzlNameDto>>>()[0]->quzl_name;
+    ret->quz_list = oatpp::Vector<oatpp::Object<QuzDto>>::createShared();
+    auto quz_list = db_->getQuzIdNameByQuzlId(id)->fetch<oatpp::Vector<oatpp::Object<QuzIdNameDto>>>();
+    for(int i = 0; i < quz_list->size(); i++) {
+        auto quz = oatpp::Object<QuzDto>::createShared();
+        quz->quz_content = quz_list[i]->quz_name;
+        quz->option_list = db_->getOptIdNameByQuzId(quz_list[i]->id)->fetch<oatpp::Vector<oatpp::Object<OptionDto>>>();
+        ret->quz_list->push_back(quz);
+    }
     return ret;
 }

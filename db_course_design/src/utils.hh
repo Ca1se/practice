@@ -7,6 +7,6 @@
 
 int64_t generateSessionId();
 
-int64_t getSessionId(const oatpp::String& cookie);
+int64_t getCookieVal(const oatpp::String& cookie, const std::string& name);
 
 #endif
