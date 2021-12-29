@@ -29,11 +29,9 @@
             function get_quzl(id) {
                 $.ajax({
                     type: "GET",
-                    url: `/quzl/getquzl/id/${id}`,
-                    success: function (response) {
-                        
-                    }
+                    url: `/quzl/getquzl/id/${id}`
                 });
+                window.location.href='quzl_ui.html'
             }
         </script>
         <style>

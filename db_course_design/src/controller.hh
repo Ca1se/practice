@@ -52,13 +52,13 @@ public:
     }
 
     ENDPOINT("GET", "/user/username", userName, HEADER(oatpp::String, cookie, "Cookie")) {
-        int64_t session_id = getSessionId(cookie);
+        int64_t session_id = getCookieVal(cookie, "session_id");
         auto user = user_service_.getUserByCookie(session_id);
         return createDtoResponse(Status::CODE_200, user);
     }
 
     ENDPOINT("GET", "/user/quit", quitLogin, HEADER(oatpp::String, cookie, "Cookie")) {
-        int64_t session_id = getSessionId(cookie);
+        int64_t session_id = getCookieVal(cookie, "session_id");
         user_service_.deleteSessionId(session_id);
         return createResponse(Status::CODE_200);
     }
@@ -77,7 +77,7 @@ public:
     ENDPOINT("POST", "/quzl/create", createQuzlist,
             BODY_DTO(Object<QuzlDto>, quzl),
             HEADER(oatpp::String, cookie, "Cookie")) {
-        int64_t session_id = getSessionId(cookie);
+        int64_t session_id = getCookieVal(cookie, "session_id");
         auto user = user_service_.getUserByCookie(session_id);
         quzl_service_.createQuzlist(quzl, user->id);
         return createResponse(Status::CODE_200, "创建成功");
@@ -88,9 +88,17 @@ public:
     }
 
     ENDPOINT("GET", "/quzl/getquzl/id/{id}",
-            getQuzlById, PATH(Int32, id)) {
-        OATPP_LOGD("get", "%d", id.getValue(0));
-        return createResponse(Status::CODE_200);
+            getCookieById, PATH(String, id)) {
+        auto ret = createResponse(Status::CODE_200);
+        ret->putHeader("Set-Cookie", "quzlid=" + id + "; path=/quzl/getquzl/;");
+        return ret;
+    }
+
+    ENDPOINT("GET", "/quzl/getquzl/get",
+            getQuzlData, HEADER(oatpp::String, cookie, "Cookie")) {
+        int64_t quzl_id = getCookieVal(cookie, "quzlid");
+        auto quzl = quzl_service_.getQuzlById(quzl_id);
+        return createDtoResponse(Status::CODE_200, quzl);
     }
 
 #include OATPP_CODEGEN_END(ApiController) // codegen end

@@ -14,6 +14,8 @@ public:
 
     oatpp::Vector<oatpp::Object<DbQuzlDto>> getAllQuzl();
 
+    oatpp::Object<QuzlDto> getQuzlById(const oatpp::Int32& id);
+
 private:
     typedef oatpp::web::protocol::http::Status Status;
 

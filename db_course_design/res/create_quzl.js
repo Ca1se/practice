@@ -46,7 +46,10 @@ $(document).ready(function () {
                     opt_list = quz['optlist'];
                 } else {
                     var opt_content = $(elem).val();
-                    if (opt_content === '') return;
+                    if (opt_content === '') {
+                        quz_list[i] = quz;
+                        return;
+                    }
                     opt_list[index - 1] = { optcontent: opt_content };
                 }
             }
@@ -59,6 +62,7 @@ $(document).ready(function () {
             data: JSON.stringify(data_form),
             success: function (response) {
                 alert(response);
+                window.location.href='/';
             },
             error: function (xhr) {
                 var text = xhr.responseText;
