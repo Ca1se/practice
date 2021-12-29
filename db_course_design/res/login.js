@@ -22,7 +22,7 @@ $(document).ready(function () {
             data: JSON.stringify(form_data),
             success: function (response) {
                 alert(response);
-                window.location.href="index.html";
+                window.location.href = '/';
             },
             error: function (xhr) {
                 var text = xhr.responseText;

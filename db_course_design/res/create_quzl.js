@@ -16,6 +16,14 @@ $(document).ready(function () {
         quz_cnt++;
     });
 
+    $('#btn_del_quz').click(function() {
+        if(quz_cnt > 1) {
+            var ch = $('#btn_del_quz').children('.quz_p');
+            $('form').remove($(ch[ch.length - 1]));
+            quz_cnt--;
+        }
+    });
+
     $('#btn_quzl_submit').click(function () {
         var data_form = {};
         var quzlname = $('#quzl_name').val();
@@ -73,3 +81,5 @@ $(document).ready(function () {
     });
 
 });
+
+

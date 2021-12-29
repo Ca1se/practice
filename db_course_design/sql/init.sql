@@ -27,7 +27,3 @@ create table answer_table(
     cnt         integer,
     optid       integer
 );
-
-问卷: 1 2
-
-问题: 1->1 2->1 3->1 4->2 
