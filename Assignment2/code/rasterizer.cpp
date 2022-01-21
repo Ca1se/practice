@@ -75,6 +75,14 @@ static std::tuple<float, float, float> computeBarycentric2D(float x, float y, co
     return {c1,c2,c3};
 }
 
+static Eigen::Vector3f getFinalColor(const std::vector<Eigen::Vector3f>& colors) {
+    Eigen::Vector3f ret{0, 0, 0};
+    for(const auto& it: colors) {
+        ret += it;
+    }
+    return ret / colors.size();
+}
+
 void rst::rasterizer::draw(pos_buf_id pos_buffer, ind_buf_id ind_buffer, col_buf_id col_buffer, Primitive type)
 {
     auto& buf = pos_buf[pos_buffer.pos_id];
@@ -163,6 +171,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                         z_interpolated *= w_reciprocal;
                         if(depth_buf[index][cnt] > z_interpolated) {
                             depth_buf[index][cnt] = z_interpolated;
+                            ssaa_buf[index][cnt] = t.getColor();
                             count++;
                         }
                     }
@@ -170,7 +179,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                 }
             }
             if(count) {
-                set_pixel(Eigen::Vector3f{(float) x, (float) y, 0}, t.getColor() * count / 4.0 + frame_buf[index] * (4 - count) / 4.0);
+                set_pixel(Eigen::Vector3f{(float) x, (float) y, 0}, getFinalColor(ssaa_buf[index]));
             }
         }
     }
@@ -237,7 +246,11 @@ void rst::rasterizer::clear(rst::Buffers buff)
 {
     if ((buff & rst::Buffers::Color) == rst::Buffers::Color)
     {
+#if defined SSAA
+        std::fill(ssaa_buf.begin(), ssaa_buf.end(), std::vector<Eigen::Vector3f>(4, Eigen::Vector3f{0, 0, 0}));
+#else
         std::fill(frame_buf.begin(), frame_buf.end(), Eigen::Vector3f{0, 0, 0});
+#endif
     }
 
     if ((buff & rst::Buffers::Depth) == rst::Buffers::Depth)
@@ -254,6 +267,9 @@ rst::rasterizer::rasterizer(int w, int h) : width(w), height(h)
 {
     frame_buf.resize(w * h);
     depth_buf.resize(w * h);
+#if defined SSAA
+    ssaa_buf.resize(w * h);
+#endif
 }
 
 int rst::rasterizer::get_index(int x, int y)
