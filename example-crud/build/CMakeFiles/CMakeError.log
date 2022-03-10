@@ -1,0 +1,60 @@
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/ca1se/Documents/practice/example-crud/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/sbin/make -f Makefile cmTC_dc911/fast && /usr/sbin/make  -f CMakeFiles/cmTC_dc911.dir/build.make CMakeFiles/cmTC_dc911.dir/build
+make[1]: Entering directory '/home/ca1se/Documents/practice/example-crud/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_dc911.dir/src.c.o
+/bin/x86_64-pc-linux-gnu-gcc-11.1.0 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_dc911.dir/src.c.o -c /home/ca1se/Documents/practice/example-crud/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_dc911
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_dc911.dir/link.txt --verbose=1
+/bin/x86_64-pc-linux-gnu-gcc-11.1.0 -rdynamic CMakeFiles/cmTC_dc911.dir/src.c.o -o cmTC_dc911 
+/usr/sbin/ld: CMakeFiles/cmTC_dc911.dir/src.c.o: in function `main':
+src.c:(.text+0x3e): undefined reference to `pthread_create'
+/usr/sbin/ld: src.c:(.text+0x4a): undefined reference to `pthread_detach'
+/usr/sbin/ld: src.c:(.text+0x56): undefined reference to `pthread_cancel'
+/usr/sbin/ld: src.c:(.text+0x67): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_dc911.dir/build.make:99: cmTC_dc911] Error 1
+make[1]: Leaving directory '/home/ca1se/Documents/practice/example-crud/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:127: cmTC_dc911/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/ca1se/Documents/practice/example-crud/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/sbin/make -f Makefile cmTC_de542/fast && /usr/sbin/make  -f CMakeFiles/cmTC_de542.dir/build.make CMakeFiles/cmTC_de542.dir/build
+make[1]: Entering directory '/home/ca1se/Documents/practice/example-crud/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_de542.dir/CheckFunctionExists.c.o
+/bin/x86_64-pc-linux-gnu-gcc-11.1.0   -DCHECK_FUNCTION_EXISTS=pthread_create -o CMakeFiles/cmTC_de542.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_de542
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_de542.dir/link.txt --verbose=1
+/bin/x86_64-pc-linux-gnu-gcc-11.1.0  -DCHECK_FUNCTION_EXISTS=pthread_create -rdynamic CMakeFiles/cmTC_de542.dir/CheckFunctionExists.c.o -o cmTC_de542  -lpthreads 
+/usr/sbin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_de542.dir/build.make:99: cmTC_de542] Error 1
+make[1]: Leaving directory '/home/ca1se/Documents/practice/example-crud/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:127: cmTC_de542/fast] Error 2
+
+
+

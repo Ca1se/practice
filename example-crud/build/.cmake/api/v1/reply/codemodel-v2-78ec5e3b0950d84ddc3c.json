@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "crud",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "crud-exe::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-crud-exe-Release-c273e30b04e9aca85032.json",
+					"name" : "crud-exe",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "crud-lib::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-crud-lib-Release-e5c8eb93714b9ebd6eac.json",
+					"name" : "crud-lib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "crud-test::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-crud-test-Release-f7bc9a80cc5351f078a6.json",
+					"name" : "crud-test",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/ca1se/Documents/practice/example-crud/build",
+		"source" : "/home/ca1se/Documents/practice/example-crud"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

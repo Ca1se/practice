@@ -1,0 +1,2 @@
+/bin/ar qc libcrud-lib.a "CMakeFiles/crud-lib.dir/src/service/UserService.cpp.o" "CMakeFiles/crud-lib.dir/src/ErrorHandler.cpp.o"
+/bin/ranlib libcrud-lib.a

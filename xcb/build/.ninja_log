@@ -1,0 +1,7 @@
+# ninja log v5
+431	533	1645019903582744800	xcb	3d02c6c0a7747ec2
+0	431	1645019903482744800	CMakeFiles/xcb.dir/src/png_image.cpp.o	107a3a893105ef82
+0	431	1645022638652744800	CMakeFiles/xcb_window.dir/src/png_image.cpp.o	7df308362fe187b4
+0	316	1645022608012744800	CMakeFiles/xcb.dir/src/main.cpp.o	ab15c490df617d9b
+0	197	1645244712246116800	CMakeFiles/xcb_window.dir/src/main.cpp.o	fda04774e70b366
+197	306	1645244712346116800	xcb_window	c628fa2427892f3f

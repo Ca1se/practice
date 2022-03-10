@@ -1,0 +1,1 @@
+/bin/c++ -O3 -DNDEBUG -rdynamic "CMakeFiles/crud-exe.dir/src/App.cpp.o" -o crud-exe  libcrud-lib.a /usr/local/lib/oatpp-1.3.0/liboatpp-swagger.a /usr/local/lib/oatpp-1.3.0/liboatpp-sqlite.a /usr/local/lib/oatpp-1.3.0/liboatpp-test.a /usr/local/lib/oatpp-1.3.0/liboatpp.a -latomic /usr/local/lib/oatpp-1.3.0/libsqlite.a -lpthread -ldl 
