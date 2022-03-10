@@ -2,6 +2,7 @@
 #ifndef CRUD_DATABASECOMPONENT_HPP
 #define CRUD_DATABASECOMPONENT_HPP
 
+#include <oatpp/core/macro/component.hpp>
 #include "db/UserDb.hpp"
 
 class DatabaseComponent {

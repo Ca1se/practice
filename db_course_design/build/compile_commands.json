@@ -1,0 +1,47 @@
+[
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/controller.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/controller.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/controller.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/db/quzl_db.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/db/quzl_db.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/db/quzl_db.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/db/user_db.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/db/user_db.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/db/user_db.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/main.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/main.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/main.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/service/quzl_service.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/service/quzl_service.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/service/quzl_service.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/service/user_service.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/service/user_service.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/service/user_service.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/ui/resource.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/ui/resource.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/ui/resource.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/ui/ui_controller.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/ui/ui_controller.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/ui/ui_controller.cc"
+},
+{
+  "directory": "/home/ca1se/Documents/practice/db_course_design/build",
+  "command": "/bin/c++ -DDATABASE_FILE=\\\"/home/ca1se/Documents/practice/db_course_design/db.sqlite\\\" -DRESOURCE_DIR_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/res\\\" -DSQL_INIT_FILE_PATH=\\\"/home/ca1se/Documents/practice/db_course_design/sql\\\" -isystem /usr/local/include/oatpp-1.3.0/oatpp -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite -isystem /usr/local/include/oatpp-1.3.0/oatpp-sqlite/sqlite -g -std=gnu++11 -o CMakeFiles/WebServer.dir/src/utils.cc.o -c /home/ca1se/Documents/practice/db_course_design/src/utils.cc",
+  "file": "/home/ca1se/Documents/practice/db_course_design/src/utils.cc"
+}
+]
