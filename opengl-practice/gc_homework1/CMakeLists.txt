@@ -9,4 +9,4 @@ file(GLOB SOURCES
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} glfw glad GL X11 pthread Xrandr Xi dl)
+target_link_libraries(${PROJECT_NAME} glfw glad GL)
