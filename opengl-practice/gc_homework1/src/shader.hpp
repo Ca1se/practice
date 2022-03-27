@@ -22,14 +22,13 @@ const char* const kDefaultFragmentShaderSource =
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}";
 
-class ShaderSource {
-public:
-    struct Path {
-        std::string str;
-        explicit Path(const std::string& path): str(path) {}
-        operator std::string() const { return str; }
-    };
+struct Path {
+    std::string str;
+    explicit Path(const std::string& path): str(path) {}
+    operator std::string() const { return str; }
+};
 
+class ShaderSource {
 private:
     std::string m_source;
     bool m_good;
@@ -65,6 +64,7 @@ public:
 
 public:
     bool prepareShader(ShaderType shader_type, const ShaderSource& shader_source);
+    bool use();
         
     constexpr const char* get_error_log() const noexcept { return m_error_log; }
 };

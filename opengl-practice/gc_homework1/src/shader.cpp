@@ -37,9 +37,17 @@ ShaderSource::ShaderSource(const Path& path):
 }
 
 Shader::Shader():
-    m_vertex_shader(), m_fragment_shader(), m_shader_program(),
-    m_shader_changed(false), m_error_log{} {
-
+        m_vertex_shader(glCreateShader(GL_VERTEX_SHADER)),
+        m_fragment_shader(glCreateShader(GL_FRAGMENT_SHADER)),
+        m_shader_program(glCreateProgram()),
+        m_shader_changed(false), m_error_log{} {
+    glShaderSource(m_vertex_shader, 1, &kDefaultVertexShaderSource, nullptr);
+    glCompileShader(m_vertex_shader);
+    glShaderSource(m_fragment_shader, 1, &kDefaultFragmentShaderSource, nullptr);
+    glCompileShader(m_fragment_shader);
+    glAttachShader(m_shader_program, m_vertex_shader);
+    glAttachShader(m_shader_program, m_fragment_shader);
+    glLinkProgram(m_shader_program);
 }
 
 Shader::~Shader() {
@@ -77,6 +85,32 @@ bool Shader::prepareShader(ShaderType shader_type, const ShaderSource& shader_so
 
     m_shader_changed = true;
 
+    return true;
+}
+
+bool Shader::use() {
+    if(m_shader_changed) {
+        unsigned int program_id = glCreateProgram();
+        glAttachShader(program_id, m_vertex_shader);
+        glAttachShader(program_id, m_fragment_shader);
+        glLinkProgram(program_id);
+
+        int res;
+        if(glGetProgramiv(program_id, GL_LINK_STATUS, &res), !res) {
+            char buf[(sizeof m_error_log) - 64];
+            glGetProgramInfoLog(program_id, sizeof buf, nullptr, buf);
+            std::sprintf(m_error_log, "Shader link error: %s", buf);
+            glDeleteProgram(program_id);
+            return false;
+        }
+
+        std::swap(program_id, m_shader_program);
+        glDeleteProgram(program_id);
+
+        m_shader_changed = false;
+    }
+
+    glUseProgram(m_shader_program);
     return true;
 }
 
