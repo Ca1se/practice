@@ -2,11 +2,12 @@
 
 #include <cstdio>
 #include <string>
+#include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 
-namespace gcw {
+namespace gchw {
 
 const char* const kDefaultVertexShaderSource = 
     "#version 330 core\n"
@@ -24,8 +25,7 @@ const char* const kDefaultFragmentShaderSource =
 
 struct Path {
     std::string str;
-    explicit Path(const std::string& path): str(path) {}
-    operator std::string() const { return str; }
+    explicit Path(const std::string& path): str(std::string{ SHADER_DIR_PATH } + path) {}
 };
 
 class ShaderSource {
@@ -35,6 +35,7 @@ private:
 
 public:
     ShaderSource(const std::string& source);
+    ShaderSource(const char* source);
     ShaderSource(const Path& path);
 
 public:
