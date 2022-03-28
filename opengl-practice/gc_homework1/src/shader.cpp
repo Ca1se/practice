@@ -3,9 +3,12 @@
 #include <algorithm>
 #include "shader.hpp"
 
-namespace gcw {
+namespace gchw {
 
 ShaderSource::ShaderSource(const std::string& source):
+        m_source(source), m_good(true) {}
+
+ShaderSource::ShaderSource(const char* source):
         m_source(source), m_good(true) {}
 
 ShaderSource::ShaderSource(const Path& path):
