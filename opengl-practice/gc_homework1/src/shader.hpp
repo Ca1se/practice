@@ -1,10 +1,12 @@
 #pragma once
 
 #include <cstdio>
+#include <stdexcept>
 #include <string>
 #include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "uniform.hpp"
 
 
 namespace gchw {
@@ -66,8 +68,27 @@ public:
 public:
     bool prepareShader(ShaderType shader_type, const ShaderSource& shader_source);
     bool use();
+
+    template<typename UniType, typename ...Args>
+    void setUniform(const std::string& name, Args ...args) const {
+        UniType setter;
+        static_assert(sizeof...(args) == uniformSize(setter), "The number of args doesn't match the uniform length.");
+        int location = glGetUniformLocation(m_shader_program, name.c_str());
+        if(location == -1) {
+            std::fprintf(stderr, "%s: gcw::Shader::%s(): Uniform set failed, make sure that the shader is used and that the uniform name matches its type.", __FILE__, __func__);
+            return;
+        }
+
+        setter(location, args...);
+    }
+
+    template<typename UniType>
+    void setUniform(const std::string& name, const ELEMENT_TYPE_POINTER(UniType) matrix) const {
+
+    }
         
     constexpr const char* get_error_log() const noexcept { return m_error_log; }
+    constexpr unsigned int get_shader_program() const noexcept { return m_shader_program; }
 };
 
 }
