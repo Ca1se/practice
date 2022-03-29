@@ -3,6 +3,7 @@
 #include <cmath>
 #include "shader.hpp"
 #include "glfw_utils.hpp"
+#include "uniform.hpp"
 
 const float vertices[] = {
     -0.5f, -0.5f, 0.0f,
@@ -32,16 +33,14 @@ int main() {
 
     shader.use();
 
-
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        float time_value = glfwGetTime();
-        float green_value = (std::sin(time_value) / 2.0f) + 0.5f;
-        glUniform4
+        auto time = glfwGetTime();
+        float green = (std::sin(time) / 2.0f) + 0.5f;
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
