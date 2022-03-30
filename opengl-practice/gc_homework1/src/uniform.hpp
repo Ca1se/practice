@@ -2,108 +2,172 @@
 
 #include <cstdio>
 #include <stdexcept>
+#include <type_traits>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#define ELEMENT_TYPE_POINTER(unitype) decltype(elementTypeAux(*((unitype*) 0)))
 
 namespace gchw {
 
 template <typename T, int Rows, int Cols>
-struct Uniform;
+struct Uniform {
+    using ElementType = T;
 
-template <typename T, int Rows, int Cols>
-constexpr int uniformSize(const Uniform<T, Rows, Cols>&) {
-    return Rows * Cols;
-}
+    // for scalar or vec
+    template <typename E = T, int R = Rows, int C = Cols>
+    void operator() (int location, int count, const E* vals) const;
 
-// only for type inference
-template <typename T, int Rows, int Cols>
-inline T* elementTypeAux(const Uniform<T, Rows, Cols>&) {
-    return nullptr;
-}
-
-template <>
-struct Uniform<float, 1, 1> {
-    void operator() (int location, float val) const {
-        glUniform1f(location, val);
+    template <>
+    void operator()<int, 1, 1> (int location, int count, const int* vals) const {
+        glUniform1iv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<float, 2, 1> {
-    void operator() (int location, float val1, float val2) const {
-        glUniform2f(location, val1, val2);
+    template <>
+    void operator()<int, 2, 1> (int location, int count, const int* vals) const {
+        glUniform2iv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<float, 3, 1> {
-    void operator() (int location, float val1, float val2, float val3) const {
-        glUniform3f(location, val1, val2, val3);
+    template <>
+    void operator()<int, 3, 1> (int location, int count, const int* vals) const {
+        glUniform3iv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<float, 4, 1> {
-    void operator() (int location, float val1, float val2, float val3, float val4) const {
-        glUniform4f(location, val1, val2, val3, val4);
+    template <>
+    void operator()<int, 4, 1> (int location, int count, const int* vals) const {
+        glUniform4iv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<int, 1, 1> {
-    void operator() (int location, int val) const {
-        glUniform1i(location, val);
+    template <>
+    void operator()<float, 1, 1> (int location, int count, const float* vals) const {
+        glUniform1fv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<int, 2, 1> {
-    void operator() (int location, int val1, int val2) const {
-        glUniform2i(location, val1, val2);
+    template <>
+    void operator()<float, 2, 1> (int location, int count, const float* vals) const {
+        glUniform2fv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<int, 3, 1> {
-    void operator() (int location, int val1, int val2, int val3) const {
-        glUniform3i(location, val1, val2, val3);
+    template <>
+    void operator()<float, 3, 1> (int location, int count, const float* vals) const {
+        glUniform3fv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<int, 4, 1> {
-    void operator() (int location, int val1, int val2, int val3, int val4) const {
-        glUniform4i(location, val1, val2, val3, val4);
+    template <>
+    void operator()<float, 4, 1> (int location, int count, const float* vals) const {
+        glUniform4fv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<unsigned int, 1, 1> {
-    void operator() (int location, unsigned int val) const {
-        glUniform1ui(location, val);
+    template <>
+    void operator()<unsigned int, 1, 1> (int location, int count, const unsigned int* vals) const {
+        glUniform1uiv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<unsigned int, 2, 1> {
-    void operator() (int location, unsigned int val1, unsigned int val2) const {
-        glUniform2ui(location, val1, val2);
+    template <>
+    void operator()<unsigned int, 2, 1> (int location, int count, const unsigned int* vals) const {
+        glUniform2uiv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<unsigned int, 3, 1> {
-    void operator() (int location, unsigned int val1, unsigned int val2, unsigned int val3) const {
-        glUniform3ui(location, val1, val2, val3);
+    template <>
+    void operator()<unsigned int, 3, 1> (int location, int count, const unsigned int* vals) const {
+        glUniform3uiv(location, count, vals);
     }
-};
 
-template <>
-struct Uniform<unsigned int, 4, 1> {
-    void operator() (int location, unsigned int val1, unsigned int val2, unsigned int val3, unsigned int val4) const {
-        glUniform4ui(location, val1, val2, val3, val4);
+    template <>
+    void operator()<unsigned int, 4, 1> (int location, int count, const unsigned int* vals) const {
+        glUniform4uiv(location, count, vals);
+    }
+
+    template <typename E = T, int R = Rows, int C = Cols>
+    void operator() (int location, int count, bool transpose, const E* vals) const;
+
+    template <>
+    void operator()<float, 2, 2> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix2fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 3, 2> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix2x3fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 4, 2> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix2x4fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 2, 3> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix3x2fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 3, 3> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix3fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 4, 3> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix3x4fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 2, 4> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix4x2fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 3, 4> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix4x3fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<float, 4, 4> (int location, int count, bool transpose, const float* vals) const {
+        glUniformMatrix4fv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 2, 2> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix2dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 3, 2> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix2x3dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 4, 2> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix2x4dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 2, 3> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix3x2dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 3, 3> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix3dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 4, 3> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix3x4dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 2, 4> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix4x2dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 3, 4> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix4x3dv(location, count, transpose, vals);
+    }
+
+    template <>
+    void operator()<double, 4, 4> (int location, int count, bool transpose, const double* vals) const {
+        glUniformMatrix4dv(location, count, transpose, vals);
     }
 };
 
@@ -121,5 +185,25 @@ using UInt  = Uniform<unsigned int, 1, 1>;
 using UVec2 = Uniform<unsigned int, 2, 1>;
 using UVec3 = Uniform<unsigned int, 3, 1>;
 using UVec4 = Uniform<unsigned int, 4, 1>;
+
+using FMat2   = Uniform<float, 2, 2>;
+using FMat2x3 = Uniform<float, 3, 2>;
+using FMat2x4 = Uniform<float, 4, 2>;
+using FMat3x2 = Uniform<float, 2, 3>;
+using FMat3   = Uniform<float, 3, 3>;
+using FMat3x4 = Uniform<float, 4, 3>;
+using FMat4x2 = Uniform<float, 2, 4>;
+using FMat4x3 = Uniform<float, 3, 4>;
+using FMat4   = Uniform<float, 4, 4>;
+
+using DMat2   = Uniform<double, 2, 2>;
+using DMat2x3 = Uniform<double, 3, 2>;
+using DMat2x4 = Uniform<double, 4, 2>;
+using DMat3x2 = Uniform<double, 2, 3>;
+using DMat3   = Uniform<double, 3, 3>;
+using DMat3x4 = Uniform<double, 4, 3>;
+using DMat4x2 = Uniform<double, 2, 4>;
+using DMat4x3 = Uniform<double, 3, 4>;
+using DMat4   = Uniform<double, 4, 4>;
 
 }

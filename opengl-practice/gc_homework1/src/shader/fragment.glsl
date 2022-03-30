@@ -1,8 +1,8 @@
 #version 330 core
 out vec4 fragment_color;
 
-uniform vec4 color[2];
+uniform float green;
 
 void main() {
-    fragment_color = color[1];
+    fragment_color = vec4(green, green, green, green);
 }

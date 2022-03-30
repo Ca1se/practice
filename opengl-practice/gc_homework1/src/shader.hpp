@@ -45,7 +45,6 @@ public:
     bool good() const noexcept { return m_good; }
 };
 
-
 class Shader {
 public:
     enum ShaderType {
@@ -69,22 +68,28 @@ public:
     bool prepareShader(ShaderType shader_type, const ShaderSource& shader_source);
     bool use();
 
-    template<typename UniType, typename ...Args>
-    void setUniform(const std::string& name, Args ...args) const {
-        UniType setter;
-        static_assert(sizeof...(args) == uniformSize(setter), "The number of args doesn't match the uniform length.");
+    // UniType must be one of GLSL Uniform scalar or vec types;
+    template<typename UniType>
+    void setUniform(const std::string& name, int count, const typename UniType::ElementType* vals) const {
         int location = glGetUniformLocation(m_shader_program, name.c_str());
         if(location == -1) {
-            std::fprintf(stderr, "%s: gcw::Shader::%s(): Uniform set failed, make sure that the shader is used and that the uniform name matches its type.", __FILE__, __func__);
+            std::fprintf(stderr, "%s: gcw::Shader::%s(): Uniform set failed, make sure that the shader is used and that the uniform name is currect.\n", __FILE__, __func__);
             return;
         }
 
-        setter(location, args...);
+        UniType()(location, count, vals);
     }
 
+    // UniType must be one of GLSL Uniform mat types;
     template<typename UniType>
-    void setUniform(const std::string& name, const ELEMENT_TYPE_POINTER(UniType) matrix) const {
+    void setUniformMatrix(const std::string& name, int count, bool transpose, const typename UniType::ElementType* vals) const {
+        int location = glGetUniformLocation(m_shader_program, name.c_str());
+        if(location == -1) {
+            std::fprintf(stderr, "%s: gcw::Shader::%s(): Uniform set failed, make sure that the shader is used and that the uniform name is currect.\n", __FILE__, __func__);
+            return;
+        }
 
+        UniType()(location, count, transpose, vals);
     }
         
     constexpr const char* get_error_log() const noexcept { return m_error_log; }
