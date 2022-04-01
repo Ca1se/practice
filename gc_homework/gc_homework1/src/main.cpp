@@ -1,17 +1,26 @@
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <vector>
+#include <map>
+#include <stack>
+#include <unordered_map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "shader.hpp"
 #include "glfw_utils.hpp"
 #include "uniform.hpp"
 #include "matrix.hpp"
+#include "haoframelinedata.inc"
 
 
 static const int kWindowWidth  = 512;
 static const int kWindowHeight = 512;
+
+inline int getIndex(int x, int y) {
+    return y * kWindowWidth + x;
+}
 
 void drawLine(const gchw::Vector2i& start_point, const gchw::Vector2i& end_point, std::vector<int>& result) {
     if(start_point.x() == end_point.x()) {
@@ -105,92 +114,13 @@ void drawCircle(const gchw::Vector2d& center, int radius, std::vector<int>& resu
     }
 }
 
-const int kHaoPart1[] = {
-    132, 124,
-    249, 124,
-    249, 110,
-    274, 110,
-    274, 124,
-    392, 124,
-    392, 148,
-    132, 148
-};
 
-const int kHaoPart2[] = {
-    161, 156,
-    360, 156,
-    360, 205,
-    161, 205
-};
 
-const int kHaoPart3White[] = {
-    184, 175,
-    337, 175,
-    337, 186,
-    184, 186
-};
-
-const int kHaoPart4[] = {
-    127, 214,
-    382, 214,
-    402, 225,
-    399, 251,
-    390, 276,
-    369, 269,
-    373, 254,
-    375, 238,
-    150, 238,
-    150, 271,
-    127, 271
-};
-
-const int kHaoPart5[] = {
-    163, 247,
-    359, 247,
-    359, 266,
-    273, 266,
-    305, 308,
-    350, 281,
-    366, 300,
-    324, 326,
-    354, 348,
-    392, 366,
-    377, 388,
-    334, 365,
-    298, 336,
-    295, 356,
-    288, 375,
-    274, 387,
-    259, 390,
-    225, 384,
-    225, 362,
-    254, 366,
-    268, 356,
-    272, 337,
-    226, 359,
-    167, 378,
-    138, 383,
-    130, 360,
-    177, 352,
-    224, 337,
-    271, 313,
-    269, 302,
-    214, 329,
-    173, 341,
-    141, 347,
-    133, 323,
-    165, 319,
-    216, 303,
-    258, 284,
-    248, 276,
-    207, 295,
-    164, 307,
-    143, 309,
-    136, 287,
-    167, 283,
-    221, 266,
-    163, 266
-};
+void floodfill(std::vector<int>& mp, const gchw::Vector2i& seed, std::vector<int>& result) {
+    std::stack<gchw::Vector2i> s;
+    s.push(seed);
+    
+}
 
 inline void drawHaoAux(const int* arr, int length, std::vector<int>& result) {
     int ind;
@@ -200,7 +130,7 @@ inline void drawHaoAux(const int* arr, int length, std::vector<int>& result) {
     }
 }
 
-void drawHao(std::vector<int>& result) {
+inline void drawHao(std::vector<int>& result) {
     drawHaoAux(kHaoPart1, sizeof kHaoPart1 / sizeof(int), result);
     drawHaoAux(kHaoPart2, sizeof kHaoPart2 / sizeof(int), result);
     drawHaoAux(kHaoPart3White, sizeof kHaoPart3White / sizeof(int), result);
