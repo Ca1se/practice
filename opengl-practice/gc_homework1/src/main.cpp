@@ -126,7 +126,6 @@ int main() {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, line.size() * sizeof(int), line.data(), GL_STATIC_DRAW);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof vertex, vertex, GL_STATIC_DRAW);
 
     gchw::Shader shader;
     if(!shader.prepareShader(gchw::Shader::kVertexShader, gchw::Path("vertex.glsl"))) {
@@ -138,7 +137,7 @@ int main() {
         return 0;
     }
 
-    glVertexAttribPointer(0, 2, GL_INT, GL_TRUE, 2 * sizeof(int), (void*) 0);
+    glVertexAttribIPointer(0, 2, GL_INT, 2 * sizeof(int), (void*) 0);
     glEnableVertexAttribArray(0);
 
     shader.use();
