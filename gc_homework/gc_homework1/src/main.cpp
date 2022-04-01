@@ -9,19 +9,11 @@
 #include "uniform.hpp"
 #include "matrix.hpp"
 
-const float vertices[] = {
-    -0.9f, -0.9f,
-     0.9f, -0.9f,
-     0.0f,  0.0f
-};
 
 static const int kWindowWidth  = 512;
 static const int kWindowHeight = 512;
 
-void drawLine(const gchw::Vector2d& start_point, const gchw::Vector2d& end_point, std::vector<int>& result) {
-    assert(std::min(start_point.x(), end_point.x()) >= 0 && std::max(start_point.x(), end_point.x()) < kWindowWidth);
-    assert(std::min(start_point.y(), end_point.y()) >= 0 && std::max(start_point.y(), end_point.y()) < kWindowHeight);
-
+void drawLine(const gchw::Vector2i& start_point, const gchw::Vector2i& end_point, std::vector<int>& result) {
     if(start_point.x() == end_point.x()) {
         int x = start_point.x();
         int min_y = std::min(start_point.y(), end_point.y());
@@ -40,8 +32,8 @@ void drawLine(const gchw::Vector2d& start_point, const gchw::Vector2d& end_point
         }
     }
 
-    gchw::Vector2d sp = start_point;
-    gchw::Vector2d ep = end_point;
+    auto sp = start_point;
+    auto ep = end_point;
 
     if(std::abs(start_point.x() - end_point.x()) >= std::abs(start_point.y() - end_point.y())) {
         if(sp.x() > ep.x()) sp.swap(ep);
@@ -51,29 +43,16 @@ void drawLine(const gchw::Vector2d& start_point, const gchw::Vector2d& end_point
         int ey = ep.y();
         int y = sp.y();
         int d = 2 * ((ex - sx) * sy + (sy - ey) * sx + sx * ey - ex * sy);
-        if(sp.y() < ep.y()) {
-            d += 2 * (sy - ey) + ex - sx;
-            for(int x = sp.x(); x <= ep.x(); x++) {
-                result.push_back(x);
-                result.push_back(y);
-                if(d < 0) {
-                    y++;
-                    d += 2 * (sy - ey + ex - sx);
-                }else {
-                    d += 2 * (sy - ey);
-                }
-            }
-        }else {
-            d += 2 * (sy - ey) - ex + sx;
-            for(int x = sp.x(); x <= ep.x(); x++) {
-                result.push_back(x);
-                result.push_back(y);
-                if(d > 0) {
-                    y--;
-                    d += 2 * (sy - ey - ex + sx);
-                }else {
-                    d += 2 * (sy - ey);
-                }
+        int mul = sp.y() < ep.y() ? 1 : -1;
+        d += 2 * (sy - ey) + mul * (ex - sx);
+        for(int x = sp.x(); x <= ep.x(); x++) {
+            result.push_back(x);
+            result.push_back(y);
+            if(d * mul < 0) {
+                y += mul;
+                d += 2 * (sy - ey + mul * (ex - sx));
+            }else {
+                d += 2 * (sy - ey);
             }
         }
     }else {
@@ -84,39 +63,156 @@ void drawLine(const gchw::Vector2d& start_point, const gchw::Vector2d& end_point
         int ey = ep.y();
         int x = sp.x();
         int d = 2 * ((sx - ex) * sy + (ey - sy) * sx + ex * sy - sx * ey);
-        if(sp.x() < ep.x()) {
-            d += 2 * (sx - ex) + ey - sy;
-            for(int y = sp.y(); y <= ep.y(); y++) {
-                result.push_back(x);
-                result.push_back(y);
-                if(d < 0) {
-                    x++;
-                    d += 2 * (sx - ex + ey - sy);
-                }else {
-                    d += 2 * (sx - ex);
-                }
-            }
-        }else {
-            d += 2 * (sx - ex) - ey + sy;
-            for(int y = sp.y(); y <= ep.y(); y++) {
-                result.push_back(x);
-                result.push_back(y);
-                if(d > 0) {
-                    x--;
-                    d += 2 * (sx - ex - ey + sy);
-                }else {
-                    d += 2 * (sx - ex);
-                }
+        int mul = sp.x() < ep.x() ? 1 : -1;
+        d += 2 * (sx - ex) + mul * (ey - sy);
+        for(int y = sp.y(); y <= ep.y(); y++) {
+            result.push_back(x);
+            result.push_back(y);
+            if(d * mul < 0) {
+                x += mul;
+                d += 2 * (sx - ex + mul * (ey - sy));
+            }else {
+                d += 2 * (sx - ex);
             }
         }
     }
 }
 
+inline void drawCircleAux(int x, int y, int ax, int ay, std::vector<int>& result) {
+    result.push_back(x + ax), result.push_back(y + ay);
+    result.push_back(x - ax), result.push_back(y + ay);
+    result.push_back(x + ay), result.push_back(y + ax);
+    result.push_back(x - ay), result.push_back(y + ax);
+    result.push_back(x + ay), result.push_back(y - ax);
+    result.push_back(x - ay), result.push_back(y - ax);
+    result.push_back(x + ax), result.push_back(y - ay);
+    result.push_back(x - ax), result.push_back(y - ay);
+}
+
+void drawCircle(const gchw::Vector2d& center, int radius, std::vector<int>& result) {
+    int p = 1 - radius;
+    int ax = 0;
+    int ay = radius;
+    drawCircleAux(center.x(), center.y(), ax, ay, result);
+    while(ax++ < ay) {
+        if(p < 0) {
+            p += 2 * ax + 1;
+        }else {
+            ay--;
+            p += 2 * (ax - ay) + 1;
+        }
+        drawCircleAux(center.x(), center.y(), ax, ay, result);
+    }
+}
+
+const int kHaoPart1[] = {
+    132, 124,
+    249, 124,
+    249, 110,
+    274, 110,
+    274, 124,
+    392, 124,
+    392, 148,
+    132, 148
+};
+
+const int kHaoPart2[] = {
+    161, 156,
+    360, 156,
+    360, 205,
+    161, 205
+};
+
+const int kHaoPart3White[] = {
+    184, 175,
+    337, 175,
+    337, 186,
+    184, 186
+};
+
+const int kHaoPart4[] = {
+    127, 214,
+    382, 214,
+    402, 225,
+    399, 251,
+    390, 276,
+    369, 269,
+    373, 254,
+    375, 238,
+    150, 238,
+    150, 271,
+    127, 271
+};
+
+const int kHaoPart5[] = {
+    163, 247,
+    359, 247,
+    359, 266,
+    273, 266,
+    305, 308,
+    350, 281,
+    366, 300,
+    324, 326,
+    354, 348,
+    392, 366,
+    377, 388,
+    334, 365,
+    298, 336,
+    295, 356,
+    288, 375,
+    274, 387,
+    259, 390,
+    225, 384,
+    225, 362,
+    254, 366,
+    268, 356,
+    272, 337,
+    226, 359,
+    167, 378,
+    138, 383,
+    130, 360,
+    177, 352,
+    224, 337,
+    271, 313,
+    269, 302,
+    214, 329,
+    173, 341,
+    141, 347,
+    133, 323,
+    165, 319,
+    216, 303,
+    258, 284,
+    248, 276,
+    207, 295,
+    164, 307,
+    143, 309,
+    136, 287,
+    167, 283,
+    221, 266,
+    163, 266
+};
+
+inline void drawHaoAux(const int* arr, int length, std::vector<int>& result) {
+    int ind;
+    for(int i = 0; i < length; i += 2) {
+        ind = (i + 2) % length;
+        drawLine(gchw::Vector2i{ arr[i], arr[i + 1] }, gchw::Vector2i{ arr[ind], arr[ind + 1] }, result);
+    }
+}
+
+void drawHao(std::vector<int>& result) {
+    drawHaoAux(kHaoPart1, sizeof kHaoPart1 / sizeof(int), result);
+    drawHaoAux(kHaoPart2, sizeof kHaoPart2 / sizeof(int), result);
+    drawHaoAux(kHaoPart3White, sizeof kHaoPart3White / sizeof(int), result);
+    drawHaoAux(kHaoPart4, sizeof kHaoPart4 / sizeof(int), result);
+    drawHaoAux(kHaoPart5, sizeof kHaoPart5 / sizeof(int), result);
+}
+
 int main() {
     auto* window = gchw::utils().createWindow("gchw1", kWindowWidth, kWindowHeight);
 
-    std::vector<int> line;
-    drawLine(gchw::Vector2d{10, 10}, gchw::Vector2d{170, 500}, line);
+    std::vector<int> lines;
+    drawHao(lines);
 
     uint32_t vao;
     glGenVertexArrays(1, &vao);
@@ -125,7 +221,7 @@ int main() {
     uint32_t vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, line.size() * sizeof(int), line.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(int), lines.data(), GL_STATIC_DRAW);
 
     gchw::Shader shader;
     if(!shader.prepareShader(gchw::Shader::kVertexShader, gchw::Path("vertex.glsl"))) {
@@ -148,7 +244,7 @@ int main() {
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_POINTS, 0, line.size() / 2);
+        glDrawArrays(GL_POINTS, 0, lines.size() / 2);
         glfwSwapBuffers(window);
     }
     
