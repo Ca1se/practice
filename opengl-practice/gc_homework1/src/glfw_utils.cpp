@@ -1,4 +1,3 @@
-#include <iostream>
 #include "glfw_utils.hpp"
 
 namespace gchw {
