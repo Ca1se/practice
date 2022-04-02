@@ -1,53 +1,57 @@
 #include <cassert>
-#include <cstdio>
 #include <iostream>
 #include <vector>
+#include <stack>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "shader.hpp"
 #include "glfw_utils.hpp"
 #include "uniform.hpp"
-#include "matrix.hpp"
+#include "haoframelinedata.inc"
 
 
 static const int kWindowWidth  = 512;
 static const int kWindowHeight = 512;
 
-void drawLine(const gchw::Vector2i& start_point, const gchw::Vector2i& end_point, std::vector<int>& result) {
-    if(start_point.x() == end_point.x()) {
-        int x = start_point.x();
-        int min_y = std::min(start_point.y(), end_point.y());
-        int max_y = start_point.y() + end_point.y() - min_y;
-        for(int y = min_y; y <= max_y; y++) {
-            result.push_back(x);
-            result.push_back(y);
-        }
-    }else if(start_point.y() == end_point.y()) {
-        int y = start_point.y();
-        int min_x = std::min(start_point.x(), end_point.x());
-        int max_x = start_point.x() + end_point.x() - min_x;
-        for(int x = min_x; x <= max_x; x++) {
-            result.push_back(x);
-            result.push_back(y);
-        }
+inline int getIndex(int x, int y) {
+    return y * kWindowWidth + x;
+}
+
+inline void storePoint(int x, int y, std::vector<int>& mp, std::vector<int>& result) {
+    result.push_back(x);
+    result.push_back(y);
+    mp[getIndex(x, y)] = 1;
+}
+
+void drawLine(const std::pair<int, int>& start_point, const std::pair<int, int>& end_point,
+        std::vector<int>& mp, std::vector<int>& result) {
+    if(start_point.first == end_point.first) {
+        int x = start_point.first;
+        int min_y = std::min(start_point.second, end_point.second);
+        int max_y = start_point.second + end_point.second - min_y;
+        for(int y = min_y; y <= max_y; y++)
+            storePoint(x, y, mp, result);
+    }else if(start_point.second == end_point.second) {
+        int y = start_point.second;
+        int min_x = std::min(start_point.first, end_point.first);
+        int max_x = start_point.first + end_point.first - min_x;
+        for(int x = min_x; x <= max_x; x++)
+            storePoint(x, y, mp, result);
     }
 
     auto sp = start_point;
     auto ep = end_point;
 
-    if(std::abs(start_point.x() - end_point.x()) >= std::abs(start_point.y() - end_point.y())) {
-        if(sp.x() > ep.x()) sp.swap(ep);
-        int sx = sp.x();
-        int sy = sp.y();
-        int ex = ep.x();
-        int ey = ep.y();
-        int y = sp.y();
+    if(std::abs(start_point.first - end_point.first) >= std::abs(start_point.second - end_point.second)) {
+        if(sp.first > ep.first) sp.swap(ep);
+        int sx = sp.first, sy = sp.second;
+        int ex = ep.first, ey = ep.second;
+        int y = sp.second;
         int d = 2 * ((ex - sx) * sy + (sy - ey) * sx + sx * ey - ex * sy);
-        int mul = sp.y() < ep.y() ? 1 : -1;
+        int mul = sy < ey ? 1 : -1;
         d += 2 * (sy - ey) + mul * (ex - sx);
-        for(int x = sp.x(); x <= ep.x(); x++) {
-            result.push_back(x);
-            result.push_back(y);
+        for(int x = sx; x <= ex; x++) {
+            storePoint(x, y, mp, result);
             if(d * mul < 0) {
                 y += mul;
                 d += 2 * (sy - ey + mul * (ex - sx));
@@ -56,18 +60,15 @@ void drawLine(const gchw::Vector2i& start_point, const gchw::Vector2i& end_point
             }
         }
     }else {
-        if(sp.y() > ep.y()) sp.swap(ep);
-        int sx = sp.x();
-        int sy = sp.y();
-        int ex = ep.x();
-        int ey = ep.y();
-        int x = sp.x();
+        if(sp.second > ep.second) sp.swap(ep);
+        int sx = sp.first, sy = sp.second;
+        int ex = ep.first, ey = ep.second;
+        int x = sp.first;
         int d = 2 * ((sx - ex) * sy + (ey - sy) * sx + ex * sy - sx * ey);
-        int mul = sp.x() < ep.x() ? 1 : -1;
+        int mul = sx < ex ? 1 : -1;
         d += 2 * (sx - ex) + mul * (ey - sy);
-        for(int y = sp.y(); y <= ep.y(); y++) {
-            result.push_back(x);
-            result.push_back(y);
+        for(int y = sy; y <= ey; y++) {
+            storePoint(x, y, mp, result);
             if(d * mul < 0) {
                 x += mul;
                 d += 2 * (sx - ex + mul * (ey - sy));
@@ -89,11 +90,11 @@ inline void drawCircleAux(int x, int y, int ax, int ay, std::vector<int>& result
     result.push_back(x - ax), result.push_back(y - ay);
 }
 
-void drawCircle(const gchw::Vector2d& center, int radius, std::vector<int>& result) {
+void drawCircle(const std::pair<int, int>& center, int radius, std::vector<int>& result) {
     int p = 1 - radius;
     int ax = 0;
     int ay = radius;
-    drawCircleAux(center.x(), center.y(), ax, ay, result);
+    drawCircleAux(center.first, center.second, ax, ay, result);
     while(ax++ < ay) {
         if(p < 0) {
             p += 2 * ax + 1;
@@ -101,127 +102,56 @@ void drawCircle(const gchw::Vector2d& center, int radius, std::vector<int>& resu
             ay--;
             p += 2 * (ax - ay) + 1;
         }
-        drawCircleAux(center.x(), center.y(), ax, ay, result);
+        drawCircleAux(center.first, center.second, ax, ay, result);
     }
 }
 
-const int kHaoPart1[] = {
-    132, 124,
-    249, 124,
-    249, 110,
-    274, 110,
-    274, 124,
-    392, 124,
-    392, 148,
-    132, 148
-};
+void floodfill(const std::pair<int, int>& seed, std::vector<int>& mp, std::vector<int>& result) {
+    const int step[][2] = { 1, 0, 0, 1, -1, 0, 0, -1 };
+    
+    int x, y;
+    std::stack<std::pair<int, int>> s;
+    s.push(seed);
+    storePoint(seed.first, seed.second, mp, result);
+    while(!s.empty()) {
+        auto [px, py] = s.top();
+        s.pop();
+        for(int i = 0; i < 4; i++) {
+            x = px + step[i][0];
+            y = py + step[i][1];
+            if(x >= 0 && x < kWindowWidth && y >= 0 && y < kWindowHeight && mp[getIndex(x, y)] == 0) {
+                s.emplace(x, y);
+                storePoint(x, y, mp, result);
+            }
+        }
+    }
+}
 
-const int kHaoPart2[] = {
-    161, 156,
-    360, 156,
-    360, 205,
-    161, 205
-};
-
-const int kHaoPart3White[] = {
-    184, 175,
-    337, 175,
-    337, 186,
-    184, 186
-};
-
-const int kHaoPart4[] = {
-    127, 214,
-    382, 214,
-    402, 225,
-    399, 251,
-    390, 276,
-    369, 269,
-    373, 254,
-    375, 238,
-    150, 238,
-    150, 271,
-    127, 271
-};
-
-const int kHaoPart5[] = {
-    163, 247,
-    359, 247,
-    359, 266,
-    273, 266,
-    305, 308,
-    350, 281,
-    366, 300,
-    324, 326,
-    354, 348,
-    392, 366,
-    377, 388,
-    334, 365,
-    298, 336,
-    295, 356,
-    288, 375,
-    274, 387,
-    259, 390,
-    225, 384,
-    225, 362,
-    254, 366,
-    268, 356,
-    272, 337,
-    226, 359,
-    167, 378,
-    138, 383,
-    130, 360,
-    177, 352,
-    224, 337,
-    271, 313,
-    269, 302,
-    214, 329,
-    173, 341,
-    141, 347,
-    133, 323,
-    165, 319,
-    216, 303,
-    258, 284,
-    248, 276,
-    207, 295,
-    164, 307,
-    143, 309,
-    136, 287,
-    167, 283,
-    221, 266,
-    163, 266
-};
-
-inline void drawHaoAux(const int* arr, int length, std::vector<int>& result) {
+inline void drawHaoAux(const int* arr, int length, std::vector<int>& mp, std::vector<int>& result) {
     int ind;
     for(int i = 0; i < length; i += 2) {
         ind = (i + 2) % length;
-        drawLine(gchw::Vector2i{ arr[i], arr[i + 1] }, gchw::Vector2i{ arr[ind], arr[ind + 1] }, result);
+        drawLine({ arr[i], arr[i + 1] }, { arr[ind], arr[ind + 1] }, mp, result);
     }
 }
 
-void drawHao(std::vector<int>& result) {
-    drawHaoAux(kHaoPart1, sizeof kHaoPart1 / sizeof(int), result);
-    drawHaoAux(kHaoPart2, sizeof kHaoPart2 / sizeof(int), result);
-    drawHaoAux(kHaoPart3White, sizeof kHaoPart3White / sizeof(int), result);
-    drawHaoAux(kHaoPart4, sizeof kHaoPart4 / sizeof(int), result);
-    drawHaoAux(kHaoPart5, sizeof kHaoPart5 / sizeof(int), result);
+inline void drawHaoFrame(std::vector<int>& mp, std::vector<int>& result) {
+    drawHaoAux(kHaoPart1, sizeof kHaoPart1 / sizeof(int), mp, result);
+    drawHaoAux(kHaoPart2, sizeof kHaoPart2 / sizeof(int), mp, result);
+    drawHaoAux(kHaoPart3White, sizeof kHaoPart3White / sizeof(int), mp, result);
+    drawHaoAux(kHaoPart4, sizeof kHaoPart4 / sizeof(int), mp, result);
+    drawHaoAux(kHaoPart5, sizeof kHaoPart5 / sizeof(int), mp, result);
+}
+
+inline void drawHaoInternal(std::vector<int>& mp, std::vector<int>& result) {
+    floodfill({kHaoPart1[0] + 1, kHaoPart1[1] + 1}, mp, result);
+    floodfill({kHaoPart2[0] + 1, kHaoPart2[1] + 1}, mp, result);
+    floodfill({kHaoPart4[0] + 1, kHaoPart4[1] + 1}, mp, result);
+    floodfill({kHaoPart5[0] + 1, kHaoPart5[1] + 1}, mp, result);
 }
 
 int main() {
     auto* window = gchw::utils().createWindow("gchw1", kWindowWidth, kWindowHeight);
-
-    std::vector<int> lines;
-    drawHao(lines);
-
-    uint32_t vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    uint32_t vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(int), lines.data(), GL_STATIC_DRAW);
 
     gchw::Shader shader;
     if(!shader.prepareShader(gchw::Shader::kVertexShader, gchw::Path("vertex.glsl"))) {
@@ -233,20 +163,49 @@ int main() {
         return 0;
     }
 
-    glVertexAttribIPointer(0, 2, GL_INT, 2 * sizeof(int), (void*) 0);
-    glEnableVertexAttribArray(0);
-
     shader.use();
     shader.setUniform<gchw::Int>("kWindowWidth", 1, &kWindowWidth);
     shader.setUniform<gchw::Int>("kWindowHeight", 1, &kWindowHeight);
 
+    std::vector<int> mp(kWindowWidth * kWindowHeight, 0);
+    std::vector<int> frame_points, internal_points;
+    drawHaoFrame(mp, frame_points);
+    drawHaoInternal(mp, internal_points);
+    drawCircle({261, 250}, 182, frame_points);
+
+    uint32_t vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    uint32_t vbo[2];
+    glGenBuffers(2, vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, internal_points.size() * sizeof(int), internal_points.data(), GL_STATIC_DRAW);
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, frame_points.size() * sizeof(int), frame_points.data(), GL_STATIC_DRAW);
+
+    glVertexAttribIPointer(0, 2, GL_INT, 2 * sizeof(int), (void*) 0);
+    glEnableVertexAttribArray(0);
+
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    while(!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_POINTS, 0, lines.size() / 2);
-        glfwSwapBuffers(window);
-    }
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glDrawArrays(GL_POINTS, 0, frame_points.size() / 2);
+    glfwSwapBuffers(window);
+
+    getchar();
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glVertexAttribIPointer(0, 2, GL_INT, 2 * sizeof(int), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glDrawArrays(GL_POINTS, 0, internal_points.size() / 2);
+    glfwSwapBuffers(window);
+
+    getchar();
     
     return 0;
 }
