@@ -135,12 +135,15 @@ inline void drawHaoAux(const int* arr, int length, std::vector<int>& mp, std::ve
     }
 }
 
-inline void drawHao(std::vector<int>& mp, std::vector<int>& result) {
+inline void drawHaoFrame(std::vector<int>& mp, std::vector<int>& result) {
     drawHaoAux(kHaoPart1, sizeof kHaoPart1 / sizeof(int), mp, result);
     drawHaoAux(kHaoPart2, sizeof kHaoPart2 / sizeof(int), mp, result);
     drawHaoAux(kHaoPart3White, sizeof kHaoPart3White / sizeof(int), mp, result);
     drawHaoAux(kHaoPart4, sizeof kHaoPart4 / sizeof(int), mp, result);
     drawHaoAux(kHaoPart5, sizeof kHaoPart5 / sizeof(int), mp, result);
+}
+
+inline void drawHaoInternal(std::vector<int>& mp, std::vector<int>& result) {
     floodfill({kHaoPart1[0] + 1, kHaoPart1[1] + 1}, mp, result);
     floodfill({kHaoPart2[0] + 1, kHaoPart2[1] + 1}, mp, result);
     floodfill({kHaoPart4[0] + 1, kHaoPart4[1] + 1}, mp, result);
@@ -149,19 +152,6 @@ inline void drawHao(std::vector<int>& mp, std::vector<int>& result) {
 
 int main() {
     auto* window = gchw::utils().createWindow("gchw1", kWindowWidth, kWindowHeight);
-
-    std::vector<int> points;
-    std::vector<int> mp(kWindowWidth * kWindowHeight, 0);
-    drawHao(mp, points);
-
-    uint32_t vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    uint32_t vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(int), points.data(), GL_STATIC_DRAW);
 
     gchw::Shader shader;
     if(!shader.prepareShader(gchw::Shader::kVertexShader, gchw::Path("vertex.glsl"))) {
@@ -173,20 +163,49 @@ int main() {
         return 0;
     }
 
-    glVertexAttribIPointer(0, 2, GL_INT, 2 * sizeof(int), (void*) 0);
-    glEnableVertexAttribArray(0);
-
     shader.use();
     shader.setUniform<gchw::Int>("kWindowWidth", 1, &kWindowWidth);
     shader.setUniform<gchw::Int>("kWindowHeight", 1, &kWindowHeight);
 
+    std::vector<int> mp(kWindowWidth * kWindowHeight, 0);
+    std::vector<int> frame_points, internal_points;
+    drawHaoFrame(mp, frame_points);
+    drawHaoInternal(mp, internal_points);
+    drawCircle({261, 250}, 182, frame_points);
+
+    uint32_t vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    uint32_t vbo[2];
+    glGenBuffers(2, vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, internal_points.size() * sizeof(int), internal_points.data(), GL_STATIC_DRAW);
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, frame_points.size() * sizeof(int), frame_points.data(), GL_STATIC_DRAW);
+
+    glVertexAttribIPointer(0, 2, GL_INT, 2 * sizeof(int), (void*) 0);
+    glEnableVertexAttribArray(0);
+
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    while(!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_POINTS, 0, points.size() / 2);
-        glfwSwapBuffers(window);
-    }
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glDrawArrays(GL_POINTS, 0, frame_points.size() / 2);
+    glfwSwapBuffers(window);
+
+    getchar();
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glVertexAttribIPointer(0, 2, GL_INT, 2 * sizeof(int), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glDrawArrays(GL_POINTS, 0, internal_points.size() / 2);
+    glfwSwapBuffers(window);
+
+    getchar();
     
     return 0;
 }
