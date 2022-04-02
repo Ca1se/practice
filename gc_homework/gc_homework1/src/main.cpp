@@ -23,6 +23,7 @@ inline void storePoint(int x, int y, std::vector<int>& mp, std::vector<int>& res
     mp[getIndex(x, y)] = 1;
 }
 
+// Bresenham's midpoint line drawing algorithm
 void drawLine(const std::pair<int, int>& start_point, const std::pair<int, int>& end_point,
         std::vector<int>& mp, std::vector<int>& result) {
     if(start_point.first == end_point.first) {
@@ -90,6 +91,7 @@ inline void drawCircleAux(int x, int y, int ax, int ay, std::vector<int>& result
     result.push_back(x - ax), result.push_back(y - ay);
 }
 
+// Bresenham's circle algorithm
 void drawCircle(const std::pair<int, int>& center, int radius, std::vector<int>& result) {
     int p = 1 - radius;
     int ax = 0;
