@@ -112,5 +112,6 @@ img {
 footer {
     padding: 2%;
     text-align: center;
-    background-color: #067bef;
+    background-color: #067befb0;
+    color: white;
 }
