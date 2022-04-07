@@ -57,10 +57,7 @@ body {
     text-indent: -999999px;
 }
 
-.button {
-    text-decoration: none;
-    color: black;
-}
+
 
 .des {
     padding: 5% 0 5% 0;
@@ -110,7 +107,7 @@ img {
 }
 
 footer {
-    padding: 2%;
+    padding: 30px;
     text-align: center;
     background-color: #067befb0;
     color: white;
