@@ -1,0 +1,114 @@
+body {
+    margin: 0;
+    background-image: url("../images/snowm.jpg");
+    background-size: 100%;
+}
+
+.content {
+    margin: 0 3% 5%;
+}
+
+.divide {
+    background-color: white;
+    height: 1px;
+    margin: 0 10%;
+}
+
+.navi {
+    position: relative;
+    height: 70px;
+}
+
+.navi div {
+    display: inline-block;
+}
+
+.navi .login_box {
+    position: absolute;
+    top: 50%;
+    right: 20%;
+    transform: translate(0, -50%);
+}
+
+.navi .login_box .button {
+    margin: 15px;
+    font-size: large;
+    font-weight: bold;
+}
+
+.navi .login_box .button:hover {
+    color: #067bef;
+}
+
+.navi .logo {
+    height: 100%;
+    position: absolute;
+    left: 20%;
+}
+
+
+.navi .logo a {
+    background-image: url("../images/logo.png");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    height: 100%;
+    width: 140px;
+    display: inline-block;
+    text-indent: -999999px;
+}
+
+
+
+.des {
+    padding: 5% 0 5% 0;
+    text-align: center;
+}
+
+.des .title {
+    font-size: 56px;
+    font-weight: 700;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.des .description {
+    font-size: 20px;
+    font-weight: 400;
+    color: white;
+    margin-bottom: 80px;
+}
+
+.des .start {
+    position: relative;
+}
+
+.des .start .start_btn {
+    padding: 15px 30px;
+    background-color: #067bef;
+    color: white;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+section {
+    position: relative;
+    text-align: center;
+}
+
+.img_wrapper {
+    width: 60%;
+    margin: auto;
+}
+
+img {
+    width: 100%;
+    border-radius: 5%;
+}
+
+footer {
+    padding: 30px;
+    text-align: center;
+    background-color: #067befb0;
+    color: white;
+}
