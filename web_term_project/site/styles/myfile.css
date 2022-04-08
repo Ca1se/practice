@@ -1,0 +1,59 @@
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    height: 60px;
+    background-color: white;
+    position: relative;
+}
+
+header div {
+    display: inline-block;
+}
+
+.logo {
+    margin-left: 5%;
+}
+
+.logo a {
+    width: 120px;
+    height: 60px;
+    background-size: 100%;
+    background-image: url("../images/logo.png");
+    display: inline-block;
+}
+
+.newwork {
+    position: absolute;
+    margin-left: 5%;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.newwork_btn {
+    color: white;
+    background-color: #067bef;
+    width: 100px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 5px;
+    position: relative;
+    display: inline-block;
+}
+
+section {
+    flex: 1;
+    background-color: bisque;
+}
