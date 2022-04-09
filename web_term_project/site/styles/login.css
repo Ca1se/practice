@@ -15,18 +15,36 @@ section .login_frame {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    box-shadow: gray 0 0 20px;
 }
 
-section .logo {
+section .register_frame {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background-color:white;
+    border-radius: 10px;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: gray 0 0 20px;
+}
+
+.logo {
+    margin: 30px auto 20px;
+}
+
+.logo a {
     position: relative;
     width: 140px;
     height: 70px;
-    margin: 50px auto 20px;
     background-size: 100%;
     background-image: url("../images/logo.png");
+    display: inline-block;
 }
 
-.login_frame input {
+input {
     display: block;
     margin: 15px auto;
     border-radius: 5px;
@@ -36,13 +54,21 @@ section .logo {
     text-indent: 10px;
 }
 
-.login_frame .login_btn {
+.login_btn {
     margin: 10px auto;
     width: 100px;
     height: 35px;
     background-color: #067bef;
     border: none;
+    color: white;
     border-radius: 5px;
+}
+
+.to_login {
+    font-size: small;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
 }
 
 footer {

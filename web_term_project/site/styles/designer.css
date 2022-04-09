@@ -1,0 +1,129 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.content {
+    height: 100%;
+}
+
+header {
+    height: 60px;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #cbcccc;
+    position: relative;
+}
+
+header div {
+    display: inline-block;
+}
+
+.return {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 10px;
+    transform: translate(0, -50%);
+}
+
+.return:hover {
+    background-color: #cbcccc;
+}
+
+.return a {
+    background-image: url("../images/sprite.png");
+    background-position: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.filename {
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    transform: translate(0, -50%);
+}
+
+.filename input {
+    height: 20px;
+    width: 200px;
+}
+
+.download {
+    position: absolute;
+    width: 70px;
+    height: 25px;
+    top: 50%;
+    right: 100px;
+    transform: translate(0, -50%);
+    text-align: center;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+.download a {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.publish {
+    position: absolute;
+    width: 70px;
+    height: 25px;
+    top: 50%;
+    right: 180px;
+    transform: translate(0, -50%);
+    text-align: center;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+.publish a {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+section {
+    position: relative;
+    height: 100%;
+}
+
+.con_left {
+    width: 200px;
+    height: calc(100% - 60px);
+    overflow: hidden;
+    overflow-y: auto;
+    background-color: #f4f4f4;
+    background-image: url("../images/tools.png");
+    border-right: 1px solid #cbcccc;
+    position: absolute;
+}
+
+.con_right {
+    margin-left: 200px;
+    height: calc(100% - 60px);
+    position: relative;
+}
+
+.con_right .canvas_layout {
+    background-image: url("../images/canvas_bg.jpg");
+    position: relative;
+    overflow: scroll;
+    height: 100%;
+    z-index: 0;
+}
+
+.canvas {
+    padding: 1000px;
+    width: 11550px;
+    height: 11550px;
+    cursor: default;
+}
+
