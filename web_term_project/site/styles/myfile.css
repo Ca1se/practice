@@ -55,5 +55,18 @@ header div {
 
 section {
     flex: 1;
+    padding: 5px;
     background-color: #f4f4f4;
+    display: flex;
+    flex-flow: row wrap;
+    align-content: flex-start;
+}
+
+section .box {
+    box-sizing: border-box;
+    width: 200px;
+    height: 150px;
+    margin: 15px;
+    border-radius: 10px;
+    background-color: gray;
 }
