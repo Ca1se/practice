@@ -1,0 +1,3 @@
+/home/ca1se/Documents/GAMES101-homework/Assignment3/code/build/CMakeFiles/Rasterizer.dir
+/home/ca1se/Documents/GAMES101-homework/Assignment3/code/build/CMakeFiles/edit_cache.dir
+/home/ca1se/Documents/GAMES101-homework/Assignment3/code/build/CMakeFiles/rebuild_cache.dir
