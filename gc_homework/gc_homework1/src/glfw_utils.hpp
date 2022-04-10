@@ -1,12 +1,11 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 namespace gchw {
-
-inline void windowSizeChangeCallback(GLFWwindow* window, int width, int height);
 
 class GlfwUtils {
 private:
@@ -14,24 +13,25 @@ private:
     ~GlfwUtils();
 
 public:
-    GlfwUtils(const GlfwUtils&) = delete;
-    GlfwUtils& operator = (const GlfwUtils&) = delete;
-
-public:
     static GlfwUtils& getUtils() noexcept {
         static GlfwUtils utils;
         return utils;
     }
 
+    GlfwUtils(const GlfwUtils&) = delete;
+    GlfwUtils& operator = (const GlfwUtils&) = delete;
+
+public:
     GLFWwindow* createWindow(const std::string& title, int width, int height) const;
-    
+        
+    void terminate() const { glfwTerminate(); }
 };
 
 inline GlfwUtils& utils() noexcept {
     return GlfwUtils::getUtils();
 }
 
-void windowSizeChangeCallback(GLFWwindow* window, int width, int height) {
+inline void windowSizeChangeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
