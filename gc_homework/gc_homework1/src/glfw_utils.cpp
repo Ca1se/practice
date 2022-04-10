@@ -1,5 +1,6 @@
 #include "glfw_utils.hpp"
 
+
 namespace gchw {
 
 GlfwUtils::GlfwUtils() {
@@ -9,9 +10,7 @@ GlfwUtils::GlfwUtils() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-GlfwUtils::~GlfwUtils() {
-    glfwTerminate();
-}
+GlfwUtils::~GlfwUtils() {}
 
 GLFWwindow* GlfwUtils::createWindow(const std::string& title, int width, int height) const {
     GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
