@@ -1,3 +1,0 @@
-/home/ca1se/Documents/practice/xcb/build/CMakeFiles/xcb_window.dir
-/home/ca1se/Documents/practice/xcb/build/CMakeFiles/edit_cache.dir
-/home/ca1se/Documents/practice/xcb/build/CMakeFiles/rebuild_cache.dir
