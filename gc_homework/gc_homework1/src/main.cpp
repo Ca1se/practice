@@ -208,7 +208,8 @@ int main() {
     glfwSwapBuffers(window);
 
     getchar();
-    
+
+    gchw::utils().terminate();
     return 0;
 }
 
