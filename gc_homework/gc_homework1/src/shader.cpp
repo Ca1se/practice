@@ -13,8 +13,6 @@ ShaderSource::ShaderSource(const char* source):
 
 ShaderSource::ShaderSource(const Path& path):
         m_source(), m_good(false) {
-    using std::ios;
-
     FILE* file = std::fopen(path.str.c_str(), "rb");
     if(file == nullptr) {
         std::fclose(file);
