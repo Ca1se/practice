@@ -29,7 +29,8 @@ inline Buffers operator&(Buffers a, Buffers b)
 enum class Primitive
 {
     Line,
-    Triangle
+    Triangle,
+	Cube
 };
 
 /*
@@ -52,7 +53,7 @@ class rasterizer
   public:
     rasterizer(int w, int h);
     pos_buf_id load_positions(const std::vector<Eigen::Vector3f>& positions);
-    ind_buf_id load_indices(const std::vector<Eigen::Vector3i>& indices);
+    ind_buf_id load_indices(const std::vector<std::vector<int>>& indices);
 
     void set_model(const Eigen::Matrix4f& m);
     void set_view(const Eigen::Matrix4f& v);
@@ -67,8 +68,9 @@ class rasterizer
     std::vector<Eigen::Vector3f>& frame_buffer() { return frame_buf; }
 
   private:
-    void draw_line(Eigen::Vector3f begin, Eigen::Vector3f end);
+    void draw_line(const Eigen::Vector3f& begin, const Eigen::Vector3f& end);
     void rasterize_wireframe(const Triangle& t);
+	void rasterize_wireframe(const std::vector<Eigen::Vector3f>& v, float min_z);
 
   private:
     Eigen::Matrix4f model;
@@ -76,7 +78,7 @@ class rasterizer
     Eigen::Matrix4f projection;
 
     std::map<int, std::vector<Eigen::Vector3f>> pos_buf;
-    std::map<int, std::vector<Eigen::Vector3i>> ind_buf;
+    std::map<int, std::vector<std::vector<int>>> ind_buf;
 
     std::vector<Eigen::Vector3f> frame_buf;
     std::vector<float> depth_buf;
