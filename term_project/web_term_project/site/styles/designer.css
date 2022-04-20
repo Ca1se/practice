@@ -120,10 +120,8 @@ section {
     z-index: 0;
 }
 
-.canvas {
-    padding: 1000px;
-    width: 11550px;
-    height: 11550px;
+.glcanvas {
+    margin: 30px;
     cursor: default;
 }
 
