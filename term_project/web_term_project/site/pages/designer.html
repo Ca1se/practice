@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="../styles/global.css">
         <link rel="stylesheet" href="../styles/designer.css">
         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js" type="text/javascript"></script>
-        <script src="../script/designer.js" type="text/javascript"></script>
+        <script src="../script/designer.js" type="module"></script>
     </head>
     <body>
         <div class="content">
@@ -14,12 +14,24 @@
                 <div class="filename"><input type="text" name="filename" placeholder="未命名文件"></div>
                 <div class="download"><a class="button" href="">下载</a></div>
                 <div class="publish"><a class="button" href="">发布</a></div>
+                <div class="to-myfile"><a class="button" href="">我的文件</a></div>
             </header>
             <section>
-                <div class="con_left"></div>
+                <div class="con_left">
+                    <div class="shape_title"><li>图形</li></div>
+                    <div class="shpbtn_field">
+                        <div class="shape_btn" id="rect"></div>
+                        <div class="shape_btn" id="triangle"></div>
+                        <div class="shape_btn" id="circle"></div>
+                        <div class="shape_btn" id="square"></div>
+                    </div>
+                </div>
                 <div class="con_right">
                     <div class="canvas_layout">
-                        <canvas class="glcanvas" width="1920px" height="1080px"></canvas>
+                        <canvas id="back-canvas" width="1920px" height="1080px"></canvas>
+                        <div id="wrapper">
+                            <div id="container"></div>
+                        </div>
                     </div>
                 </div>
             </section>

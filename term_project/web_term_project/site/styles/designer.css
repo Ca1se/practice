@@ -59,7 +59,7 @@ header div {
     width: 70px;
     height: 25px;
     top: 50%;
-    right: 100px;
+    right: 200px;
     transform: translate(0, -50%);
     text-align: center;
     border: 1px solid gray;
@@ -77,7 +77,7 @@ header div {
     width: 70px;
     height: 25px;
     top: 50%;
-    right: 180px;
+    right: 280px;
     transform: translate(0, -50%);
     text-align: center;
     border: 1px solid gray;
@@ -90,38 +90,117 @@ header div {
     height: 100%;
 }
 
+.to-myfile {
+    position: absolute;
+    width: 90px;
+    height: 25px;
+    top: 50%;
+    right: 100px;
+    transform: translate(0, -50%);
+    background-color: rgb(67, 134, 245);
+    text-align: center;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+.to-myfile a {
+    position: relative;
+    color: white;
+    width: 100%;
+    height: 100%;
+}
+
 section {
     position: relative;
     height: 100%;
 }
 
 .con_left {
-    width: 200px;
+    width: 100px;
     height: calc(100% - 60px);
     overflow: hidden;
     overflow-y: auto;
     background-color: #f4f4f4;
-    background-image: url("../images/tools.png");
-    border-right: 1px solid #cbcccc;
+    border-right: 1px solid #000000;
     position: absolute;
 }
 
+.shape_title {
+    text-indent: 10px;
+    line-height: 30px;
+    font-weight: bold;
+    font-size: 10px;
+    height: 30px;
+}
+
+.shpbtn_field {
+    border-bottom: 2px solid #cbcccc;
+    border-top: 2px solid #cbcccc;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.shape_btn {
+    box-shadow: gray 0 0 2px;
+    width: 70px;
+    height: 40px;
+    margin: 10px auto;
+    background-size: 40px;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid #cbcccc;
+}
+
+#rect {
+    background-image: url('../images/rectangle.png');
+}
+
+#triangle {
+    background-image: url('../images/triangle.png');
+}
+
+#circle {
+    background-image: url('../images/circle.png');
+}
+
+#square {
+    background-image: url('../images/square.png');
+}
+
 .con_right {
-    margin-left: 200px;
+    margin-left: 100px;
     height: calc(100% - 60px);
     position: relative;
+    overflow: scroll;
 }
 
 .con_right .canvas_layout {
     background-image: url("../images/canvas_bg.jpg");
     position: relative;
-    overflow: scroll;
-    height: 100%;
+    width: 1980px;
+    height: 1140px;
+}
+
+#back-canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 0;
 }
 
-.glcanvas {
-    margin: 30px;
-    cursor: default;
+#wrapper {
+    position: absolute;
+    width: 1920px;
+    height: 1080px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
+#container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
