@@ -94,7 +94,7 @@ class Shape {
     }
 
     remove() {
-        $(`#${this.id}`).remove();
+        $(`#i${this.id}`).remove();
         this.belong = '';
         this.showed = false;
     }

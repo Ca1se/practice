@@ -1,6 +1,6 @@
 // @ts-check
 
-import { drawLines } from './utils.js';
+import { drawLines, Manage } from './utils.js';
 import { Point, Rectangle, Shape } from './typedef.js';
 
 
@@ -42,6 +42,5 @@ function drawBackground() {
 $(function main() {
     drawBackground();
 
-    const rect = new Rectangle(new Point(100, 100), 100, 50, '#000000');
-    rect.show('container');
+    (new Rectangle(new Point(100, 100), 100, 100, '#000000')).show('container');
 })

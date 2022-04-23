@@ -54,60 +54,38 @@ header div {
     width: 200px;
 }
 
-.download {
-    position: absolute;
-    width: 70px;
-    height: 25px;
+.btn_box {
+    right: 70px;
     top: 50%;
-    right: 200px;
+    height: 30px;
     transform: translate(0, -50%);
-    text-align: center;
-    border: 1px solid gray;
-    border-radius: 5px;
+    position: absolute;
 }
 
-.download a {
+.btn_box a {
     position: relative;
-    width: 100%;
-    height: 100%;
+    margin-left: 10px;
 }
 
-.publish {
-    position: absolute;
-    width: 70px;
-    height: 25px;
-    top: 50%;
-    right: 280px;
-    transform: translate(0, -50%);
-    text-align: center;
+.download div, .publish div, .to-myfile div  {
     border: 1px solid gray;
-    border-radius: 5px;
+    box-shadow: 1px 1px 3px gray;
+    border-radius: 3px;
+    height: 23px;
+    line-height: 23px;
+    text-align: center;
+    font-size: 10px;
+    background-color: #ececec;
 }
 
-.publish a {
-    position: relative;
-    width: 100%;
-    height: 100%;
+.download div, .publish div {
+    width: 50px;
 }
 
-.to-myfile {
-    position: absolute;
-    width: 90px;
-    height: 25px;
-    top: 50%;
-    right: 100px;
-    transform: translate(0, -50%);
+.to-myfile div {
     background-color: rgb(67, 134, 245);
-    text-align: center;
-    border: 1px solid gray;
-    border-radius: 5px;
-}
-
-.to-myfile a {
-    position: relative;
-    color: white;
-    width: 100%;
-    height: 100%;
+    width: 80px;
+    color: white
 }
 
 section {
@@ -125,7 +103,7 @@ section {
     position: absolute;
 }
 
-.shape_title {
+.title {
     text-indent: 10px;
     line-height: 30px;
     font-weight: bold;
@@ -142,14 +120,23 @@ section {
 }
 
 .shape_btn {
-    box-shadow: gray 0 0 2px;
     width: 70px;
     height: 40px;
     margin: 10px auto;
+    border: 1px solid #cbcccc;
+    box-shadow: gray 0 0 2px;
+}
+
+.shape_btn:hover {
+    cursor: pointer;
+}
+
+.shape_btn div {
+    width: 100%;
+    height: 100%;
     background-size: 40px;
     background-repeat: no-repeat;
     background-position: center;
-    border: 1px solid #cbcccc;
 }
 
 #rect {
