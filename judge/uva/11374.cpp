@@ -31,9 +31,10 @@ priority_queue<statu, vector<statu>, greater<statu>> q;
 
 
 int main() {
-    freopen("test.in", "r", stdin);
-    freopen("test.out", "w", stdout);
+    // freopen("test.in", "r", stdin);
+    // freopen("test.out", "w", stdout);
     int m, u, v, w;
+    int cnt = 0;
     while(~scanf("%d%d%d", &n, &s, &e)) {
         memset(d, 0x3f, sizeof d);
         memset(vis, 0, sizeof vis);
@@ -85,6 +86,8 @@ int main() {
             }
         }
 
+        if(cnt++) printf("\n");
+
         if(d[0][e] < d[1][e]) {
             int to = e;
             ans.push_back(e);
@@ -114,10 +117,7 @@ int main() {
             printf("\n%d\n", swi);
             printf("%d\n", d[1][e]);
         }
-
-        printf("\n");
     }
-    
 
     return 0;
 }
