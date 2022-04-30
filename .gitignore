@@ -1,4 +1,8 @@
-
+*
+!*.*
+!*/
 node_modules
 *.exe
 *.json
+*.in
+*.out
