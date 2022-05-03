@@ -1,5 +1,3 @@
-// ts-check
-
 import { Manage } from './utils.js';
 
 class Point {
@@ -52,65 +50,82 @@ class Point {
     }
 }
 
-
-
 class Shape {
     /**
-     * @param {Point} origin 
-     * @param {string} color
+     * @param {Point} start 
+     * @param {number} width 
+     * @param {number} height 
+     * @param {string} color 
+     * @param {boolean} fill
      */
-    constructor(origin, color) {
-        this.origin = origin,
+    constructor(start, width, height, color, fill) {
+        this.start = start;
+        this.width = width;
+        this.height = height;
         this.color = color;
+        this.fill = fill;
 
-        // this.up = new Point(Math.sqrt(2) / 2, Math.sqrt(2) / 2);
-        this.up = new Point(0, -1);
         this.id = parseInt(Math.random().toString().substring(2, 6) + Date.now().toString().substring(7));
         this.showed = false;
         this.belong = '';
     }
 
-    /**
-     * @param {string} container
-     * @param {Point} xy
-     * @param {number} width
-     * @param {number} height
-     */
-    show(container, xy, width, height) {
-        const item = $(`<canvas id="${'i' + this.id}" width="${width}" height="${height}"></canvas>`).css(
-            { 
-                'position': 'absolute',
-                'top': xy.y,
-                'left': xy.x
-            }
-        );
-        $(`#${container}`).append(item);
-        this.belong = container;
-        this.showed = true;
-
-        /** @type {HTMLCanvasElement} */
-        const html = item[0];
-        this.ctx = html.getContext('2d');
+    show(container) {
+        if(!this.showed) {
+            /** @type {HTMLDivElement} */
+            const wrapper = $(`<div class="canvas_wrapper" id="${'i' + this.id}"></div>`).css(
+                { 
+                    'width': `${this.width}px`,
+                    'height': `${this.height}px`,
+                    'position': 'absolute',
+                    'top': this.start.y,
+                    'left': this.start.x
+                }
+            )[0];
+            /** @type {HTMLCanvasElement} */
+            this.canvas = $(`<canvas width="${this.width}px" height="${this.height}px"></canvas>`)[0];
+            const rotate = $(`<div class="rotate"></div>`).css(
+                {
+                    'width': '10px',
+                    'height': '10px',
+                    'position': 'absolute',
+                    'top': 0,
+                    'left': 0,
+                    'border': '1px solid black',
+                    'background-color': 'white',
+                    'visibility': 'hidden'
+                }
+            )[0];
+            const scale = $('<div class="scale"></div>').css(
+                {
+                    'width': '10px',
+                    'height': '10px',
+                    'position': 'absolute',
+                    'right': 0,
+                    'bottom': 0,
+                    'border': '1px solid black',
+                    'background-color': 'white',
+                    'visibility': 'hidden'
+                }
+            )[0];
+            wrapper.append(this.canvas);
+            wrapper.append(rotate);
+            wrapper.append(scale);
+            $(`#${container}`).append(wrapper);
+            this.belong = container;
+            this.showed = true;
+        }
     }
 
     remove() {
-        $(`#i${this.id}`).remove();
-        this.belong = '';
-        this.showed = false;
+        if(this.showed) {
+            $(`#i${this.id}`).remove();
+            this.belong = '';
+            this.showed = false;
+        }
     }
 
-    /**
-     * @param {Point} min_xy
-     * @param {boolean} fill
-     */
-    drawShape(min_xy, fill) { throw 'No implementation'; }
-
-    /**
-     * @param {boolean} enable 
-     */
-    setZoomFrame(enable) { throw 'No implementation'; }
-
-
+    drawShape() { throw 'No implementation'; }
 }
 
 class Rectangle extends Shape {
@@ -119,77 +134,48 @@ class Rectangle extends Shape {
      * @param {number} width 
      * @param {number} height 
      * @param {string} color
+     * @param {boolean} fill
      */
-    constructor(origin, width, height, color) {
-        super(origin, color);
-        this.width = width;
-        this.height = height;
-    }
-
-    /**
-     * @param {Point} origin
-     * @returns {Point[]}
-     */
-    getVertice(origin) {
-        const v_offset = this.up.mul(this.height / 2);
-        const h_offset = (new Point(this.up.y, -this.up.x)).mul(this.width / 2);
-
-        return [
-            origin.add(v_offset).add(h_offset),
-            origin.add(v_offset).sub(h_offset),
-            origin.sub(v_offset).sub(h_offset),
-            origin.sub(v_offset).add(h_offset)
-        ];
+    constructor(start, width, height, color, fill) {
+        super(start, width, height, color, fill);
     }
 
     /**
      * @param {string} container
      */
     show(container) {
-        const points = this.getVertice(this.origin);
-        const min_xy = new Point(Math.min(points[0].x, points[1].x, points[2].x, points[3].x) - 10,
-                                 Math.min(points[0].y, points[1].y, points[2].y, points[3].y) - 10);
-        const max_xy = new Point(Math.max(points[0].x, points[1].x, points[2].x, points[3].x) + 10,
-                                 Math.max(points[0].y, points[1].y, points[2].y, points[3].y) + 10);
+        super.show(container);
         Manage.shape_map.set(this.id, this);
-        super.show(container, min_xy, max_xy.x - min_xy.x, max_xy.y - min_xy.y);
-        this.drawShape(min_xy, false);
+        this.drawShape();
     }
 
     remove() {
-        Manage.shape_map.delete(this.id);
         super.remove();
+        Manage.shape_map.delete(this.id);
     }
 
-    /**
-     * @param {Point} min_xy
-     * @param {boolean} fill
-     */
-    drawShape(min_xy, fill) {
-        const ori = this.origin.sub(min_xy);
-        const points = this.getVertice(ori);
-        const ctx = this.ctx;
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(points[3].x, points[3].y);
-        for(let i = 0; i < points.length; i++) {
-            ctx.lineTo(points[i].x, points[i].y);
-        }
-        ctx.closePath();
-        if(fill) {
-            ctx.fillStyle = this.color;
-            ctx.fill();
-        }else {
+    drawShape() {
+        if(this.showed) {
+            const ctx = this.canvas.getContext('2d');
+
+            this.canvas.height = this.canvas.height;
             ctx.strokeStyle = this.color;
+            ctx.fillStyle = this.color;
+
+            if(this.fill) {
+                ctx.fillRect(0, 0, this.width, this.height);
+                return;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(this.width, 0);
+            ctx.lineTo(this.width, this.height);
+            ctx.lineTo(0, this.height);
+            ctx.lineTo(0, 0);
             ctx.stroke();
         }
     }
-
-    /**
-     * @param {boolean} enable 
-     */
-    setZoomFrame(enable) { throw 'No implementation'; }
-
 }
 
 class Circle extends Shape {

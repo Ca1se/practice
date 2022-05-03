@@ -1,9 +1,5 @@
-// @ts-check
-
 import { drawLines, Manage } from './utils.js';
 import { Point, Rectangle, Shape } from './typedef.js';
-
-
 
 function drawBackground() {
     /** @type {HTMLCanvasElement} */
@@ -39,8 +35,13 @@ function drawBackground() {
     drawLines(ctx, arr1, 0.3, 'black');
 }
 
+function drawRect() {
+    (new Rectangle(new Point(100, 100), 100, 100, '#000000', false)).show('container');
+
+}
+
 $(function main() {
     drawBackground();
+    $('#rect').on('click', drawRect);
 
-    (new Rectangle(new Point(100, 100), 100, 100, '#000000')).show('container');
 })
