@@ -1,3 +1,72 @@
+// Prim
+#include <cstdio>
+#include <queue>
+#include <cstring>
+#include <vector>
+using namespace std;
+
+struct Edge {
+    int t, w;
+    bool operator< (const Edge& other) const noexcept {
+        return this->w > other.w;
+    }
+};
+
+const int maxn = 1000 + 5;
+vector<Edge> edges[maxn];
+int price[maxn];
+int d[maxn];
+bool vis[maxn];
+
+priority_queue<Edge> q;
+
+
+int main() {
+    int t, n, w, ans;
+    scanf("%d", &t);
+    while(t--) {
+        ans = 0;
+        scanf("%d", &n);
+        memset(price, 0, n * sizeof(int));
+        memset(d, 0x3f, n * sizeof(int));
+        memset(vis, 0, n * sizeof(bool));
+        for(int i = 0; i < n; i++) edges[i].clear();
+        for(int i = 0; i < n; i++) {
+            scanf("%d", price + i);
+        }
+        for(int i = 0; i < n; i++) {
+            for(int k = 0; k < n; k++) {
+                scanf("%d", &w);
+                if(k > i) {
+                    w += price[i] + price[k];
+                    edges[i].push_back(Edge { k, w });
+                    edges[k].push_back(Edge { i, w });
+                }
+            }
+        }
+
+        d[0] = 0;
+        q.push(Edge { 0, 0 });
+        while(!q.empty()) {
+            Edge e = q.top(); q.pop();
+            if(vis[e.t]) continue;
+            vis[e.t] = true;
+            ans += e.w;
+            for(const auto& ed: edges[e.t]) {
+                if(!vis[ed.t] && d[ed.t] > ed.w) {
+                    d[ed.t] = ed.w;
+                    q.push(ed);
+                }
+            }
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}
+
+/*
+// Kruskal
+
 #include <cstdio>
 #include <vector>
 #include <cstring>
@@ -56,6 +125,7 @@ int main() {
     }
     return 0;
 }
+*/
 
 /*
 #include<bits/stdc++.h>
