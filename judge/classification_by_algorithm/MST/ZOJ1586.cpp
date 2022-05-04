@@ -1,3 +1,63 @@
+#include <cstdio>
+#include <vector>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+
+struct Edge {
+    int f, t, w;
+};
+
+const int maxn = 1000 + 5;
+int price[maxn];
+int ufset[maxn];
+int ans;
+vector<Edge> edges;
+
+inline int Find(int pos) {
+    return (~ufset[pos] ? ufset[pos] = Find(ufset[pos]) : pos);
+}
+
+inline void Union(int x, int y, int w) {
+    int xx = Find(x);
+    int yy = Find(y);
+    if(xx == yy) return;
+    ans += w;
+    ufset[xx] = yy;
+}
+
+int main() {
+    int t, n, w;
+    scanf("%d", &t);
+    while(t--) {
+        scanf("%d", &n);
+        ans = 0;
+        memset(price, 0, (n + 1) * sizeof(int));
+        memset(ufset, -1, (n + 1) * sizeof(int));
+        edges.clear();
+        for(int i = 0; i < n; i++) {
+            scanf("%d", price + i);
+        }
+        for(int i = 0; i < n; i++) {
+            for(int k = 0; k < n; k++) {
+                scanf("%d", &w);
+                if(k > i) {
+                    edges.push_back(Edge { i, k, w + price[i] + price[k] });
+                }
+            }
+        }
+        sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+            return a.w < b.w;
+        });
+        for(const auto& it: edges) {
+            Union(it.f, it.t, it.w);
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}
+
+/*
 #include<bits/stdc++.h>
 using namespace std;
 const int maxn = 1000 + 5;
@@ -53,3 +113,4 @@ int main() {
     }
     return 0;
 }
+*/
