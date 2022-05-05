@@ -73,7 +73,7 @@ class Shape {
     show(container) {
         if(!this.showed) {
             /** @type {HTMLDivElement} */
-            const wrapper = $(`<div class="canvas_wrapper" id="${'i' + this.id}"></div>`).css(
+            this.wrapper = $(`<div class="canvas_wrapper" id="${'i' + this.id}"></div>`).css(
                 { 
                     'width': `${this.width}px`,
                     'height': `${this.height}px`,
@@ -84,37 +84,21 @@ class Shape {
             )[0];
             /** @type {HTMLCanvasElement} */
             this.canvas = $(`<canvas width="${this.width}px" height="${this.height}px"></canvas>`)[0];
-            const rotate = $(`<div class="rotate"></div>`).css(
-                {
-                    'width': '10px',
-                    'height': '10px',
-                    'position': 'absolute',
-                    'top': 0,
-                    'left': 0,
-                    'border': '1px solid black',
-                    'background-color': 'white',
-                    'visibility': 'hidden'
-                }
-            )[0];
-            const scale = $('<div class="scale"></div>').css(
-                {
-                    'width': '10px',
-                    'height': '10px',
-                    'position': 'absolute',
-                    'right': 0,
-                    'bottom': 0,
-                    'border': '1px solid black',
-                    'background-color': 'white',
-                    'visibility': 'hidden'
-                }
-            )[0];
-            wrapper.append(this.canvas);
-            wrapper.append(rotate);
-            wrapper.append(scale);
-            $(`#${container}`).append(wrapper);
+            /** @type {HTMLDivElement} */
+            this.rotate = $(`<div class="rotate control_frame"></div>`)[0];
+            /** @type {HTMLDivElement} */
+            this.scale = $('<div class="scale control_frame"></div>')[0];
+            this.wrapper.append(this.canvas);
+            this.wrapper.append(this.rotate);
+            this.wrapper.append(this.scale);
+            $(`#${container}`).append(this.wrapper);
             this.belong = container;
             this.showed = true;
+
+            return this.wrapper;
         }
+
+        return null;
     }
 
     remove() {
@@ -126,6 +110,30 @@ class Shape {
     }
 
     drawShape() { throw 'No implementation'; }
+
+    /**
+     * @param {boolean} show 
+     */
+    setZoomFrame(show) {
+        if(show) {
+            $(this.rotate).css('visibility', 'visible');
+            $(this.scale).css('visibility', 'visible');
+        }else {
+            $(this.rotate).css('visibility', 'hidden');
+            $(this.scale).css('visibility', 'hidden');
+        }
+    }
+
+
+    /**
+     * @param {number} x_offset 
+     * @param {number} y_offset 
+     */
+    update(x_offset, y_offset) {
+        this.start = this.start.add(new Point(x_offset, y_offset));
+        this.wrapper.style.left = this.start.x + 'px';
+        this.wrapper.style.top = this.start.y + 'px';
+    }
 }
 
 class Rectangle extends Shape {
@@ -144,9 +152,10 @@ class Rectangle extends Shape {
      * @param {string} container
      */
     show(container) {
-        super.show(container);
+        const wrapper = super.show(container);
         Manage.shape_map.set(this.id, this);
         this.drawShape();
+        return wrapper;
     }
 
     remove() {
@@ -179,19 +188,21 @@ class Rectangle extends Shape {
 }
 
 class Circle extends Shape {
-    /**
-     * @param {Point} origin 
-     * @param {number} radius 
-     * @param {string} color
-     */
-    constructor(origin, radius, color) {
-        super(origin, color);
-        this.radius = radius;
+    constructor(start, width, height, color, fill) {
+        super(start, width, height, color, fill);
     }
 }
 
 class Triangle extends Shape {
+    constructor(start, width, height, color, fill) {
+        super(start, width, height, color, fill);
+    }
+}
 
+class Square extends Shape {
+    constructor(start, width, height, color, fill) {
+        super(start, width, height, color, fill);
+    }
 }
 
 export {

@@ -190,12 +190,25 @@ section {
 
 .rotate {
     cursor: grab;
+    top: 0;
+    left: 0;
 }
 
 .scale {
     cursor: nwse-resize;
+    right: 0;
+    bottom: 0;
 }
 
 .canvas_wrapper {
     cursor: move;
+}
+
+.control_frame {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    border: 1px solid black;
+    background-color: white;
+    visibility: hidden;
 }
