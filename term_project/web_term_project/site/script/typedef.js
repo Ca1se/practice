@@ -94,8 +94,6 @@ class Shape {
             $(`#${container}`).append(this.wrapper);
             this.belong = container;
             this.showed = true;
-
-            return this.wrapper;
         }
 
         return null;
@@ -152,10 +150,9 @@ class Rectangle extends Shape {
      * @param {string} container
      */
     show(container) {
-        const wrapper = super.show(container);
+        super.show(container);
         Manage.shape_map.set(this.id, this);
         this.drawShape();
-        return wrapper;
     }
 
     remove() {

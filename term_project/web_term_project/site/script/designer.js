@@ -53,20 +53,39 @@ function drawBackground() {
 }
 
 /** @type {Shape} */
-let down = null;
+let moving_item = null;
+
+let resizing = false;
+
+let rotating = false;
+let rotating_center = new Point(0, 0);
+let rotating_prevec = new Point(0, 0);
+
 /**
  * @param {Shape} item 
  */
 function enableItem(item) {
-    const element = item.show('container');
-    $(element).on('click', event => {
+    item.show('container');
+
+    const wrapper = item.wrapper;
+    $(wrapper).on('click', event => {
         event.stopPropagation();
         setTargetItem(item);
     });
 
-    $(element).on('mousedown', event => {
+    $(wrapper).on('mousedown', event => {
         event.stopPropagation();
-        down = item;
+        moving_item = item;
+    });
+
+    const rotate = item.rotate;
+    rotate.addEventListener('mousedown', event => {
+        event.stopPropagation();
+        rotating_center.x = item.wrapper.getBoundingClientRect().left + item.width / 2;
+        rotating_center.y = item.wrapper.getBoundingClientRect().top + item.height / 2;
+        rotating_prevec.x = event.clientX - rotating_center.x;
+        rotating_prevec.y = event.clientY - rotating_center.y;
+        rotating = true;
     });
 }
 
@@ -108,10 +127,16 @@ $(() => {
         drawMethodMap.get(aim_shape)(event.offsetX - 50, event.offsetY - 50);
     });
     $(container).on('click', () => { setTargetItem(null); });
-    $(container).on('mouseup', () => { down = null; });
+    $(container).on('mouseup', () => { moving_item = null; });
     container.addEventListener('mousemove', event => {
-        if(down != null) {
-            down.update(event.movementX, event.movementY);
+        if(moving_item != null) {
+            moving_item.update(event.movementX, event.movementY);
+        }else if(resizing) {
+
+        }else if(rotating) {
+            const nowvec = new Point(event.clientX - rotating_center.x,
+                                     event.clientY - rotating_center.y);
+            
         }
     });
 })
