@@ -3,14 +3,6 @@
 /** @typedef {import('./typedef').Point } Point */
 /** @typedef {import('./typedef').Shape } Shape */
 
-class Manage {
-    /** @type {Map<number, Shape>} */
-    static shape_map = new Map;
-
-    /** @type {Shape} */
-    static aim;
-}
-
 /**
  * @param {CanvasRenderingContext2D} ctx 
  * @param {{ start: Point, end: Point }[]} line_endpoints 
@@ -32,6 +24,5 @@ function drawLines(ctx, line_endpoints, width, color) {
 }
 
 export {
-    drawLines,
-    Manage
+    drawLines
 }

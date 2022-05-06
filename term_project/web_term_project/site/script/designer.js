@@ -1,5 +1,5 @@
-import { drawLines, Manage } from './utils.js';
-import { Point, Rectangle, Shape } from './typedef.js';
+import { drawLines } from './utils.js';
+import { Circle, Hexagon, Point, Rectangle, Shape, Triangle } from './typedef.js';
 
 
 /** @type {Shape} */
@@ -53,10 +53,10 @@ function drawBackground() {
 }
 
 /** @type {Shape} */
-let moving_item = null;
+let titem = null;
 
-let resizing = false;
-
+let moving   = false;
+let scaling = false;
 let rotating = false;
 let rotating_center = new Point(0, 0);
 let rotating_prevec = new Point(0, 0);
@@ -75,17 +75,26 @@ function enableItem(item) {
 
     $(wrapper).on('mousedown', event => {
         event.stopPropagation();
-        moving_item = item;
+        titem = item;
+        moving = true;
     });
 
     const rotate = item.rotate;
-    rotate.addEventListener('mousedown', event => {
+    $(rotate).on('mousedown', event => {
         event.stopPropagation();
+        titem = item;
         rotating_center.x = item.wrapper.getBoundingClientRect().left + item.width / 2;
         rotating_center.y = item.wrapper.getBoundingClientRect().top + item.height / 2;
         rotating_prevec.x = event.clientX - rotating_center.x;
         rotating_prevec.y = event.clientY - rotating_center.y;
         rotating = true;
+    });
+
+    const scale = item.scale;
+    $(scale).on('mousedown', event => {
+        event.stopPropagation();
+        titem = item;
+        scaling = true;
     });
 }
 
@@ -95,15 +104,25 @@ function drawRect(x, y) {
 }
 
 function drawTriangle(x, y) {
-
+    const triagnle = new Triangle(new Point(x, y), 100, 87, '#000000', false);
+    enableItem(triagnle);
 }
 
 function drawCircle(x, y) {
-
+    const circle = new Circle(new Point(x, y), 100, 100, '#000000', false);
+    enableItem(circle);
 }
 
-function drawSquare(x, y) {
+function drawHexagon(x, y) {
+    const hexagon = new Hexagon(new Point(x, y), 100, 87, '#000000', false);
+    enableItem(hexagon);
+}
 
+/**
+ * @param {Point} vec 
+ */
+function squareNorm(vec) {
+    return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
 $(() => {
@@ -113,30 +132,41 @@ $(() => {
     drawMethodMap.set(0, drawRect);
     drawMethodMap.set(1, drawTriangle);
     drawMethodMap.set(2, drawCircle);
-    drawMethodMap.set(3, drawSquare);
+    drawMethodMap.set(3, drawHexagon);
 
-    let aim_shape;
+    let aim_shape = -1;
     $('#rect').on('dragstart', () => { aim_shape = 0; });
     $('#triangle').on('dragstart', () => { aim_shape = 1; });
     $('#circle').on('dragstart', () => { aim_shape = 2; });
-    $('#square').on('dragstart', () => { aim_shape = 3; });
+    $('#hexagon').on('dragstart', () => { aim_shape = 3; });
 
     const container = $('#container')[0];
     $(container).on('dragover', event => { event.preventDefault(); });
     $(container).on('drop', event => {
-        drawMethodMap.get(aim_shape)(event.offsetX - 50, event.offsetY - 50);
+        if(aim_shape != -1) {
+            drawMethodMap.get(aim_shape)(event.offsetX - 50, event.offsetY - 50);
+            aim_shape = -1;
+        }
     });
     $(container).on('click', () => { setTargetItem(null); });
-    $(container).on('mouseup', () => { moving_item = null; });
+    $(container).on('mouseup', () => { moving = false; scaling = false; rotating = false; });
     container.addEventListener('mousemove', event => {
-        if(moving_item != null) {
-            moving_item.update(event.movementX, event.movementY);
-        }else if(resizing) {
-
+        if(moving) {
+            titem.update({ start_offset: new Point(event.movementX, event.movementY) });
+        }else if(scaling) {
+            titem.update({ scale_offset: new Point(event.movementX, event.movementY) });
         }else if(rotating) {
             const nowvec = new Point(event.clientX - rotating_center.x,
                                      event.clientY - rotating_center.y);
-            
+            if(Math.abs(rotating_prevec.x * nowvec.x + rotating_prevec.y * nowvec.y)
+                     / (squareNorm(rotating_prevec) * squareNorm(nowvec)) <= 0.998) {
+                let deg = 5;
+                if(rotating_prevec.x * nowvec.y - rotating_prevec.y * nowvec.x < 0) {
+                    deg = -5;
+                }
+                titem.update({ rotate: deg });
+                rotating_prevec = nowvec;
+            }
         }
     });
 })

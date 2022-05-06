@@ -94,7 +94,7 @@ section {
 }
 
 .con_left {
-    width: 100px;
+    width: 130px;
     height: calc(100% - 60px);
     overflow: hidden;
     overflow-y: auto;
@@ -143,16 +143,40 @@ section {
     background-image: url('../images/circle.png');
 }
 
-#square {
-    background-image: url('../images/square.png');
+#hexagon {
+    background-image: url('../images/hexagon.png');
 }
 
 .shape_btn:hover {
     cursor: pointer;
 }
 
+.toobtn_field {
+    width: 100%;
+    border-bottom: 1px solid #cbcccc;
+    border-top: 1px solid #cbcccc;
+}
+
+.tfield {
+    border-bottom: 1px solid #cbcccc;
+    width: 130px;
+    padding: 10px 0;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: large;
+}
+
+.attri_input {
+    margin: 3px 0;
+    width: 45px;
+}
+
 .con_right {
-    margin-left: 100px;
+    margin-left: 130px;
     height: calc(100% - 60px);
     position: relative;
     overflow: scroll;
@@ -190,6 +214,7 @@ section {
 
 .rotate {
     cursor: grab;
+    border-radius: 50%;
     top: 0;
     left: 0;
 }
@@ -202,13 +227,21 @@ section {
 
 .canvas_wrapper {
     cursor: move;
+
 }
 
 .control_frame {
+    position: absolute;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    border: 1px solid black;
+    visibility: hidden
+}
+
+.control_bar {
     width: 10px;
     height: 10px;
     position: absolute;
     border: 1px solid black;
     background-color: white;
-    visibility: hidden;
 }
