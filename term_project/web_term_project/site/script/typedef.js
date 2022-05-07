@@ -57,6 +57,9 @@ class Point {
 }
 
 class Shape {
+    /** @type {Map<number, Shape>} */
+    static s_shapes = new Map;
+
     /**
      * @param {Point} start 
      * @param {number} width 
@@ -85,7 +88,8 @@ class Shape {
                     'height': `${this.height}px`,
                     'position': 'absolute',
                     'top': this.start.y,
-                    'left': this.start.x
+                    'left': this.start.x,
+                    'z-index': 0
                 }
             )[0];
             /** @type {HTMLCanvasElement} */
@@ -101,6 +105,8 @@ class Shape {
             this.wrapper.append(this.frame);
             $(`#${container}`).append(this.wrapper);
             this.showed = true;
+            Shape.s_shapes.set(this.id, this);
+            console.log(Shape.s_shapes.size);
         }
     }
 
@@ -108,6 +114,8 @@ class Shape {
         if(this.showed) {
             $(`#i${this.id}`).remove();
             this.showed = false;
+            Shape.s_shapes.delete(this.id);
+            console.log(Shape.s_shapes.size);
         }
     }
 
@@ -149,7 +157,7 @@ class Shape {
         }else if(attrib.color) {
             this.color = attrib.color;
             this.drawShape();
-        }else if(attrib.fill) {
+        }else if(attrib.fill != undefined) {
             this.fill = attrib.fill;
             this.drawShape();
         }

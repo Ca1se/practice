@@ -13,9 +13,8 @@
                 <div class="return"><a href=""></a></div>
                 <div class="filename"><input type="text" name="filename" placeholder="未命名文件"></div>
                 <div class="btn_box">
-                    <a class="download button" href=""><div>下载</div></a>
-                    <a class="publish button" href=""><div>发布</div></a>
-                    <a class="to-myfile button" href=""><div>我的文件</div></a>
+                    <a class="download button"><div style="cursor: pointer;">下载</div></a>
+                    <a class="to-myfile button"><div>我的文件</div></a>
                 </div>
                 
             </header>
@@ -31,17 +30,21 @@
                     <div class="title"><li>属性</li></div>
                     <div class="toobtn_field">
                         <div class="tfield">
-                            <div>x:<input class="attri_input" type="number" id="x"></div>
-                            <div>y:<input class="attri_input" type="number" id="y"></div>
-                            <div>z:<input class="attri_input" type="number" id="z"></div>
+                            <div>x:<input class="attri_input" type="number" id="x_in"><span>px</span></div>
+                            <div>y:<input class="attri_input" type="number" id="y_in"><span>px</span></div>
+                            <div>z:<input class="attri_input" type="number" id="z_in"><span>px</span></div>
                         </div>
                         <div class="tfield">
-                            <div>w:<input class="attri_input" type="number" id="width"></div>
-                            <div>h:<input class="attri_input" type="number" id="height"></div>
-                            <div>r:<input class="attri_input" type="number" id="rotate"></div>
+                            <div>w:<input class="attri_input" type="number" id="w_in"><span>px</span></div>
+                            <div>h:<input class="attri_input" type="number" id="h_in"><span>px</span></div>
+                            <div>r:<input class="attri_input" type="number" id="r_in"><span style="font-size: 15px;">deg</span></div>
                         </div>
-                        <div class="tfield">
-                            <div>color: <input class="attri_input" style="width: 50px;"></div>
+                        <div class="tfield" style="text-align: center;">
+                            <div style="font-size: 15px">color:<input class="attri_input" id="color_in" style="width: 60px;"></div>
+                            <div>fill:<input class="attri_input" type="checkbox" id="fill_in"></div>
+                        </div>
+                        <div class="tfield" style="text-align: center">
+                            <button id="delete_shape">删除图元</button>
                         </div>
                     </div>
                 </div>

@@ -13,8 +13,22 @@ function setTargetItem(item) {
         targetItem.setZoomFrame(false);
     }
     targetItem = item;
+    const attri_inputs = $('.attri_input');
     if(targetItem != null) {
         targetItem.setZoomFrame(true);
+        attri_inputs[0].value = targetItem.start.x;
+        attri_inputs[1].value = targetItem.start.y;
+        attri_inputs[2].value = parseInt(targetItem.wrapper.style.zIndex);
+        attri_inputs[3].value = targetItem.width;
+        attri_inputs[4].value = targetItem.height;
+        attri_inputs[5].value = targetItem.rotate_deg;
+        attri_inputs[6].value = targetItem.color;
+        attri_inputs[7].checked = targetItem.fill;
+    }else {
+        for(let i = 0; i < 7; i++) {
+            attri_inputs[i].value = null;
+        }
+        attri_inputs[7].checked = false;
     }
 }
 
@@ -168,5 +182,85 @@ $(() => {
                 rotating_prevec = nowvec;
             }
         }
+    });
+
+    $('#x_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.update({ start_offset: new Point(Math.max(0, event.target.value) - targetItem.start.x, 0) });
+        }
+    });
+
+    $('#y_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.update({ start_offset: new Point(0, Math.max(0, event.target.value) - targetItem.start.y) });
+        }
+    });
+
+    $('#z_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.wrapper.style.zIndex = Math.max(0, Math.min(20, event.target.value));
+        }
+    });
+
+    $('#w_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.update({ scale_offset: new Point(event.target.value - targetItem.width, 0) });
+        }
+    });
+
+    $('#h_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.update({ scale_offset: new Point(0, event.target.value - targetItem.height) });
+        }
+    });
+
+    $('#r_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.update({ rotate: (event.target.value - targetItem.rotate_deg) });
+        }
+    });
+
+    $('#color_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.update({ color: event.target.value });
+        }
+    });
+
+    $('#fill_in').on('change', event => {
+        if(targetItem != null) {
+            targetItem.update({ fill: event.target.checked });
+        }
+    });
+
+    $('#delete_shape').on('click', () => {
+        if(targetItem != null) {
+            targetItem.remove();
+            setTargetItem(null);
+        }
+    });
+
+    $('.download').on('click', () => {
+        /** @type {HTMLCanvasElement} */
+        const canvas = $("<canvas width='1920px' height='1080px'></canvas>")[0];
+        const ctx = canvas.getContext('2d');
+        // unsolved
+        Shape.s_shapes.forEach((val) => {
+            ctx.save();
+            ctx.rotate(val.rotate_deg * Math.PI / 180);
+            ctx.drawImage(val.canvas, 0, 0);
+            ctx.restore();
+        });
+
+        const MIME_TYPE = 'image/png';
+        const img_url = canvas.toDataURL(MIME_TYPE);
+
+        const alink = document.createElement('a');
+        alink.download = ($('.filename input')[0].value.length == 0 ? 'no-title': $('.filename input')[0].value) + '.png';
+        alink.href = img_url;
+        alink.dataset.downloadurl = [MIME_TYPE, alink.download, alink.href].join(':');
+
+        document.body.appendChild(alink);
+        alink.click();
+        alink.remove();
     });
 })

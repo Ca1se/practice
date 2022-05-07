@@ -159,20 +159,25 @@ section {
 
 .tfield {
     border-bottom: 1px solid #cbcccc;
-    width: 130px;
-    padding: 10px 0;
-    display: flex;
-    text-align: center;
-    justify-content: center;
-    flex-wrap: wrap;
+    padding: 10px 20px;
+    width: auto;
     font-family: monospace;
     font-weight: bold;
+    font-size: 15px;
+}
+
+.tfield span {
+    font-weight: normal;
     font-size: large;
+}
+
+.tfield button {
+    padding: 5px 10px;
 }
 
 .attri_input {
     margin: 3px 0;
-    width: 45px;
+    width: 40px;
 }
 
 .con_right {
@@ -227,7 +232,6 @@ section {
 
 .canvas_wrapper {
     cursor: move;
-
 }
 
 .control_frame {
