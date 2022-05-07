@@ -243,11 +243,11 @@ $(() => {
         /** @type {HTMLCanvasElement} */
         const canvas = $("<canvas width='1920px' height='1080px'></canvas>")[0];
         const ctx = canvas.getContext('2d');
-        // unsolved
         Shape.s_shapes.forEach((val) => {
             ctx.save();
+            ctx.translate(val.start.x + val.width / 2, val.start.y + val.height / 2);
             ctx.rotate(val.rotate_deg * Math.PI / 180);
-            ctx.drawImage(val.canvas, 0, 0);
+            ctx.drawImage(val.canvas, -val.width / 2, -val.height / 2);
             ctx.restore();
         });
 
