@@ -25,6 +25,17 @@ const char* const kDefaultFragmentShaderSource =
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}";
 
+const char* const kDefaultGeometryShaderSource =
+    "#version 330 core\n"
+    "layout (points) in;\n"
+    "layout (points, max_vertices = 1) out;\n"
+    "void main() {\n"
+    "   gl_Position = gl_in[0].gl_Position;\n"
+    "   EmitVertex();\n"
+    "   EndPrimitive();\n"
+    "}";
+
+
 struct Path {
     std::string str;
     explicit Path(const std::string& path): str(std::string{ SHADER_DIR_PATH } + path) {}
@@ -50,18 +61,22 @@ public:
     enum ShaderType {
         kVertexShader = GL_VERTEX_SHADER,
         kFragmentShader = GL_FRAGMENT_SHADER,
+        kGeometryShader = GL_GEOMETRY_SHADER
     };
 
 private:
     unsigned int m_vertex_shader;
     unsigned int m_fragment_shader;
+    unsigned int m_geometry_shader;
     unsigned int m_shader_program;
+
+    bool m_have_geometry;
     bool m_shader_changed;
 
     char m_error_log[512];
 
 public:
-    Shader();
+    Shader(bool geometry = false);
     ~Shader();
 
 public:

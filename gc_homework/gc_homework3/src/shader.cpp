@@ -1,3 +1,5 @@
+#include <cassert>
+#include <cstdint>
 #include <cstdio>
 #include <string>
 #include <algorithm>
@@ -37,23 +39,36 @@ ShaderSource::ShaderSource(const Path& path):
     std::fclose(file);
 }
 
-Shader::Shader():
+Shader::Shader(bool geometry):
         m_vertex_shader(glCreateShader(GL_VERTEX_SHADER)),
         m_fragment_shader(glCreateShader(GL_FRAGMENT_SHADER)),
         m_shader_program(glCreateProgram()),
-        m_shader_changed(false), m_error_log{} {
+        m_have_geometry(geometry), m_shader_changed(false),
+        m_error_log{} {
+    if(geometry) {
+        m_geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(m_geometry_shader, 1, &kDefaultGeometryShaderSource, nullptr);
+        glCompileShader(m_geometry_shader);
+    }
+
     glShaderSource(m_vertex_shader, 1, &kDefaultVertexShaderSource, nullptr);
     glCompileShader(m_vertex_shader);
     glShaderSource(m_fragment_shader, 1, &kDefaultFragmentShaderSource, nullptr);
     glCompileShader(m_fragment_shader);
     glAttachShader(m_shader_program, m_vertex_shader);
     glAttachShader(m_shader_program, m_fragment_shader);
+    if(geometry) {
+        glAttachShader(m_shader_program, m_geometry_shader);
+    }
     glLinkProgram(m_shader_program);
 }
 
 Shader::~Shader() {
     glDeleteShader(m_vertex_shader);
     glDeleteShader(m_fragment_shader);
+    if(m_have_geometry) {
+        glDeleteShader(m_geometry_shader);
+    }
     glDeleteProgram(m_shader_program);
 }
 
@@ -81,6 +96,14 @@ bool Shader::prepareShader(ShaderType shader_type, const ShaderSource& shader_so
         std::swap(m_vertex_shader, shader_id);
     else if(shader_type == kFragmentShader)
         std::swap(m_fragment_shader, shader_id);
+    else {
+        if(!m_have_geometry) {
+            std::sprintf(m_error_log, "Shader type error: Geometry Shader is not enabled.");
+            glDeleteShader(shader_id);
+            return false;
+        }
+        std::swap(m_geometry_shader, shader_id);
+    }
 
     glDeleteShader(shader_id);
 
@@ -94,6 +117,11 @@ bool Shader::use() {
         unsigned int program_id = glCreateProgram();
         glAttachShader(program_id, m_vertex_shader);
         glAttachShader(program_id, m_fragment_shader);
+
+        if(m_have_geometry) {
+            glAttachShader(program_id, m_geometry_shader);
+        }
+
         glLinkProgram(program_id);
 
         int res;

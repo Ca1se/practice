@@ -2,24 +2,17 @@
 #include <vector>
 #include <cassert>
 #include <cmath>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "matrix.hpp"
 #include "glfw_utils.hpp"
 #include "shader.hpp"
 #include "uniform.hpp"
+#include "camera.hpp"
 
-
-constexpr float kPi = 3.141593;
-const int kWindowWidth  = 800;
-const int kWindowHeight = 600;
-
-struct Camera {
-    Camera(Vector3f target, Vector3f view, Vector3f up): target(target), view(view), up(up) {}
-    Vector3f target;
-    Vector3f view;
-    Vector3f up;
-};
 
 inline std::vector<float> generateTs(float step_size) noexcept {
     assert(step_size <= 1);
@@ -34,44 +27,78 @@ inline std::vector<float> generateTs(float step_size) noexcept {
     return ret;
 }
 
-inline Matrix4f calViewMatrix(const Camera& camera) {
-    Vector3f w = Vector3f{camera.view - camera.target}.normalized();
-    Vector3f u = camera.up.cross(w).normalized();
-    Vector3f v = w.cross(u).normalized();
-    const Vector3f& e = camera.view;
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow *window);
 
-    return Matrix4f{
-        u.x(), u.y(), u.z(), -u.x() * e.x() - u.y() * e.y() - u.z() * e.z(),
-        v.x(), v.y(), v.z(), -v.x() * e.x() - v.y() * e.y() - v.z() * e.z(),
-        w.x(), w.y(), w.z(), -w.x() * e.x() - w.y() * e.y() - w.z() * e.z(),
-        0, 0, 0, 1
-    };
-}
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
-inline Matrix4f calProjectionMatrix(float fov, float aspect, float near, float far) {
-    float r = fov / 2 / 180 * kPi;
-    float top = -tan(r) * near;
-    float right = top * aspect;
+// camera
+Camera camera(glm::vec3(0.0f, 0.0f, 9.0f));
+float lastX = (float)SCR_WIDTH / 2.0;
+float lastY = (float)SCR_HEIGHT / 2.0;
+bool firstMouse = true;
 
-    // perspective
-    return Matrix4f{
-        near / right, 0, 0, 0,
-        0, near / top, 0, 0,
-        0, 0, (near + far) / (near - far), -2 * near * far / (near - far),
-        0, 0, 1, 0
-    };
-}
+// timing
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
-std::vector<Vector3f> g_control_points {
-    Vector3f{ 0, 200, 0 },
-    Vector3f{ 0, 0, 0 },
-    Vector3f{ 200, 0, 0 }
+
+std::vector<Vector3f> g_control_points[4] = {
+    {
+        Vector3f{ 0, 2, 0 }, Vector3f{ 2.5, 1, 0 }, Vector3f{ 2.5, -1, 0 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ 1.7678, 1, -1.7678 }, Vector3f{ 1.7678, -1, -1.7678 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ 0, 1, -2.5 }, Vector3f{ 0, -1, -2.5 }, Vector3f{ 0, -2, 0 },
+    },
+    {
+        Vector3f{ 0, 2, 0 }, Vector3f{ 0, 1, -2.5 }, Vector3f{ 0, -1, -2.5 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ -1.7678, 1, -1.7678 }, Vector3f{ -1.7678, -1, -1.7678 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ -2.5, 1, 0 }, Vector3f{ -2.5, -1, 0 }, Vector3f{ 0, -2, 0 },
+    },
+    {
+        Vector3f{ 0, 2, 0 }, Vector3f{ -2.5, 1, 0 }, Vector3f{ -2.5, -1, 0 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ -1.7678, 1, 1.7678 }, Vector3f{ -1.7678, -1, 1.7678 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ 0, 1, 2.5 }, Vector3f{ 0, -1, 2.5 }, Vector3f{ 0, -2, 0 },
+    },
+    {
+        Vector3f{ 0, 2, 0 }, Vector3f{ 0, 1, 2.5 }, Vector3f{ 0, -1, 2.5 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ 1.7678, 1, 1.7678 }, Vector3f{ 1.7678, -1, 1.7678 }, Vector3f{ 0, -2, 0 },
+        Vector3f{ 0, 2, 0 }, Vector3f{ 2.5, 1, 0 }, Vector3f{ 2.5, -1, 0 }, Vector3f{ 0, -2, 0 },
+    }
 };
 
 int main() {
-    auto* window = gchw::utils().createWindow("gc_homework3", kWindowWidth, kWindowHeight);
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    gchw::Shader shader;
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    glEnable(GL_DEPTH_TEST);
+
+    gchw::Shader shader(true);
 
     if(!shader.prepareShader(gchw::Shader::kVertexShader, gchw::Path("shader.vert"))) {
         std::cout << shader.get_error_log() << std::endl;
@@ -85,22 +112,23 @@ int main() {
         return 0;
     }
 
-    Camera camera(Vector3f{0, 0, 0}, Vector3f{0, 0, 30}, Vector3f{0, 1, 0});
-    Matrix4f view_matrix = calViewMatrix(camera);
-    Matrix4f perspective_matrix = calProjectionMatrix(60, (float) kWindowWidth / kWindowHeight, -0.1, -10000);
-    Matrix4f mvp = perspective_matrix * view_matrix;
+    if(!shader.prepareShader(gchw::Shader::kGeometryShader, gchw::Path("shader.geom"))) {
+        std::cout << shader.get_error_log() << std::endl;
+        gchw::utils().terminate();
+        return 0;
+    }
+    
+    glm::mat4 pers = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 1.0f, 100.0f);
 
-    /*
-    for(auto& point: g_control_points) {
-        point.x() /= kWindowWidth / 2.0f;
-        point.y() /= kWindowHeight / 2.0f;
+    if(!shader.use()) {
+        std::cout << shader.get_error_log() << std::endl;
+        gchw::utils().terminate();
+        return 0;
     }
 
-    shader.use();
-    shader.setUniform<gchw::FVec3>("u_control_points", 
-            g_control_points.size(), (const float*) g_control_points.data());
+    shader.setUniformMatrix<gchw::FMat4>("u_p", 1, false, &pers[0][0]);
 
-    const std::vector<float> ts = generateTs(0.0025);
+    const std::vector<float> ts = generateTs(0.01);
 
     uint32_t vao;
     glGenVertexArrays(1, &vao);
@@ -117,15 +145,81 @@ int main() {
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     while(!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_POINTS, 0, ts.size());
+        processInput(window);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glm::mat4 view = camera.GetViewMatrix();
+        shader.setUniformMatrix<gchw::FMat4>("u_v", 1, false, &view[0][0]);
+
+        for(int i = 0; i < 4; i++) {
+            shader.setUniform<gchw::FVec3>("u_control_points", 12, (const float*) g_control_points[i].data());
+            glDrawArrays(GL_POINTS, 0, ts.size());
+        }
+
         glfwSwapBuffers(window);
+        glfwPollEvents();
     }
-    */
 
-    gchw::utils().terminate();
-
+    glfwTerminate();
     return 0;
+}
+
+// reference from https://learnopengl.com/code_viewer_gh.php?code=src/4.advanced_opengl/9.3.geometry_shader_normals/normal_visualization.cpp
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
