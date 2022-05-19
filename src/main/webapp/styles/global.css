@@ -1,0 +1,18 @@
+.button {
+    text-decoration: none;
+    color: black;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-left: 1px solid #e8e8e8;
+}
+::-webkit-scrollbar-thumb {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #fff;
+    border-radius: 6px;
+    background: #c9c9c9;
+}

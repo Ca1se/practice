@@ -1,0 +1,248 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.content {
+    height: 100%;
+}
+
+header {
+    height: 60px;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #cbcccc;
+    position: relative;
+}
+
+header div {
+    display: inline-block;
+}
+
+.return {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 10px;
+    transform: translate(0, -50%);
+}
+
+.return:hover {
+    background-color: #cbcccc;
+}
+
+.return a {
+    background-image: url("../images/sprite.png");
+    background-position: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.filename {
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    transform: translate(0, -50%);
+}
+
+.filename input {
+    height: 20px;
+    width: 200px;
+}
+
+.btn_box {
+    right: 70px;
+    top: 50%;
+    height: 30px;
+    transform: translate(0, -50%);
+    position: absolute;
+}
+
+.btn_box a {
+    position: relative;
+    margin-left: 10px;
+}
+
+.download div, .save div, .to-myfile div  {
+    border: 1px solid gray;
+    box-shadow: 1px 1px 3px gray;
+    border-radius: 3px;
+    width: 50px;
+    height: 23px;
+    line-height: 23px;
+    text-align: center;
+    font-size: 10px;
+    background-color: #ececec;
+}
+
+.to-myfile div {
+    background-color: rgb(67, 134, 245);
+    width: 80px;
+    color: white
+}
+
+section {
+    position: relative;
+    height: 100%;
+}
+
+.con_left {
+    width: 130px;
+    height: calc(100% - 60px);
+    overflow: hidden;
+    overflow-y: auto;
+    background-color: #f4f4f4;
+    border-right: 1px solid #000000;
+    position: absolute;
+}
+
+.title {
+    text-indent: 10px;
+    line-height: 30px;
+    font-weight: bold;
+    font-size: 10px;
+    height: 30px;
+}
+
+.shpbtn_field {
+    border-bottom: 2px solid #cbcccc;
+    border-top: 2px solid #cbcccc;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.shape_btn {
+    width: 70px;
+    height: 40px;
+    margin: 10px auto;
+    border: 1px solid #cbcccc;
+    box-shadow: gray 0 0 2px;
+    display: block;
+    background-size: 40px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#rect {
+    background-image: url('../images/rectangle.png');
+}
+
+#triangle {
+    background-image: url('../images/triangle.png');
+}
+
+#circle {
+    background-image: url('../images/circle.png');
+}
+
+#hexagon {
+    background-image: url('../images/hexagon.png');
+}
+
+.shape_btn:hover {
+    cursor: pointer;
+}
+
+.toobtn_field {
+    width: 100%;
+    border-bottom: 1px solid #cbcccc;
+    border-top: 1px solid #cbcccc;
+}
+
+.tfield {
+    border-bottom: 1px solid #cbcccc;
+    padding: 10px 20px;
+    width: auto;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.tfield span {
+    font-weight: normal;
+    font-size: large;
+}
+
+.tfield button {
+    padding: 5px 10px;
+}
+
+.attri_input {
+    margin: 3px 0;
+    width: 40px;
+}
+
+.con_right {
+    margin-left: 130px;
+    height: calc(100% - 60px);
+    position: relative;
+    overflow: scroll;
+}
+
+.con_right .canvas_layout {
+    background-image: url("../images/canvas_bg.jpg");
+    position: relative;
+    width: 1980px;
+    height: 1140px;
+}
+
+#back-canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+}
+
+#wrapper {
+    position: absolute;
+    width: 1920px;
+    height: 1080px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.rotate {
+    cursor: grab;
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+}
+
+.scale {
+    cursor: nwse-resize;
+    right: 0;
+    bottom: 0;
+}
+
+.canvas_wrapper {
+    cursor: move;
+}
+
+.control_frame {
+    position: absolute;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    border: 1px solid black;
+    visibility: hidden
+}
+
+.control_bar {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    border: 1px solid black;
+    background-color: white;
+}
