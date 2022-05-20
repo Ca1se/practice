@@ -15,11 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebFilter(filterName = "AutoLoginFilter")
+@WebFilter(filterName = "AutoLoginFilter", urlPatterns = "/*")
 public class AutoLoginFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-
         UserBean user_bean = (UserBean) req.getSession().getAttribute("user");
         if(user_bean != null) {
             chain.doFilter(req, res);

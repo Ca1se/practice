@@ -28,16 +28,13 @@ $(function () {
 
         $.ajax({
             type: 'POST',
-            url: '/demo_war_exploded/login',
+            url: '/NicePaint_war_exploded/login',
             data: {
-                username: null,
-                password: $.md5($.md5($.md5($password, 'what'), 'the'), 'hell')
+                username: $username,
+                password: $.md5($.md5($.md5($password, 'what'), 'the'), 'hell'),
             },
             success: function (data) {
-                alert(data);
-            },
-            error: function () {
-                alert('error');
+                document.write(data);
             }
         });
 
