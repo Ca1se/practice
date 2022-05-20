@@ -26,6 +26,7 @@ public class LoginServlet extends HttpServlet {
             String username = req.getParameter("username");
             String password = req.getParameter("password");
 
+            resp.setCharacterEncoding("utf-8");
             UserBean user = new UserBean();
             user.setUsername(username);
             user.setPassword(password);
@@ -39,8 +40,8 @@ public class LoginServlet extends HttpServlet {
                 req.getSession().setAttribute("user", login);
                 resp.sendRedirect("pages/myfile.html");
             }else {
-                req.setAttribute("errorInfo", "用户名或密码不正确");
-                req.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(req, resp);
+                resp.setStatus(500);
+                resp.getWriter().print("用户名或密码不正确");
             }
 
         }catch (SQLException e) {

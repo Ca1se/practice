@@ -19,7 +19,7 @@
                     <input type="password" id="password" required="required" placeholder="密码">
                     <button class="login_btn" type="submit">登录</button>
                 </form>
-                <div class="hint">${errorInfo}</div>
+                <div class="hint"></div>
                 <a class="button to_login" href="RegisterPage">还没有账号？点此注册</a>
             </div>
         </section>
