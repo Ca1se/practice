@@ -67,7 +67,7 @@ header div {
     margin-left: 10px;
 }
 
-.download div, .save div, .to-myfile div  {
+.download div, .save div, .to-works div  {
     border: 1px solid gray;
     box-shadow: 1px 1px 3px gray;
     border-radius: 3px;
@@ -79,7 +79,7 @@ header div {
     background-color: #ececec;
 }
 
-.to-myfile div {
+.to-works div {
     background-color: rgb(67, 134, 245);
     width: 80px;
     color: white

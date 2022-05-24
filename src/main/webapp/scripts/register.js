@@ -40,10 +40,11 @@ $(function () {
                 username: $username,
                 password: $.md5($.md5($.md5($password, 'what'), 'the'), 'hell')
             },
-            success: function (data) {
-                window.location.href = 'pages/login.html';
+            success: function () {
+                alert('注册成功！');
+                window.location.href = 'LoginPage';
             },
-            error: function (xhr, text, err) {
+            error: function (xhr) {
                 $('.hint')[0].innerText = xhr.responseText;
             }
         });

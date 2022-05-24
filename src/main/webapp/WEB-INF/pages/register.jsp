@@ -20,12 +20,12 @@
                     <input type="password" id="pwd-again" required="required" placeholder="再次输入密码">
                     <button class="login_btn" type="submit">注册</button>
                 </form>
+                <div class="hint"></div>
                 <a class="button to_login" href="LoginPage">已有账号？点此登录</a>
             </div>
         </section>
         <footer>
-            Web term project<br/>
-            <a href="https://github.com/Ca1se">Github</a>
+            Web term project
         </footer>
     </body>
 </html>

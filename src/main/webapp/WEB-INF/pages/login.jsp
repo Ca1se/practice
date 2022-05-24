@@ -9,6 +9,14 @@
         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js" type="text/javascript"></script>
         <script src="scripts/jquery.md5.js" type="text/javascript"></script>
         <script src="scripts/login.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            function checkLogin() {
+                location.href="index.html";
+            }
+            $(function () {
+                autoLogin(checkLogin);
+            });
+        </script>
     </head>
     <body>
         <section>
@@ -24,8 +32,7 @@
             </div>
         </section>
         <footer>
-            Web term project<br/>
-            <a href="https://github.com/Ca1se">Github</a>
+            Web term project
         </footer>
     </body>
 </html>

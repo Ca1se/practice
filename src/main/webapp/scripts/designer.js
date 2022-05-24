@@ -198,7 +198,7 @@ $(() => {
 
     $('#z_in').on('change', event => {
         if(targetItem != null) {
-            targetItem.wrapper.style.zIndex = Math.max(0, Math.min(20, event.target.value));
+            targetItem.update({ z_index: event.target.value });
         }
     });
 
@@ -239,7 +239,7 @@ $(() => {
         }
     });
 
-    $('.download').on('click', () => {
+    $('.download').on('click', function () {
         /** @type {HTMLCanvasElement} */
         const canvas = $("<canvas width='1920px' height='1080px'></canvas>")[0];
         const ctx = canvas.getContext('2d');
@@ -255,12 +255,54 @@ $(() => {
         const img_url = canvas.toDataURL(MIME_TYPE);
 
         const alink = document.createElement('a');
-        alink.download = ($('.filename input')[0].value.length == 0 ? 'no-title': $('.filename input')[0].value) + '.png';
+        let $work_name = $('.filename input').val();
+        alink.download = ($work_name.length === 0 ? '未命名文件' : $work_name) + '.png';
         alink.href = img_url;
         alink.dataset.downloadurl = [MIME_TYPE, alink.download, alink.href].join(':');
 
         document.body.appendChild(alink);
         alink.click();
         alink.remove();
+    });
+
+    /** @typedef {{
+     *              start_x: number,
+     *              start_y: number,
+     *              width: number,
+     *              height: number,
+     *              color: string,
+     *              fill: boolean,
+     *              z_index: number,
+     *              rotation: number,
+     *            }} ShapeInfo
+     */
+
+    $('.save').on('click', function () {
+        /** @type {ShapeInfo[]} */
+        let payload = [];
+        Shape.s_shapes.forEach(function (val) {
+            payload.push({
+                start_x: val.start.x,
+                start_y: val.start.y,
+                width: val.width,
+                height: val.height,
+                color: val.color,
+                fill: val.fill,
+                z_index: val.wrapper.style.zIndex,
+                rotation: val.rotate_deg,
+            });
+        });
+
+        let $work_name = $('.filename input').val();
+
+        $.ajax({
+            type: 'POST',
+            url: 'upload',
+            data: {
+                work_name: ($work_name.length === 0 ? '未命名文件' : $work_name),
+                shape_list: JSON.stringify(payload),
+            },
+            success: function (data) { alert(data); }
+        });
     });
 })

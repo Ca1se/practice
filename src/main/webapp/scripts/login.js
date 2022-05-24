@@ -9,6 +9,26 @@ function checkPassword(password) {
     return passwordRegex.test(password);
 }
 
+function autoLogin(success_callback, error_callback) {
+    $.ajax({
+        type: 'GET',
+        url: 'autologin',
+        success: function (data) {
+            let user_info = JSON.parse(data);
+            success_callback(user_info);
+        },
+        error: error_callback
+    });
+}
+
+function logout() {
+    $.ajax({
+        type: 'GET',
+        url: 'logout',
+        success: function () { location.reload(); }
+    });
+}
+
 $(function () {
     $('.login_form').submit(function (e) {
         e.preventDefault();
@@ -33,13 +53,12 @@ $(function () {
                 username: $username,
                 password: $.md5($.md5($.md5($password, 'what'), 'the'), 'hell'),
             },
-            success: function (data) {
-                window.location.href='pages/myfile.html';
+            success: function () {
+                window.location.href='Works';
             },
-            error: function (xhr, text, err) {
+            error: function (xhr) {
                 $('.hint')[0].innerText = xhr.responseText;
             }
         });
-
     });
 });

@@ -19,4 +19,20 @@
         <servlet-name>RegisterPage</servlet-name>
         <url-pattern>/RegisterPage</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>Designer</servlet-name>
+        <jsp-file>/WEB-INF/pages/designer.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Designer</servlet-name>
+        <url-pattern>/Designer</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>Works</servlet-name>
+        <jsp-file>/WEB-INF/pages/works.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Works</servlet-name>
+        <url-pattern>/Works</url-pattern>
+    </servlet-mapping>
 </web-app>

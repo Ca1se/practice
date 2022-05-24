@@ -1,6 +1,7 @@
 .button {
     text-decoration: none;
     color: black;
+    cursor: pointer;
 }
 
 ::-webkit-scrollbar {
@@ -15,4 +16,8 @@
     border-color: #fff;
     border-radius: 6px;
     background: #c9c9c9;
+}
+
+.hint {
+    color: red;
 }

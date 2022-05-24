@@ -106,7 +106,6 @@ class Shape {
             $(`#${container}`).append(this.wrapper);
             this.showed = true;
             Shape.s_shapes.set(this.id, this);
-            console.log(Shape.s_shapes.size);
         }
     }
 
@@ -132,7 +131,7 @@ class Shape {
         }
     }
 
-    /** @typedef {{ start_offset?: Point, scale_offset?: Point, rotate?: number, color?: string, fill?: boolean }} Attrib */
+    /** @typedef {{ start_offset?: Point, scale_offset?: Point, z_index?: number, rotate?: number, color?: string, fill?: boolean }} Attrib */
 
     /**
      * @param {Attrib} attrib 
@@ -143,14 +142,15 @@ class Shape {
             this.wrapper.style.left = this.start.x + 'px';
             this.wrapper.style.top = this.start.y + 'px';
         }else if(attrib.scale_offset) {
-            this.width  = Math.max(30, this.width + attrib.scale_offset.x);
+            this.width = Math.max(30, this.width + attrib.scale_offset.x);
             this.height = Math.max(30, this.height + attrib.scale_offset.y);
             this.wrapper.style.width = this.width + 'px';
             this.wrapper.style.height = this.height + 'px';
             this.canvas.width = this.width;
             this.canvas.height = this.height;
             this.drawShape();
-
+        }else if(attrib.z_index) {
+            this.wrapper.style.zIndex = Math.max(0, Math.min(20, attrib.z_index));
         }else if(attrib.rotate) {
             this.rotate_deg = (this.rotate_deg + attrib.rotate + 360) % 360;
             this.wrapper.style.transform = `rotate(${this.rotate_deg}deg)`;

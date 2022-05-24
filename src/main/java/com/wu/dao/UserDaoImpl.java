@@ -10,15 +10,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDaoImpl implements UserDao {
-    @Override
-    public UserBean login(UserBean user) throws SQLException {
+
+    public ResultSet checkUsername(String username) throws SQLException {
         Connection conn = DBUtil.getConnection();
-        UserBean ret = null;
 
         String sql = "select * from user_info where username=?";
         PreparedStatement statement = conn.prepareStatement(sql);
-        statement.setString(1, user.getUsername());
-        ResultSet result = statement.executeQuery();
+        statement.setString(1, username);
+        return statement.executeQuery();
+    }
+    @Override
+    public UserBean login(UserBean user) throws SQLException {
+        UserBean ret = null;
+        ResultSet result = checkUsername(user.getUsername());
         if(result.next()) {
             String password = result.getString("password");
             if(password.equals(user.getPassword())) {
@@ -30,5 +34,21 @@ public class UserDaoImpl implements UserDao {
         }
 
         return ret;
+    }
+
+    @Override
+    public boolean register(UserBean user) throws SQLException {
+        ResultSet result = checkUsername(user.getUsername());
+        if(!result.next()) {
+            Connection conn = DBUtil.getConnection();
+            String sql = "insert into user_info (username, password) values (?, ?)";
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPassword());
+            statement.executeUpdate();
+            return true;
+        }
+
+        return false;
     }
 }
