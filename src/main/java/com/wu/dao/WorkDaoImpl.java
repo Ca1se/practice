@@ -3,12 +3,15 @@ package com.wu.dao;
 
 import com.wu.db.DBUtil;
 import com.wu.domain.ShapeBean;
+import com.wu.domain.UserBean;
 import com.wu.domain.WorkBean;
+import com.wu.domain.WorkJson;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WorkDaoImpl implements WorkDao {
@@ -79,5 +82,24 @@ public class WorkDaoImpl implements WorkDao {
         }
         statement = conn.prepareStatement(sql.toString());
         statement.executeUpdate();
+    }
+
+    @Override
+    public List<WorkJson> getWorks(UserBean user) throws SQLException {
+        Connection conn = DBUtil.getConnection();
+        List<WorkJson> ret = new ArrayList<>();
+
+        String sql = "select id, name from works where author_id=?";
+        PreparedStatement statement = conn.prepareStatement(sql);
+        statement.setInt(1, user.getId());
+        ResultSet res = statement.executeQuery();
+        while (res.next()) {
+            WorkJson work = new WorkJson();
+            work.setWorkId(res.getInt(1));
+            work.setWorkName(res.getString(2));
+            ret.add(work);
+        }
+
+        return ret;
     }
 }

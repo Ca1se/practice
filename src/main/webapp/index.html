@@ -11,7 +11,7 @@
             function checkLogin(user_info) {
                 $('.login_btn').remove();
                 $('.register_btn').remove();
-                let $profile = $(`<a class="button login_btn" href="Works">欢迎，${user_info.name}</a>`);
+                let $profile = $(`<a class="button login_btn" href="WorksPage">欢迎，${user_info.name}</a>`);
                 let $logout = $(`<a class="button register_btn" onclick="logout()">登出</a>`)
                 let $login_box = $('.login_box');
                 $login_box.append($profile);
@@ -39,7 +39,7 @@
                     <div class="title">在线绘图网站</div>
                     <div class="description">使用矩形、三角形、圆型等图元与画笔自由绘制你想要的内容</div>
                     <div class="start">
-                        <a class="button start_btn" href="Designer">马上开始</a>
+                        <a class="button start_btn" href="DesignerPage">马上开始</a>
                     </div>
                 </div>
             </header>

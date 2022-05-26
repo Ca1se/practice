@@ -54,7 +54,7 @@ $(function () {
                 password: $.md5($.md5($.md5($password, 'what'), 'the'), 'hell'),
             },
             success: function () {
-                window.location.href='Works';
+                window.location.href='WorksPage';
             },
             error: function (xhr) {
                 $('.hint')[0].innerText = xhr.responseText;

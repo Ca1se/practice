@@ -69,4 +69,7 @@ section .box {
     margin: 15px;
     border-radius: 10px;
     background-color: gray;
+    text-align: center;
+    line-height: 150px;
+    color: white;
 }

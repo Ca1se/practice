@@ -14,8 +14,21 @@
         }
 
         $(function () {
-            autoLogin(null, checkLogin);
+            autoLogin(function () {}, checkLogin);
+
+            $.ajax({
+                type: 'GET',
+                url: 'works',
+                success: function (json) {
+                    let data = JSON.parse(json);
+                    let $section = $('section');
+                    data.forEach(function (val) {
+                        $section.append($(`<div class='box' id='\${val.workId}'>\${val.workName}</div>`));
+                    });
+                }
+            });
         });
+
     </script>
 </head>
 <body>
@@ -24,8 +37,7 @@
         <div class="logo"><a href="index.html"></a></div>
     </header>
     <section>
-        <button class="get-log" style="margin: 100px" onclick="window.location.href='log.html'">登录日志</button>
-        <input type="file" style="margin: 100px" onchange="up(this)">
+
     </section>
 </div>
 </body>
