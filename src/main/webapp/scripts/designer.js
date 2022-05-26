@@ -266,14 +266,15 @@ $(() => {
     });
 
     /** @typedef {{
-     *              start_x: number,
-     *              start_y: number,
+     *              type: number,
+     *              x: number,
+     *              y: number,
+     *              z: number,
      *              width: number,
      *              height: number,
+     *              rotation: number,
      *              color: string,
      *              fill: boolean,
-     *              z_index: number,
-     *              rotation: number,
      *            }} ShapeInfo
      */
 
@@ -282,14 +283,15 @@ $(() => {
         let payload = [];
         Shape.s_shapes.forEach(function (val) {
             payload.push({
-                start_x: val.start.x,
-                start_y: val.start.y,
+                type: val.type,
+                x: val.start.x,
+                y: val.start.y,
+                z: val.wrapper.style.zIndex,
                 width: val.width,
                 height: val.height,
+                rotation: val.rotate_deg,
                 color: val.color,
                 fill: val.fill,
-                z_index: val.wrapper.style.zIndex,
-                rotation: val.rotate_deg,
             });
         });
 
@@ -299,10 +301,13 @@ $(() => {
             type: 'POST',
             url: 'upload',
             data: {
+                update: true,
+                work_id: 1,
                 work_name: ($work_name.length === 0 ? '未命名文件' : $work_name),
-                shape_list: JSON.stringify(payload),
+                shape_list: JSON.stringify(payload)
             },
-            success: function (data) { alert(data); }
+            success: function () { alert('保存成功'); },
+            error: function () { alert('保存失败'); }
         });
     });
 })

@@ -61,13 +61,15 @@ class Shape {
     static s_shapes = new Map;
 
     /**
-     * @param {Point} start 
-     * @param {number} width 
-     * @param {number} height 
-     * @param {string} color 
+     * @param {number} type
+     * @param {Point} start
+     * @param {number} width
+     * @param {number} height
+     * @param {string} color
      * @param {boolean} fill
      */
-    constructor(start, width, height, color, fill) {
+    constructor(type, start, width, height, color, fill) {
+        this.type = type;
         this.start = start;
         this.width = width;
         this.height = height;
@@ -166,14 +168,14 @@ class Shape {
 
 class Rectangle extends Shape {
     /**
-     * @param {Point} origin 
+     * @param {Point} start
      * @param {number} width 
      * @param {number} height 
      * @param {string} color
      * @param {boolean} fill
      */
     constructor(start, width, height, color, fill) {
-        super(start, width, height, color, fill);
+        super(0, start, width, height, color, fill);
     }
 
     /**
@@ -209,9 +211,44 @@ class Rectangle extends Shape {
     }
 }
 
+
+class Triangle extends Shape {
+    constructor(start, width, height, color, fill) {
+        super(1, start, width, height, color, fill);
+    }
+
+    show(container) {
+        super.show(container);
+        this.drawShape();
+    }
+
+    drawShape() {
+        if(this.showed) {
+            const ctx = this.canvas.getContext('2d');
+
+            this.canvas.width = this.canvas.width;
+            ctx.strokeStyle = this.color;
+            ctx.fillStyle = this.color;
+
+            ctx.beginPath();
+            ctx.moveTo(this.width / 2, 0);
+            ctx.lineTo(this.width, this.height);
+            ctx.lineTo(0, this.height);
+            ctx.lineTo(this.width / 2, 0);
+            ctx.closePath();
+            
+            if(this.fill) {
+                ctx.fill();
+                return;
+            }
+            ctx.stroke();
+        }
+    }
+}
+
 class Circle extends Shape {
     constructor(start, width, height, color, fill) {
-        super(start, width, height, color, fill);
+        super(2, start, width, height, color, fill);
     }
 
     show(container) {
@@ -246,43 +283,9 @@ class Circle extends Shape {
     }
 }
 
-class Triangle extends Shape {
-    constructor(start, width, height, color, fill) {
-        super(start, width, height, color, fill);
-    }
-
-    show(container) {
-        super.show(container);
-        this.drawShape();
-    }
-
-    drawShape() {
-        if(this.showed) {
-            const ctx = this.canvas.getContext('2d');
-
-            this.canvas.width = this.canvas.width;
-            ctx.strokeStyle = this.color;
-            ctx.fillStyle = this.color;
-
-            ctx.beginPath();
-            ctx.moveTo(this.width / 2, 0);
-            ctx.lineTo(this.width, this.height);
-            ctx.lineTo(0, this.height);
-            ctx.lineTo(this.width / 2, 0);
-            ctx.closePath();
-            
-            if(this.fill) {
-                ctx.fill();
-                return;
-            }
-            ctx.stroke();
-        }
-    }
-}
-
 class Hexagon extends Shape {
     constructor(start, width, height, color, fill) {
-        super(start, width, height, color, fill);
+        super(3, start, width, height, color, fill);
     }
 
     show(container) {
