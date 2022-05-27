@@ -23,10 +23,16 @@
                     let data = JSON.parse(json);
                     let $section = $('section');
                     data.forEach(function (val) {
-                        $section.append($(`<div class='box' id='\${val.workId}'>\${val.workName}</div>`));
+                        let $box = $(`<div class='box'>\${val.workName}</div>`);
+                        $box.on('click', function (event) {
+                            let target = event.target;
+                            location.href=`designer?workId=\${val.workId}`;
+                        });
+                        $section.append($box);
                     });
                 }
             });
+
         });
 
     </script>
@@ -35,6 +41,7 @@
 <div class="content">
     <header>
         <div class="logo"><a href="index.html"></a></div>
+        <div class="newwork"><a class="button newwork_btn" href="designer">新建</a></div>
     </header>
     <section>
 

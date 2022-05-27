@@ -102,4 +102,31 @@ public class WorkDaoImpl implements WorkDao {
 
         return ret;
     }
+
+    @Override
+    public List<ShapeBean> getShapes(WorkBean work) throws SQLException {
+        Connection conn = DBUtil.getConnection();
+        List<ShapeBean> ret = new ArrayList<>();
+
+        String sql = "select * from shapes where work_id=?";
+        PreparedStatement statement = conn.prepareStatement(sql);
+        statement.setInt(1, work.getId());
+        ResultSet res = statement.executeQuery();
+
+        while(res.next()) {
+            ShapeBean shape = new ShapeBean();
+            shape.setType(res.getInt(2));
+            shape.setX(res.getInt(3));
+            shape.setY(res.getInt(4));
+            shape.setZ(res.getInt(5));
+            shape.setWidth(res.getInt(6));
+            shape.setHeight(res.getInt(7));
+            shape.setRotation(res.getInt(8));
+            shape.setColor(res.getString(9));
+            shape.setFill(res.getBoolean(10));
+            ret.add(shape);
+        }
+
+        return ret;
+    }
 }

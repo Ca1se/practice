@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page session="true" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -22,7 +23,7 @@
     <body>
         <div class="content">
             <header>
-                <div class="return"><a href=""></a></div>
+                <div class="return"><a href="WorksPage"></a></div>
                 <div class="filename"><input type="text" name="filename" placeholder="未命名文件"></div>
                 <div class="btn_box">
                     <a class="save button"><div>保存</div></a>
@@ -71,5 +72,6 @@
                 </div>
             </section>
         </div>
+        <div id="work_id" style="visibility: hidden"><%=session.getAttribute("workId")%></div>
     </body>
 </html>

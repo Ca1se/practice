@@ -112,24 +112,48 @@ function enableItem(item) {
     });
 }
 
-function drawRect(x, y) {
-    const rect = new Rectangle(new Point(x, y), 100, 100, '#000000', false);
+function drawRect(x, y, width = 100, height = 100, color = '#000000', fill = false) {
+    const rect = new Rectangle(new Point(x, y), width, height, color, fill);
     enableItem(rect);
+    return rect;
 }
 
-function drawTriangle(x, y) {
-    const triagnle = new Triangle(new Point(x, y), 100, 87, '#000000', false);
-    enableItem(triagnle);
+function drawTriangle(x, y, width = 100, height = 87, color = '#000000', fill = false) {
+    const triangle = new Triangle(new Point(x, y), width, height, color, fill);
+    enableItem(triangle);
+    return triangle;
 }
 
-function drawCircle(x, y) {
-    const circle = new Circle(new Point(x, y), 100, 100, '#000000', false);
+function drawCircle(x, y, width = 100, height = 100, color = '#000000', fill = false) {
+    const circle = new Circle(new Point(x, y), width, height, color, fill);
     enableItem(circle);
+    return circle;
 }
 
-function drawHexagon(x, y) {
-    const hexagon = new Hexagon(new Point(x, y), 100, 87, '#000000', false);
+function drawHexagon(x, y, width = 100, height = 87, color = '#000000', fill = false) {
+    const hexagon = new Hexagon(new Point(x, y), width, height, color, fill);
     enableItem(hexagon);
+    return hexagon;
+}
+
+let update_work = false;
+let work_id;
+const drawMethodMap = new Map;
+
+/**
+ * @param {string} json
+ * @param {number} id
+ */
+function initWork(json, id) {
+    /** @type {ShapeInfo[]} */
+    let shapes = JSON.parse(json);
+    shapes.forEach(function (value) {
+        /** @type {Shape} */
+        const shape = drawMethodMap.get(value.type)(value.x, value.y, value.width, value.height, value.color, value.fill);
+        shape.update({ z_index: value.z, rotate: value.rotation });
+    });
+    update_work = true;
+    work_id = id;
 }
 
 /**
@@ -139,10 +163,9 @@ function squareNorm(vec) {
     return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
-$(() => {
+function init() {
     drawBackground();
 
-    const drawMethodMap = new Map;
     drawMethodMap.set(0, drawRect);
     drawMethodMap.set(1, drawTriangle);
     drawMethodMap.set(2, drawCircle);
@@ -301,8 +324,8 @@ $(() => {
             type: 'POST',
             url: 'upload',
             data: {
-                update: true,
-                work_id: 1,
+                update: update_work,
+                work_id: work_id,
                 work_name: ($work_name.length === 0 ? '未命名文件' : $work_name),
                 shape_list: JSON.stringify(payload)
             },
@@ -310,4 +333,19 @@ $(() => {
             error: function () { alert('保存失败'); }
         });
     });
-})
+}
+
+$(function () {
+    init();
+    let $work_id = $('#work_id')[0].innerHTML;
+    if($work_id !== 'null') {
+        $.ajax({
+            type: 'GET',
+            url: 'shapes',
+            data: { workId: $work_id },
+            success: function (data) {
+                initWork(data, Number($work_id));
+            }
+        });
+    }
+});
