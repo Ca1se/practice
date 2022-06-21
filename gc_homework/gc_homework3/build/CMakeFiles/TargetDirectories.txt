@@ -1,3 +1,0 @@
-/home/ca1se/Documents/practice/gc_homework/gc_homework3/build/CMakeFiles/gc_homework3.dir
-/home/ca1se/Documents/practice/gc_homework/gc_homework3/build/CMakeFiles/edit_cache.dir
-/home/ca1se/Documents/practice/gc_homework/gc_homework3/build/CMakeFiles/rebuild_cache.dir

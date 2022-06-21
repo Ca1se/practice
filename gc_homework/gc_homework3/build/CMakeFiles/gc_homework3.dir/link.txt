@@ -1,1 +1,0 @@
-/usr/sbin/c++ -O3 -DNDEBUG -rdynamic CMakeFiles/gc_homework3.dir/src/glfw_utils.cpp.o CMakeFiles/gc_homework3.dir/src/main.cpp.o CMakeFiles/gc_homework3.dir/src/shader.cpp.o -o gc_homework3  -lglfw -lglad -lGL 
