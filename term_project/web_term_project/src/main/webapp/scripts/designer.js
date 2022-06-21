@@ -112,24 +112,48 @@ function enableItem(item) {
     });
 }
 
-function drawRect(x, y) {
-    const rect = new Rectangle(new Point(x, y), 100, 100, '#000000', false);
+function drawRect(x, y, width = 100, height = 100, color = '#000000', fill = false) {
+    const rect = new Rectangle(new Point(x, y), width, height, color, fill);
     enableItem(rect);
+    return rect;
 }
 
-function drawTriangle(x, y) {
-    const triagnle = new Triangle(new Point(x, y), 100, 87, '#000000', false);
-    enableItem(triagnle);
+function drawTriangle(x, y, width = 100, height = 87, color = '#000000', fill = false) {
+    const triangle = new Triangle(new Point(x, y), width, height, color, fill);
+    enableItem(triangle);
+    return triangle;
 }
 
-function drawCircle(x, y) {
-    const circle = new Circle(new Point(x, y), 100, 100, '#000000', false);
+function drawCircle(x, y, width = 100, height = 100, color = '#000000', fill = false) {
+    const circle = new Circle(new Point(x, y), width, height, color, fill);
     enableItem(circle);
+    return circle;
 }
 
-function drawHexagon(x, y) {
-    const hexagon = new Hexagon(new Point(x, y), 100, 87, '#000000', false);
+function drawHexagon(x, y, width = 100, height = 87, color = '#000000', fill = false) {
+    const hexagon = new Hexagon(new Point(x, y), width, height, color, fill);
     enableItem(hexagon);
+    return hexagon;
+}
+
+let update_work = false;
+let work_id;
+const drawMethodMap = new Map;
+
+/**
+ * @param {string} json
+ * @param {number} id
+ */
+function initWork(json, id) {
+    /** @type {ShapeInfo[]} */
+    let shapes = JSON.parse(json);
+    shapes.forEach(function (value) {
+        /** @type {Shape} */
+        const shape = drawMethodMap.get(value.type)(value.x, value.y, value.width, value.height, value.color, value.fill);
+        shape.update({ z_index: value.z, rotate: value.rotation });
+    });
+    update_work = true;
+    work_id = id;
 }
 
 /**
@@ -139,10 +163,9 @@ function squareNorm(vec) {
     return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
-$(() => {
+function init() {
     drawBackground();
 
-    const drawMethodMap = new Map;
     drawMethodMap.set(0, drawRect);
     drawMethodMap.set(1, drawTriangle);
     drawMethodMap.set(2, drawCircle);
@@ -198,7 +221,7 @@ $(() => {
 
     $('#z_in').on('change', event => {
         if(targetItem != null) {
-            targetItem.wrapper.style.zIndex = Math.max(0, Math.min(20, event.target.value));
+            targetItem.update({ z_index: event.target.value });
         }
     });
 
@@ -239,7 +262,7 @@ $(() => {
         }
     });
 
-    $('.download').on('click', () => {
+    $('.download').on('click', function () {
         /** @type {HTMLCanvasElement} */
         const canvas = $("<canvas width='1920px' height='1080px'></canvas>")[0];
         const ctx = canvas.getContext('2d');
@@ -255,7 +278,8 @@ $(() => {
         const img_url = canvas.toDataURL(MIME_TYPE);
 
         const alink = document.createElement('a');
-        alink.download = ($('.filename input')[0].value.length == 0 ? 'no-title': $('.filename input')[0].value) + '.png';
+        let $work_name = $('.filename input').val();
+        alink.download = ($work_name.length === 0 ? '未命名文件' : $work_name) + '.png';
         alink.href = img_url;
         alink.dataset.downloadurl = [MIME_TYPE, alink.download, alink.href].join(':');
 
@@ -263,4 +287,65 @@ $(() => {
         alink.click();
         alink.remove();
     });
-})
+
+    /** @typedef {{
+     *              type: number,
+     *              x: number,
+     *              y: number,
+     *              z: number,
+     *              width: number,
+     *              height: number,
+     *              rotation: number,
+     *              color: string,
+     *              fill: boolean,
+     *            }} ShapeInfo
+     */
+
+    $('.save').on('click', function () {
+        /** @type {ShapeInfo[]} */
+        let payload = [];
+        Shape.s_shapes.forEach(function (val) {
+            payload.push({
+                type: val.type,
+                x: val.start.x,
+                y: val.start.y,
+                z: val.wrapper.style.zIndex,
+                width: val.width,
+                height: val.height,
+                rotation: val.rotate_deg,
+                color: val.color,
+                fill: val.fill,
+            });
+        });
+
+        let $work_name = $('.filename input').val();
+
+        $.ajax({
+            type: 'POST',
+            url: 'upload',
+            data: {
+                update: update_work,
+                work_id: work_id,
+                work_name: ($work_name.length === 0 ? '未命名文件' : $work_name),
+                shape_list: JSON.stringify(payload)
+            },
+            success: function () { alert('保存成功'); },
+            error: function () { alert('保存失败'); }
+        });
+    });
+}
+
+$(function () {
+    init();
+    let $work_id = $('#work_id')[0].innerHTML;
+    if($work_id !== 'null') {
+        $.ajax({
+            type: 'GET',
+            url: 'shapes',
+            data: { workId: $work_id },
+            success: function (data) {
+                initWork(data, Number($work_id));
+            }
+        });
+    }
+});

@@ -1,20 +1,34 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page session="true" %>
 <!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Nice Paint - 新建</title>
-        <link rel="stylesheet" href="../styles/global.css">
-        <link rel="stylesheet" href="../styles/designer.css">
+        <link rel="stylesheet" href="styles/global.css">
+        <link rel="stylesheet" href="styles/designer.css">
         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js" type="text/javascript"></script>
-        <script src="../script/designer.js" type="module"></script>
+        <script src="scripts/designer.js" type="module"></script>
+        <script src="scripts/login.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            function checkLogin() {
+                location.href="LoginPage";
+            }
+
+            $(function () {
+                autoLogin(function () {}, checkLogin);
+            });
+        </script>
     </head>
     <body>
         <div class="content">
             <header>
-                <div class="return"><a href=""></a></div>
+                <div class="return"><a href="WorksPage"></a></div>
                 <div class="filename"><input type="text" name="filename" placeholder="未命名文件"></div>
                 <div class="btn_box">
+                    <a class="save button"><div>保存</div></a>
                     <a class="download button"><div style="cursor: pointer;">下载</div></a>
-                    <a class="to-myfile button"><div>我的文件</div></a>
+                    <a class="to-works button" href="WorksPage"><div>我的文件</div></a>
                 </div>
                 
             </header>
@@ -58,5 +72,6 @@
                 </div>
             </section>
         </div>
+        <div id="work_id" style="visibility: hidden"><%=session.getAttribute("workId")%></div>
     </body>
 </html>

@@ -66,7 +66,11 @@ section .box {
     box-sizing: border-box;
     width: 200px;
     height: 150px;
-    margin: 15px;
+    margin: 30px;
     border-radius: 10px;
     background-color: gray;
+    text-align: center;
+    line-height: 150px;
+    color: white;
+    cursor: pointer;
 }
