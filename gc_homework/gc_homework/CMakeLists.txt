@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(gc_homework1)
+project(gc_homework3)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -8,9 +8,14 @@ file(GLOB SOURCES
     ${PROJECT_SOURCE_DIR}/src/*.hpp
 )
 
+find_package(OpenMP REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+
 add_definitions(
     -DSHADER_DIR_PATH="${PROJECT_SOURCE_DIR}/src/shader/"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} glfw glad GL)
+
+
+target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX glfw glad GL)

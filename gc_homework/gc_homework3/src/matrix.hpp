@@ -19,7 +19,7 @@
 #include <utility>
 
 
-inline constexpr bool equalValue(size_t t1, size_t t2) {
+constexpr inline bool equalValue(size_t t1, size_t t2) {
     return (t1 == t2);
 }
 
@@ -33,7 +33,7 @@ class Matrix;
 template <typename U>
 using IsNumber = typename std::enable_if<std::is_arithmetic<U>::value, int>::type;
 
-// The Base class, This class contains functions
+// The base class, This class contains functions
 // that are available when the number of rows and
 // columns of the matrix are equal and when they are not.
 template <typename T, size_t Rows, size_t Cols>
@@ -51,7 +51,7 @@ public:
         std::copy(other.begin(), other.end(), begin());
     }
 
-    Matrix(const std::initializer_list<T>& elements) {
+    Matrix(std::initializer_list<T>&& elements) {
         assert(elements.size() == size());
         std::copy(elements.begin(), elements.end(), begin());
     }

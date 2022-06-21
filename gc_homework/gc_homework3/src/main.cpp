@@ -128,7 +128,7 @@ int main() {
 
     shader.setUniformMatrix<gchw::FMat4>("u_p", 1, false, &pers[0][0]);
 
-    const std::vector<float> ts = generateTs(0.01);
+    const std::vector<float> ts = generateTs(0.001);
 
     uint32_t vao;
     glGenVertexArrays(1, &vao);
