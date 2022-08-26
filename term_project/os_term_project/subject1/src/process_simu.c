@@ -25,14 +25,34 @@ pcb_tree_t* get_pcb_tree() {
     return tree;
 }
 
-void add_pcb(pcb_t* pcb) {
+void add_pcb(pcb_t* pcb, pcb_t* parent) {
     pcb_list_t* list = get_pcb_list();
+    pcb_node_t* node = (pcb_node_t*) malloc(sizeof(pcb_node_t));
+
+    node->child = node->sibling = NULL;
+    node->pcb = pcb;
+
+    pcb->control_info.next = NULL;
+    pcb->node = node;
 
     if(list->last != NULL) {
         list->last->control_info.next = pcb;
         list->last = pcb;
+
+        if(parent->node->child == NULL)
+            parent->node->child = node;
+        else {
+            pcb_node_t* tmp = parent->node->child;
+
+            while(tmp->sibling != NULL)
+                tmp = tmp->sibling;
+            tmp->sibling = node;
+        }
+
     }else {
         list->first = list->last = pcb;
+
+        get_pcb_tree()->root = node;
     }
 
     list->size++;
@@ -43,27 +63,58 @@ void init_pcb(pcb_t* pcb, pcb_t* parent) {
 
     pcb->pid = pcb_count++;
     pcb->uid = 0;
+
+    pcb->ppid = 0;
     if(parent != NULL) {
         pcb->ppid = parent->pid;
     }
 
     // initialize process status, process dispath information and process control information
-    pcb->control_info.next = NULL;
 }
 
-pcb_t* create_pcb() {
-     return (pcb_t*) malloc(sizeof(pcb_t));
-}
+pcb_t* search_pcb(int32_t pid) {
+    if(pid == -1) return NULL;
 
-void destroy_pcb(pcb_t* pcb) {
-    free(pcb);
-}
+    pcb_list_t* list = get_pcb_list();
+    pcb_t* ret = NULL;
 
-pcb_t* fork(pcb_t* parent) {
-    pcb_t* ret = create_pcb();
-
-    init_pcb(ret, parent);
-    add_pcb(ret);
-
+    pcb_t* tmp = list->first;
+    while(tmp != NULL) {
+        if(tmp->pid == pid) {
+            ret = tmp;
+            break;
+        }
+        tmp = tmp->control_info.next;
+    }
     return ret;
+}
+
+int32_t fork(int32_t ppid) {
+    pcb_t* pcb      = (pcb_t*) malloc(sizeof(pcb_t));
+    pcb_t* parent   = search_pcb(ppid);
+
+    init_pcb(pcb, parent);
+    add_pcb(pcb, parent);
+
+    return pcb->pid;
+}
+
+void terminate_all_aux(pcb_node_t* root) {
+    pcb_node_t* tmp = root->child;
+
+    while(tmp != NULL) {
+        terminate_all_aux(tmp);
+        tmp = tmp->sibling;
+    }
+
+    free(root);
+}
+
+void terminate_all() {
+    pcb_tree_t* tree = get_pcb_tree();
+    pcb_list_t* list = get_pcb_list();
+
+    terminate_all_aux(tree->root);
+    free(tree);
+    free(list);
 }
