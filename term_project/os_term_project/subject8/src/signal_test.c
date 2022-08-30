@@ -15,59 +15,34 @@ signal_t* make_signal(int resource_num) {
     return ret;
 }
 
-void queue_push_aux(queue_t* queue, queue_node_t* node) {
+void queue_push(queue_t* queue, process_t* proc) {
+    proc->next = NULL;
+
     if(queue->first == NULL) {
-        queue->first = node;
-        queue->last  = node;
+        queue->first = proc;
+        queue->last  = proc;
     }else {
-        queue->last->next = node;
-        queue->last = node;
+        queue->last->next = proc;
+        queue->last = proc;
     }
-}
-
-void queue_push(queue_t* queue, process_t* process) {
-    queue_node_t* node = (queue_node_t*) malloc(sizeof(queue_node_t));
-
-    node->proc = process;
-    node->next = NULL;
-
-    queue_push_aux(queue, node);
-}
-
-void queue_push_node(queue_t* queue, queue_node_t* node) {
-    node->next = NULL;
-    queue_push_aux(queue, node);
 }
 
 process_t* queue_pop(queue_t* queue) {
     process_t* ret = NULL;
 
     if(queue->first != NULL) {
-        ret = queue->first->proc;
-        queue_node_t* tmp = queue->first;
-        queue->first = queue->first->next;
-        free(tmp);
-    }
-
-    return ret;
-}
-
-queue_node_t* queue_pop_node(queue_t* queue) {
-    queue_node_t* ret = NULL;
-
-    if(queue->first != NULL) {
         ret = queue->first;
         queue->first = queue->first->next;
     }
-
+    
     return ret;
 }
 
 void msignal(signal_t* sig) {
     sig->value--;
     if(sig->value < 0) {
-        queue_node_t* tmp = queue_pop_node(&process_queue);
-        queue_push_node(sig->wait_process, tmp);
+        process_t* tmp = queue_pop(&process_queue);
+        queue_push(sig->wait_process, tmp);
         skip_schedule = 1;
     }
 }
@@ -75,7 +50,7 @@ void msignal(signal_t* sig) {
 void mwait(signal_t* sig) {
     sig->value++;
     if(sig->value <= 0) {
-        queue_node_t* tmp = queue_pop_node(sig->wait_process);
-        queue_push_node(&process_queue, tmp);
+        process_t* tmp = queue_pop(sig->wait_process);
+        queue_push(&process_queue, tmp);
     }
 }

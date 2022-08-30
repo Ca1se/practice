@@ -16,7 +16,7 @@ signal_t* sig = NULL;
 
 void simulate() {
     while(process_queue.first != NULL) {
-        process_t* cur = process_queue.first->proc;
+        process_t* cur = process_queue.first;
         
         // executing instruction
         cur->ins[cur->ins_pointer++]();
@@ -32,8 +32,8 @@ void simulate() {
         }
 
         // scheduling process
-        queue_node_t* tmp = queue_pop_node(&process_queue);
-        queue_push_node(&process_queue, tmp);
+        process_t* tmp = queue_pop(&process_queue);
+        queue_push(&process_queue, tmp);
     }
 }
 
