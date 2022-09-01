@@ -38,7 +38,7 @@ process_t* queue_pop(queue_t* queue) {
     return ret;
 }
 
-void msignal(signal_t* sig) {
+void mwait(signal_t* sig) {
     sig->value--;
     if(sig->value < 0) {
         process_t* tmp = queue_pop(&process_queue);
@@ -47,7 +47,7 @@ void msignal(signal_t* sig) {
     }
 }
 
-void mwait(signal_t* sig) {
+void msignal(signal_t* sig) {
     sig->value++;
     if(sig->value <= 0) {
         process_t* tmp = queue_pop(sig->wait_process);

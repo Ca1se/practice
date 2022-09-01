@@ -63,7 +63,7 @@ int main() {
     queue_push(&process_queue, process1);
     queue_push(&process_queue, process2);
 
-    printf("Simulate with semaphore disabled:\n");
+    printf("Simulate with signal disabled:\n");
     simulate();
     printf("\n");
 
@@ -76,18 +76,18 @@ int main() {
             process1->ins[i] = instruction_print_1;
             process2->ins[i] = instruction_print_2;
         }else if(i % 5 == 0) {
-            process1->ins[i] = instruction_signal;
-            process2->ins[i] = instruction_signal;
-        }else {
             process1->ins[i] = instruction_wait;
             process2->ins[i] = instruction_wait;
+        }else {
+            process1->ins[i] = instruction_signal;
+            process2->ins[i] = instruction_signal;
         }
     }
 
     queue_push(&process_queue, process1);
     queue_push(&process_queue, process2);
 
-    printf("Simulate with semaphore enabled:\n");
+    printf("Simulate with signal enabled:\n");
     simulate();
     printf("\n");
 
@@ -104,7 +104,7 @@ void instruction_print_1() {
 }
 
 void instruction_print_2() {
-    printf("Hi! This is a message from process2!\n");
+    printf("Hello! This is a message from process2!\n");
 }
 
 void instruction_signal() {
