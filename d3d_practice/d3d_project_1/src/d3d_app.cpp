@@ -1,13 +1,30 @@
-#include <vector>
-
 #include <d3dcommon.h>
+#include <Windows.h>
 #include <minwinbase.h>
+#include <tchar.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winuser.h>
 
 #include "d3d_app.hpp"
 
+#define RELEASE_COM(x) \
+    if(x) { \
+        x->Release(); \
+        x = nullptr; \
+    }
+
 
 namespace {
-    d3df::D3DApp* g_d3d_app = nullptr;
+
+d3df::D3DApp* g_d3d_app = nullptr;
+
+}
+
+inline LRESULT CALLBACK
+main_window_proc(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam)
+{
+    return g_d3d_app->msg_proc(hwnd, msg, wparam, lparam);
 }
 
 namespace d3df {
@@ -28,7 +45,7 @@ D3DApp::D3DApp(HINSTANCE inst):
     m_render_target_view(nullptr),
     m_depth_buffer_view(nullptr),
     m_viewport(),
-    m_window_title(L"D3D11 Application"),
+    m_window_title(_T("D3D11 Application")),
     m_d3d_driver_type(D3D_DRIVER_TYPE_HARDWARE),
     m_client_width(800),
     m_client_height(600),
@@ -41,11 +58,109 @@ D3DApp::D3DApp(HINSTANCE inst):
 
 D3DApp::~D3DApp()
 {
+    RELEASE_COM(m_depth_buffer_view);
+    RELEASE_COM(m_render_target_view);
+    RELEASE_COM(m_depth_buffer);
+    RELEASE_COM(m_swap_chain);
 
+    if(m_d3d_context) {
+        m_d3d_context->ClearState();
+        m_d3d_context->Release();
+    }
+
+    RELEASE_COM(m_d3d_device);
 }
 
 inline HINSTANCE D3DApp::app_instance() const noexcept { return m_app_instance; }
 inline HWND D3DApp::main_window() const noexcept { return m_main_window; }
 inline float D3DApp::aspect_ratio() const noexcept { return static_cast<float>(m_client_width) / m_client_height; }
+
+int D3DApp::run()
+{
+
+}
+
+bool D3DApp::init()
+{
+    if(!init_main_window())
+        return false;
+
+    if(!init_direct3d())
+        return false;
+
+    return true;
+}
+
+LRESULT D3DApp::msg_proc(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam)
+{
+
+}
+
+void D3DApp::handle_resize()
+{
+
+}
+
+bool D3DApp::init_main_window()
+{
+    WNDCLASSEX wc;
+
+    ZeroMemory(&wc, sizeof(WNDCLASSEX));
+
+    wc.style            = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc      = main_window_proc;
+    wc.cbClsExtra       = 0;
+    wc.cbWndExtra       = 0;
+    wc.hInstance        = m_app_instance;
+    wc.hIcon            = LoadIcon(nullptr, IDI_APPLICATION);
+    wc.hCursor          = LoadCursor(nullptr, IDC_ARROW);
+    wc.hbrBackground    = (HBRUSH) GetStockObject(NULL_BRUSH);
+    wc.lpszMenuName     = nullptr;
+    wc.lpszClassName    = _T("D3DWndClassName");
+
+    if(!RegisterClassEx(&wc)) {
+        MessageBox(nullptr, _T("RegisterClass Failed."), nullptr, 0);
+        return false;
+    }
+
+    RECT r = {0, 0, m_client_width, m_client_height};
+    AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, false);
+    
+    int width   = r.right - r.left;
+    int height  = r.bottom - r.top;
+
+    m_main_window = CreateWindowEx(0,
+                                   _T("D3DWndClassName"),
+                                   m_window_title.c_str(),
+                                   WS_OVERLAPPEDWINDOW,
+                                   CW_USEDEFAULT,
+                                   CW_USEDEFAULT,
+                                   width,
+                                   height,
+                                   nullptr,
+                                   nullptr,
+                                   m_app_instance,
+                                   nullptr);
+
+    if(!m_main_window) {
+        MessageBox(nullptr, _T("CreateWindow Failed."), nullptr, 0);
+        return false;
+    }
+
+    ShowWindow(m_main_window, SW_SHOW);
+    UpdateWindow(m_main_window);
+
+    return true;
+}
+
+bool D3DApp::init_direct3d()
+{
+
+}
+
+void D3DApp::calculate_frame_stats()
+{
+
+}
 
 }

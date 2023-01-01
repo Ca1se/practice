@@ -38,8 +38,6 @@ public:
     virtual void handle_mouse_up(WPARAM btn_state, int x, int y) {}
     virtual void handle_mouse_move(WPARAM btn_state, int x, int y) {}
 
-    static D3DApp& instance();
-
 protected:
     bool init_main_window();
     bool init_direct3d();
@@ -67,7 +65,7 @@ protected:
     ID3D11DepthStencilView* m_depth_buffer_view;
     D3D11_VIEWPORT m_viewport;
 
-    std::wstring m_window_title;
+    std::string m_window_title;
 
     D3D_DRIVER_TYPE m_d3d_driver_type;
 
