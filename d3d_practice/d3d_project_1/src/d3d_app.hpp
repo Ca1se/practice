@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <d3dcommon.h>
+#include <stdint.h>
 #include <string>
 
 #include <d3d11.h>
@@ -65,7 +66,7 @@ protected:
     ID3D11DepthStencilView* m_depth_buffer_view;
     D3D11_VIEWPORT m_viewport;
 
-    std::string m_window_title;
+    std::wstring m_window_title;
 
     D3D_DRIVER_TYPE m_d3d_driver_type;
 
@@ -73,6 +74,8 @@ protected:
     int m_client_height;
 
     bool m_msaa4x_enabled;
+
+    uint32_t m_pos;
 };
 
 }

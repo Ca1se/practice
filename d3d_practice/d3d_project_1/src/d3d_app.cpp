@@ -4,6 +4,7 @@
 #include <tchar.h>
 #include <windef.h>
 #include <wingdi.h>
+#include <winnt.h>
 #include <winuser.h>
 
 #include "d3d_app.hpp"
@@ -45,7 +46,7 @@ D3DApp::D3DApp(HINSTANCE inst):
     m_render_target_view(nullptr),
     m_depth_buffer_view(nullptr),
     m_viewport(),
-    m_window_title(_T("D3D11 Application")),
+    m_window_title(L"D3D11 Application"),
     m_d3d_driver_type(D3D_DRIVER_TYPE_HARDWARE),
     m_client_width(800),
     m_client_height(600),
@@ -103,23 +104,19 @@ void D3DApp::handle_resize()
 
 bool D3DApp::init_main_window()
 {
-    WNDCLASSEX wc;
+    WNDCLASSEXW wc;
 
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
+    ZeroMemory(&wc, sizeof(WNDCLASSEXW));
 
-    wc.style            = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc      = main_window_proc;
-    wc.cbClsExtra       = 0;
-    wc.cbWndExtra       = 0;
-    wc.hInstance        = m_app_instance;
-    wc.hIcon            = LoadIcon(nullptr, IDI_APPLICATION);
-    wc.hCursor          = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground    = (HBRUSH) GetStockObject(NULL_BRUSH);
-    wc.lpszMenuName     = nullptr;
-    wc.lpszClassName    = _T("D3DWndClassName");
+    wc.cbSize       = sizeof(WNDCLASSEXW);
+    wc.style        = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc  = main_window_proc;
+    wc.cbClsExtra   = 0;
+    // to do
 
-    if(!RegisterClassEx(&wc)) {
-        MessageBox(nullptr, _T("RegisterClass Failed."), nullptr, 0);
+
+    if(!RegisterClassExW(&wc)) {
+        MessageBoxW(nullptr, L"RegisterClass Failed.", nullptr, 0);
         return false;
     }
 
@@ -129,8 +126,7 @@ bool D3DApp::init_main_window()
     int width   = r.right - r.left;
     int height  = r.bottom - r.top;
 
-    m_main_window = CreateWindowEx(0,
-                                   _T("D3DWndClassName"),
+    m_main_window = CreateWindowW(L"D3DWndClassName",
                                    m_window_title.c_str(),
                                    WS_OVERLAPPEDWINDOW,
                                    CW_USEDEFAULT,
