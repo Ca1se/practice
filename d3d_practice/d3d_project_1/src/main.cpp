@@ -20,17 +20,15 @@
 const uint32_t client_width     = 640;
 const uint32_t client_height    = 480;
 
-LRESULT CALLBACK WindowProc(HWND hWnd,
-                         UINT message,
-                         WPARAM wParam,
-                         LPARAM lParam);
+LRESULT CALLBACK
+WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-int CALLBACK WinMain(
-    HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    LPSTR     pCmdLine,
-    int       nShowCmd
-) {
+int CALLBACK
+WinMain(HINSTANCE hInstance,
+        HINSTANCE hPrevInstance,
+        LPSTR     pCmdLine,
+        int       nShowCmd)
+{
     // the handle for the window, filled by a function
     HWND hWnd;
     // this struct holds information for the window class

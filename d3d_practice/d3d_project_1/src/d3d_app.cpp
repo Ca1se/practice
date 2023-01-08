@@ -1,3 +1,4 @@
+#include <WindowsX.h>
 #include <d3dcommon.h>
 #include <Windows.h>
 #include <minwinbase.h>
@@ -8,6 +9,7 @@
 #include <winuser.h>
 
 #include "d3d_app.hpp"
+#include "log.hpp"
 
 #define RELEASE_COM(x) \
     if(x) { \
@@ -18,7 +20,7 @@
 
 namespace {
 
-d3df::D3DApp* g_d3d_app = nullptr;
+t7dxf::D3DApp* g_d3d_app = nullptr;
 
 }
 
@@ -28,7 +30,7 @@ main_window_proc(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam)
     return g_d3d_app->msg_proc(hwnd, msg, wparam, lparam);
 }
 
-namespace d3df {
+namespace t7dxf {
 
 D3DApp::D3DApp(HINSTANCE inst):
     m_app_instance(inst),
@@ -108,15 +110,21 @@ bool D3DApp::init_main_window()
 
     ZeroMemory(&wc, sizeof(WNDCLASSEXW));
 
-    wc.cbSize       = sizeof(WNDCLASSEXW);
-    wc.style        = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc  = main_window_proc;
-    wc.cbClsExtra   = 0;
-    // to do
-
+    wc.cbSize           = sizeof(WNDCLASSEXW);
+    wc.style            = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc      = main_window_proc;
+    wc.cbClsExtra       = 0;
+    wc.cbWndExtra       = 0;
+    wc.hInstance        = m_app_instance;
+    wc.hIcon            = LoadIcon(nullptr, IDI_APPLICATION);
+    wc.hCursor          = LoadCursor(nullptr, IDC_ARROW);
+    wc.hbrBackground    = (HBRUSH) GetStockBrush(NULL_BRUSH);
+    wc.lpszMenuName     = nullptr;
+    wc.lpszClassName    = L"D3DWndClass";
+    wc.hIconSm          = nullptr;
 
     if(!RegisterClassExW(&wc)) {
-        MessageBoxW(nullptr, L"RegisterClass Failed.", nullptr, 0);
+        LOGFMT_ERROR("Register class failed.");
         return false;
     }
 

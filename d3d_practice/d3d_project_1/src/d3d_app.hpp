@@ -14,7 +14,7 @@
 #include "game_timer.hpp"
 
 
-namespace d3df {
+namespace t7dxf {
 
 class D3DApp {
 private:

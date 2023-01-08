@@ -9,7 +9,11 @@ file(GLOB SOURCES
     ${PROJECT_SOURCE_DIR}/src/*.hpp
 )
 
+include(cmake/file_basename.cmake)
+
 add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
+define_file_basename_for_sources(${PROJECT_NAME})
+
 find_package(dxsdk-d3dx CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::D3DX9 Microsoft::D3DX10 Microsoft::D3DX11)
 target_link_libraries(${PROJECT_NAME} PRIVATE
