@@ -14,11 +14,11 @@ include(cmake/file_basename.cmake)
 add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
 define_file_basename_for_sources(${PROJECT_NAME})
 
-find_package(dxsdk-d3dx CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::D3DX9 Microsoft::D3DX10 Microsoft::D3DX11)
+# find_package(dxsdk-d3dx CONFIG REQUIRED)
+# target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::D3DX9 Microsoft::D3DX10 Microsoft::D3DX11)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     d3d11.lib dxgi.lib dxguid.lib uuid.lib
-    kernel32.lib user32.lib
+    kernel32.lib user32.lib 
     comdlg32.lib advapi32.lib shell32.lib
     ole32.lib oleaut32.lib
 )

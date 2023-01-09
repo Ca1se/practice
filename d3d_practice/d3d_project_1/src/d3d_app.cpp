@@ -1,26 +1,30 @@
+#include <cassert>
+
 #include <WindowsX.h>
+#include <d3d11.h>
 #include <d3dcommon.h>
 #include <Windows.h>
+#include <dxgi.h>
+#include <dxgiformat.h>
+#include <dxgitype.h>
 #include <minwinbase.h>
 #include <tchar.h>
+#include <winbase.h>
 #include <windef.h>
 #include <wingdi.h>
 #include <winnt.h>
 #include <winuser.h>
+#include <wrl.h>
+#include <wrl/client.h>
 
 #include "d3d_app.hpp"
 #include "log.hpp"
-
-#define RELEASE_COM(x) \
-    if(x) { \
-        x->Release(); \
-        x = nullptr; \
-    }
+#include "util.hpp"
 
 
 namespace {
 
-t7dxf::D3DApp* g_d3d_app = nullptr;
+t7d3d::D3DApp* g_d3d_app = nullptr;
 
 }
 
@@ -30,7 +34,7 @@ main_window_proc(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam)
     return g_d3d_app->msg_proc(hwnd, msg, wparam, lparam);
 }
 
-namespace t7dxf {
+namespace t7d3d {
 
 D3DApp::D3DApp(HINSTANCE inst):
     m_app_instance(inst),
@@ -101,7 +105,26 @@ LRESULT D3DApp::msg_proc(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam)
 
 void D3DApp::handle_resize()
 {
+    assert(m_d3d_device);
+    assert(m_d3d_context);
+    assert(m_swap_chain);
 
+    RELEASE_COM(m_render_target_view);
+    RELEASE_COM(m_depth_buffer_view);
+    RELEASE_COM(m_depth_buffer);
+
+    HR_V(m_swap_chain->ResizeBuffers, 1,
+        m_client_width, m_client_height,
+        DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> back_buffer;
+    HR_V(m_swap_chain->GetBuffer, 0, 
+        __uuidof(ID3D11Texture2D), (void**) back_buffer.GetAddressOf());
+    HR_V(m_d3d_device->CreateRenderTargetView, back_buffer.Get(), 
+        nullptr, m_render_target_view.GetAddressOf());
+
+    D3D11_TEXTURE2D_DESC depth_buffer_desc;
+    
 }
 
 bool D3DApp::init_main_window()
@@ -147,7 +170,7 @@ bool D3DApp::init_main_window()
                                    nullptr);
 
     if(!m_main_window) {
-        MessageBox(nullptr, _T("CreateWindow Failed."), nullptr, 0);
+        LOG_ERROR("CreateWindow Failed.");
         return false;
     }
 
@@ -159,7 +182,73 @@ bool D3DApp::init_main_window()
 
 bool D3DApp::init_direct3d()
 {
+    uint32_t device_flag = 0;
+#if defined (DEBUG) || defined (_DEBUG)
+    device_flag |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 
+    D3D_FEATURE_LEVEL check_level;
+    HR_B(D3D11CreateDevice,
+        nullptr,
+        m_d3d_driver_type,
+        nullptr,
+        device_flag,
+        nullptr,
+        0,
+        D3D11_SDK_VERSION,
+        m_d3d_device.GetAddressOf(),
+        &check_level,
+        m_d3d_context.GetAddressOf());
+
+    if(check_level != D3D_FEATURE_LEVEL_11_0) {
+        LOG_ERROR("Direct3D Feature Level 11 unsupported.");
+        return false;
+    }
+
+    HR_B(m_d3d_device->CheckMultisampleQualityLevels,
+        DXGI_FORMAT_R8G8B8A8_UNORM, 4, 
+        &m_msaa4x_quality);
+    assert(m_msaa4x_quality > 0);
+
+    DXGI_SWAP_CHAIN_DESC sc_desc;
+    sc_desc.BufferDesc.Width                    = m_client_width;
+    sc_desc.BufferDesc.Height                   = m_client_height;
+    sc_desc.BufferDesc.RefreshRate.Numerator    = 60;
+    sc_desc.BufferDesc.RefreshRate.Denominator  = 1;
+    sc_desc.BufferDesc.Format                   = DXGI_FORMAT_R8G8B8A8_UNORM;
+    sc_desc.BufferDesc.ScanlineOrdering         = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+    sc_desc.BufferDesc.Scaling                  = DXGI_MODE_SCALING_UNSPECIFIED;
+
+    sc_desc.SampleDesc.Count            = 1;
+    sc_desc.SampleDesc.Quality          = 0;
+    if(m_msaa4x_enabled) {
+        sc_desc.SampleDesc.Count        = 4;
+        sc_desc.SampleDesc.Quality      = m_msaa4x_quality - 1;
+    }
+
+    sc_desc.BufferUsage         = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sc_desc.BufferCount         = 1;
+    sc_desc.OutputWindow        = m_main_window;
+    sc_desc.Windowed            = true;
+    sc_desc.SwapEffect          = DXGI_SWAP_EFFECT_DISCARD;
+    sc_desc.Flags               = 0;
+
+    Microsoft::WRL::ComPtr<IDXGIDevice> dxgi_device;
+    HR_B(m_d3d_device->QueryInterface, __uuidof(IDXGIDevice), (void**) dxgi_device.GetAddressOf());
+
+    Microsoft::WRL::ComPtr<IDXGIAdapter> dxgi_adapter;
+    HR_B(dxgi_device->GetParent, __uuidof(IDXGIAdapter), (void**) dxgi_adapter.GetAddressOf());
+
+    Microsoft::WRL::ComPtr<IDXGIFactory> dxgi_factory;
+    HR_B(dxgi_adapter->GetParent, __uuidof(IDXGIFactory), (void**) dxgi_factory.GetAddressOf());
+
+    HR_B(dxgi_factory->CreateSwapChain,
+        m_d3d_device.Get(), &sc_desc, 
+        m_swap_chain.GetAddressOf());
+
+    handle_resize();
+
+    return true;
 }
 
 void D3DApp::calculate_frame_stats()

@@ -3,18 +3,19 @@
 
 
 #include <cstdint>
-#include <d3dcommon.h>
 #include <stdint.h>
 #include <string>
 
 #include <d3d11.h>
+#include <d3dcommon.h>
 #include <dxgi.h>
 #include <windows.h>
+#include <wrl/client.h>
 
 #include "game_timer.hpp"
 
 
-namespace t7dxf {
+namespace t7d3d {
 
 class D3DApp {
 private:
@@ -58,12 +59,13 @@ protected:
 
     GameTimer m_timer;
 
-    ID3D11Device* m_d3d_device;
-    ID3D11DeviceContext* m_d3d_context;
-    IDXGISwapChain* m_swap_chain;
-    ID3D11Texture2D* m_depth_buffer;
-    ID3D11RenderTargetView* m_render_target_view;
-    ID3D11DepthStencilView* m_depth_buffer_view;
+    Microsoft::WRL::ComPtr<ID3D11Device>            m_d3d_device;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext>     m_d3d_context;
+    Microsoft::WRL::ComPtr<IDXGISwapChain>          m_swap_chain;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D>         m_depth_buffer;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_render_target_view;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depth_buffer_view;
+
     D3D11_VIEWPORT m_viewport;
 
     std::wstring m_window_title;
@@ -74,8 +76,6 @@ protected:
     int m_client_height;
 
     bool m_msaa4x_enabled;
-
-    uint32_t m_pos;
 };
 
 }
