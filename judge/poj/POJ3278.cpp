@@ -1,3 +1,4 @@
+/*
 #include<queue>
 #include<cstring>
 #include<algorithm>
@@ -30,5 +31,58 @@ int solve() {
 int main() {
     cin >> N >> K;
     cout << solve() << endl;
+    return 0;
+}
+*/
+
+#include <cstdio>
+#include <queue>
+
+static const int maxn = 100000 + 5;
+int n, k;
+bool vis[maxn];
+
+struct Status
+{
+    Status(int pos, int cnt): pos(pos), cnt(cnt) {}
+    int pos;
+    int cnt;
+};
+
+int main()
+{
+    scanf("%d%d", &n, &k);
+    if(k <= n) {
+        printf("%d\n", n - k);
+        return 0;
+    }
+    std::queue<Status> q;
+    q.push(Status(n, 0));
+    vis[n] = true;
+    while(!q.empty()) {
+        Status now = q.front();
+        q.pop();
+        if(now.pos == k) {
+            printf("%d\n", now.cnt);
+            break;
+        }
+        if(now.pos < k) {
+            int t1 = now.pos * 2;
+            if(t1 <= 100000 && !vis[t1]) {
+                vis[t1] = true;
+                q.push(Status(t1, now.cnt + 1));
+            }
+            int t2 = now.pos + 1;
+            if(t2 <= 100000 && !vis[t2]) {
+                vis[t2] = true;
+                q.push(Status(t2, now.cnt + 1));
+            }
+        }
+        int t1 = now.pos - 1;
+        if(t1 >= 0 && !vis[t1]) {
+            vis[t1] = true;
+            q.push(Status(t1, now.cnt + 1));
+        }
+    }
     return 0;
 }
