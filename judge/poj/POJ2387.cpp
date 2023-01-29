@@ -1,41 +1,4 @@
-//注意题目中有没有说有重边， 取小的一个
-//朴素实现
 /*
-#include<iostream>
-#include<cstring>
-#include<algorithm>
-using namespace std;
-int T, N;
-const int maxn = 2000 + 5;
-const int INF = 0x3f3f3f3f;
-int w[maxn][maxn];
-int d[maxn];
-bool vis[maxn];
-void dijkstra() {
-    memset(d, 0x3f3f, sizeof d);
-    memset(vis, 0, sizeof vis); 
-    d[N] = 0;
-    for(int i = 1; i <= N; i++) {
-        int x, m = INF;
-        for(int j = 1; j <= N; j++) if(!vis[j] && d[j] < m) m = d[x = j];
-        vis[x] = 1;
-        for(int j = 1; j <= N; j++) d[j] = min(d[j], d[x] + w[x][j]);
-    }
-    cout << d[1] << endl;
-}
-int main() {
-    memset(w, 0x3f3f, sizeof w);
-    cin >> T >> N;
-    for(int i = 0; i < T; i++) {
-        int u, v, d;
-        cin >> u >> v >> d;
-        w[u][v] = w[v][u] = min(d, w[u][v]);
-    }
-    dijkstra(); 
-    return 0;
-}
-*/
-//队列优化, 无需考虑重边
 #include<iostream>
 #include<algorithm>
 #include<queue>
@@ -99,3 +62,63 @@ int main() {
     }
     d.dijkstra();
 }
+*/
+
+#include <cstdio>
+#include <queue>
+#include <vector>
+#include <cstring>
+
+struct Edge
+{
+    Edge(int to, int len): to(to), len(len) {}
+    int to, len;
+};
+
+static const int maxn = 1000 + 5;
+int dist[maxn];
+struct Step
+{
+    Step(int pos): pos(pos) {}
+    int pos;
+    bool operator<(const Step& s) const
+    {
+        return dist[this->pos] > dist[s.pos];
+    }
+};
+
+int t, n;
+std::vector<Edge> edges[maxn];
+std::priority_queue<Step> q;
+
+int main() {
+    int x, y, c;
+    memset(dist, 0x3f, sizeof dist);
+    scanf("%d%d", &t, &n);
+    for(int i = 0; i < t; i++) {
+        scanf("%d%d%d", &x, &y, &c);
+        edges[x].push_back(Edge(y, c));
+        edges[y].push_back(Edge(x, c));
+    }
+    q.push(Step(n));
+    dist[n] = 0;
+    while(!q.empty()) {
+        Step now = q.top();
+        q.pop();
+        if(now.pos == 1) {
+            printf("%d\n", dist[1]);
+            break;
+        }
+        const std::vector<Edge>& es = edges[now.pos];
+        for(int i = 0; i < es.size(); i++) {
+            const Edge& e = es[i];
+            if(dist[e.to] > dist[now.pos] + e.len) {
+                dist[e.to] = dist[now.pos] + e.len;
+                q.push(e.to);
+            }
+        }
+    }
+    return 0;
+}
+
+
