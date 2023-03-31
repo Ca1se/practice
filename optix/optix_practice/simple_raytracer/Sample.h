@@ -1,9 +1,6 @@
 #pragma once
 
-#include "CudaOutputBuffer.h"
 #include "LaunchParams.h"
-
-#include <CudaDeviceBuffer.h>
 
 class Sample
 {
@@ -30,6 +27,8 @@ protected:
     void createPipeline();
 
     void buildSBT();
+
+    OptixTraversableHandle buildAccel();
 
 protected:
     // CUDA device context and stream that optix pipeline will run
@@ -62,5 +61,8 @@ protected:
     // our launch parameters, on the host, and the buffer to store
     // them on the device
     LaunchParams m_launch_params;
-    tputil::CudaDeviceBuffer m_launch_params_buffer = {};
+    tputil::CudaDeviceBuffer m_launch_params_buffer = { sizeof(LaunchParams) };
+
+    //tputil::CudaDeviceBuffer m_vertex_buffer        = {};
+    tputil::CudaDeviceBuffer m_gas_buffer = {};
 };

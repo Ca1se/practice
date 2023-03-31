@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <format>
@@ -9,12 +10,15 @@
 #include <string>
 #include <vector>
 
+#include <glad/glad.h>
+
+#include <CudaDeviceBuffer.h>
+#include <CudaOutputBuffer.h>
 #include <Exception.h>
 #include <GlDisplay.h>
 #include <GlUtil.h>
 #include <Windows.h>
 #include <cuda_runtime.h>
-#include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <optix.h>
 #include <optix_stubs.h>

@@ -2,11 +2,14 @@
 
 struct LaunchParams
 {
-    int frame_id;
-    uchar4* color_buffer;
+    int32_t width;
+    int32_t height;
+
     struct
     {
-        int width;
-        int height;
-    } size;
+        uint64_t id;
+        uchar4* color_buffer;
+    } frame;
+
+    OptixTraversableHandle handle;
 };

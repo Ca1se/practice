@@ -29,6 +29,13 @@ namespace
 {
 
 void
+resizeAndUpload(tputil::CudaDeviceBuffer& dest, const void* src, size_t byte_size)
+{
+    dest.resize(byte_size);
+    dest.upload(src, byte_size);
+}
+
+void
 destoryProgramGroups(std::vector<OptixProgramGroup>& program_groups) noexcept
 {
     for (auto group : program_groups)
@@ -38,42 +45,20 @@ destoryProgramGroups(std::vector<OptixProgramGroup>& program_groups) noexcept
 }
 
 void
-allocateDeviceMemory(CUdeviceptr* pp, size_t byte_size)
-{
-    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(pp), byte_size));
-}
-
-void
-deallocateDeviceMemory(CUdeviceptr p)
-{
-    CUDA_CHECK(cudaFree(reinterpret_cast<void*>(p)));
-}
-
-void
-copyHostToDevice(CUdeviceptr dest, const void* src, size_t byte_size)
-{
-    CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(dest), src, byte_size, cudaMemcpyHostToDevice));
-}
-
-template <typename T>
-void
-allocateAndCopyHostToDevice(CUdeviceptr* dest, const std::vector<T>& src)
-{
-    const int32_t byte_size = sizeof(T) * src.size();
-    allocateDeviceMemory(dest, byte_size);
-    copyHostToDevice(*dest, src.data(), byte_size);
-}
-
-void
 context_log_cb(uint32_t level, const char* tag, const char* message, void*)
 {
     LOG_INFO(std::format("[{}][{}]: {}", level, tag, message));
 }
 
+size_t
+roundUp(size_t x, size_t y)
+{
+    return (x + y - 1) / y * y;
+}
+
 }  // namespace
 
 Sample::Sample(int32_t width, int32_t height)
-    : m_launch_params{ .frame_id = 0, .color_buffer = nullptr, .size = { .width = width, .height = height } }
 {
     initOptix();
     createContext();
@@ -83,6 +68,12 @@ Sample::Sample(int32_t width, int32_t height)
     createHitgroupPrograms();
     createPipeline();
     buildSBT();
+    m_launch_params = LaunchParams{
+        .width  = width,
+        .height = height,
+        .frame  = { .id = 0, .color_buffer = nullptr },
+        .handle = buildAccel(),
+    };
 }
 
 Sample::~Sample()
@@ -151,7 +142,7 @@ Sample::createModule()
                                      .exceptionFlags                   = OPTIX_EXCEPTION_FLAG_NONE,
                                      .pipelineLaunchParamsVariableName = "g_optix_launch_params" };
 
-    m_pipeline_link_options    = OptixPipelineLinkOptions{ .maxTraceDepth = 2 };
+    m_pipeline_link_options = OptixPipelineLinkOptions{ .maxTraceDepth = 2 };
 
     const std::string ptx_code = embedded_ptx_code;
 
@@ -215,8 +206,9 @@ Sample::createHitgroupPrograms()
         OptixProgramGroupDesc{ .kind     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP,
                                .hitgroup = OptixProgramGroupHitgroup{ .moduleCH            = m_module,
                                                                       .entryFunctionNameCH = "__closesthit__radiance",
+                                                                      /*
                                                                       .moduleAH            = m_module,
-                                                                      .entryFunctionNameAH = "__anyhit__radiance" } };
+                                                                      .entryFunctionNameAH = "__anyhit__radiance"*/ } };
 
     char log[2048];
     size_t log_size = sizeof(log);
@@ -260,7 +252,7 @@ Sample::buildSBT()
         rec.data = nullptr;  // for now
         raygen_records.push_back(rec);
     }
-    m_raygen_records_buffer.upload(static_cast<void*>(raygen_records.data()), raygen_records.size());
+    resizeAndUpload(m_raygen_records_buffer, raygen_records.data(), raygen_records.size() * sizeof(RaygenRecord));
     m_shader_binding_table.raygenRecord = m_raygen_records_buffer.data();
 
     std::vector<MissRecord> miss_records;
@@ -270,7 +262,7 @@ Sample::buildSBT()
         rec.data = nullptr;
         miss_records.push_back(rec);
     }
-    m_miss_records_buffer.upload(static_cast<void*>(miss_records.data()), miss_records.size());
+    resizeAndUpload(m_miss_records_buffer, miss_records.data(), miss_records.size() * sizeof(MissRecord));
     m_shader_binding_table.missRecordBase          = m_miss_records_buffer.data();
     m_shader_binding_table.missRecordStrideInBytes = sizeof(MissRecord);
     m_shader_binding_table.missRecordCount         = static_cast<int>(miss_records.size());
@@ -284,7 +276,9 @@ Sample::buildSBT()
         rec.object_id = i;
         hitgroup_records.push_back(rec);
     }
-    m_hitgroup_records_buffer.upload(static_cast<void*>(hitgroup_records.data()), hitgroup_records.size());
+    resizeAndUpload(m_hitgroup_records_buffer,
+                    hitgroup_records.data(),
+                    hitgroup_records.size() * sizeof(HitgroupRecord));
     m_shader_binding_table.hitgroupRecordBase          = m_hitgroup_records_buffer.data();
     m_shader_binding_table.hitgroupRecordStrideInBytes = sizeof(HitgroupRecord);
     m_shader_binding_table.hitgroupRecordCount         = static_cast<int>(hitgroup_records.size());
@@ -293,18 +287,18 @@ Sample::buildSBT()
 void
 Sample::render(tputil::CudaOutputBuffer<uchar4>& pixel_buffer)
 {
-    m_launch_params.color_buffer = pixel_buffer.map();
+    m_launch_params.frame.color_buffer = pixel_buffer.map();
     m_launch_params_buffer.upload(static_cast<void*>(&m_launch_params), sizeof(LaunchParams));
 
-    m_launch_params.frame_id++;
+    m_launch_params.frame.id++;
 
     OPTIX_CHECK(optixLaunch(m_pipeline,
                             m_cuda_stream,
                             m_launch_params_buffer.data(),
                             sizeof(LaunchParams),
                             &m_shader_binding_table,
-                            m_launch_params.size.width,
-                            m_launch_params.size.height,
+                            m_launch_params.width,
+                            m_launch_params.height,
                             1));
     pixel_buffer.unmap();
 
@@ -314,5 +308,82 @@ Sample::render(tputil::CudaOutputBuffer<uchar4>& pixel_buffer)
 void
 Sample::resize(int32_t width, int32_t height) noexcept
 {
-    m_launch_params.size = { .width = width, .height = height };
+    m_launch_params.width  = width;
+    m_launch_params.height = height;
+}
+
+OptixTraversableHandle
+Sample::buildAccel()
+{
+    static constexpr std::array<float3, 3> vertices = {
+        {
+            { -0.5f, -0.5f, 0.0f },
+            { 0.5f, -0.5f, 0.0f },
+            { 0.0f, 0.5f, 0.0f },
+        },
+    };
+    static constexpr uint32_t triangle_input_flags = OPTIX_GEOMETRY_FLAG_NONE;
+
+    tputil::CudaDeviceBuffer vertex_buffer = { static_cast<const void*>(vertices.data()), sizeof(vertices) };
+
+    OptixAccelBuildOptions accel_options = {
+        .buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION,
+        .operation  = OPTIX_BUILD_OPERATION_BUILD,
+    };
+    CUdeviceptr buffer_pointer     = vertex_buffer.data();
+    OptixBuildInput triangle_input = {
+        .type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES,
+        .triangleArray =
+            OptixBuildInputTriangleArray{
+                .vertexBuffers       = &buffer_pointer,
+                .numVertices         = vertices.size(),
+                .vertexFormat        = OPTIX_VERTEX_FORMAT_FLOAT3,
+                .vertexStrideInBytes = sizeof(float3),
+                .flags               = &triangle_input_flags,
+                .numSbtRecords       = 1,
+            },
+    };
+
+    OptixAccelBufferSizes gas_buffer_size;
+
+    OPTIX_CHECK(optixAccelComputeMemoryUsage(m_optix_context, &accel_options, &triangle_input, 1, &gas_buffer_size));
+
+    tputil::CudaDeviceBuffer temp_buffer           = { gas_buffer_size.tempSizeInBytes };
+    tputil::CudaDeviceBuffer output_buffer         = { gas_buffer_size.outputSizeInBytes };
+    tputil::CudaDeviceBuffer compacted_size_buffer = { sizeof(size_t) };
+
+    OptixAccelEmitDesc emit_desc = { .result = compacted_size_buffer.data(),
+                                     .type   = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE };
+
+    OptixTraversableHandle handle;
+
+    OPTIX_CHECK(optixAccelBuild(m_optix_context,
+                                m_cuda_stream,
+                                &accel_options,
+                                &triangle_input,
+                                1,
+                                temp_buffer.data(),
+                                temp_buffer.size(),
+                                output_buffer.data(),
+                                output_buffer.size(),
+                                &handle,
+                                &emit_desc,
+                                1));
+
+    size_t compacted_size;
+    compacted_size_buffer.download(static_cast<void*>(&compacted_size), sizeof(size_t));
+
+    if (compacted_size < gas_buffer_size.outputSizeInBytes) {
+        m_gas_buffer.resize(compacted_size);
+        OPTIX_CHECK(optixAccelCompact(m_optix_context,
+                                      m_cuda_stream,
+                                      handle,
+                                      m_gas_buffer.data(),
+                                      m_gas_buffer.size(),
+                                      &handle));
+    } else {
+        m_gas_buffer = std::move(output_buffer);
+    }
+
+    return handle;
 }

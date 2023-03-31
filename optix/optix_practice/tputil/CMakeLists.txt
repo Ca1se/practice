@@ -10,7 +10,7 @@ add_library(tputil
 set_target_properties(tputil PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON
 )
-  
+
 target_include_directories(tputil PUBLIC
     ${CUDAToolkit_INCLUDE}
 	${OptiX_INCLUDE}

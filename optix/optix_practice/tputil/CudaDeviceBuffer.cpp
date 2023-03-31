@@ -40,7 +40,9 @@ memoryCopyDeviceToHost(void* dest, CUdeviceptr src, size_t byte_size)
 
 }  // namespace
 
-CudaDeviceBuffer::CudaDeviceBuffer() : m_data{ 0 }, m_size{ 0 }
+CudaDeviceBuffer::CudaDeviceBuffer()
+    : m_data{ 0 }
+    , m_size{ 0 }
 {
 }
 
@@ -53,7 +55,37 @@ CudaDeviceBuffer::~CudaDeviceBuffer() noexcept
     }
 }
 
-CudaDeviceBuffer::CudaDeviceBuffer(const void* src, size_t byte_size) : m_size{ byte_size }
+CudaDeviceBuffer::CudaDeviceBuffer(CudaDeviceBuffer&& other)
+    : m_data{ other.m_data }
+    , m_size{ other.m_size }
+{
+    other.m_data = 0;
+    other.m_size = 0;
+}
+
+CudaDeviceBuffer&
+CudaDeviceBuffer::operator=(CudaDeviceBuffer&& other)
+{
+    destory();
+
+    m_data       = other.m_data;
+    m_size       = other.m_size;
+    other.m_data = 0;
+    other.m_size = 0;
+
+    return *this;
+}
+
+CudaDeviceBuffer::CudaDeviceBuffer(size_t byte_size)
+    : m_size{ byte_size }
+{
+    assert(byte_size != 0);
+
+    allocateDeviceMemory(m_data, m_size);
+}
+
+CudaDeviceBuffer::CudaDeviceBuffer(const void* src, size_t byte_size)
+    : m_size{ byte_size }
 {
     assert(src != nullptr);
     assert(byte_size != 0);
@@ -65,23 +97,24 @@ CudaDeviceBuffer::CudaDeviceBuffer(const void* src, size_t byte_size) : m_size{ 
 void
 CudaDeviceBuffer::upload(const void* src, size_t byte_size)
 {
+    assert(m_data != 0);
     assert(src != nullptr);
-    assert(byte_size != 0);
-
-    if(byte_size != m_size)
-        resize(byte_size);
+    assert(byte_size != 0 && byte_size <= m_size);
 
     memoryCopyHostToDevice(m_data, src, byte_size);
 }
 
-void
+size_t
 CudaDeviceBuffer::download(void* dest, size_t buffer_size) const
 {
     assert(m_data != 0);
     assert(dest != nullptr);
-    assert(buffer_size >= m_size);
+    assert(buffer_size != 0);
 
-    memoryCopyDeviceToHost(dest, m_data, m_size);
+    size_t download_size = std::min(buffer_size, m_size);
+    memoryCopyDeviceToHost(dest, m_data, download_size);
+
+    return download_size;
 }
 
 void

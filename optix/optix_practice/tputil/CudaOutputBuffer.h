@@ -40,6 +40,14 @@ public:
 private:
     void makeCurrent() const { CUDA_CHECK(cudaSetDevice(m_device_idx)); }
 
+    static void ensureMinimumSize(int32_t width, int32_t height)
+    {
+        if (width <= 0)
+            width = 1;
+        if (height <= 0)
+            height = 1;
+    }
+
 private:
     int32_t m_width                           = 0;
     int32_t m_height                          = 0;

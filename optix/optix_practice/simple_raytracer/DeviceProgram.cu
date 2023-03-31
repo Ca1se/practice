@@ -39,10 +39,10 @@ __closesthit__radiance()
 { /*! for this simple example, this will remain empty */
 }
 
-extern "C" __global__ void
-__anyhit__radiance()
-{ /*! for this simple example, this will remain empty */
-}
+// extern "C" __global__ void
+// __anyhit__radiance()
+// { /*! for this simple example, this will remain empty */
+// }
 
 //------------------------------------------------------------------------------
 // miss program that gets called for any ray that did not have a
@@ -63,15 +63,15 @@ __miss__radiance()
 extern "C" __global__ void
 __raygen__renderFrame()
 {
-    if (g_optix_launch_params.frame_id == 0 && optixGetLaunchIndex().x == 0 && optixGetLaunchIndex().y == 0) {
+    if (g_optix_launch_params.frame.id == 0 && optixGetLaunchIndex().x == 0 && optixGetLaunchIndex().y == 0) {
         // we could of course also have used optixGetLaunchDims to query
         // the launch size, but accessing the g_optix_launch_params here
         // makes sure they're not getting optimized away (because
         // otherwise they'd not get used)
         printf("############################################\n");
         printf("Hello world from OptiX 7 raygen program!\n(within a %ix%i-sized launch)\n",
-               g_optix_launch_params.size.width,
-               g_optix_launch_params.size.height);
+               g_optix_launch_params.width,
+               g_optix_launch_params.height);
         printf("############################################\n");
     }
 
@@ -83,7 +83,7 @@ __raygen__renderFrame()
     const int ix       = optixGetLaunchIndex().x;
     const int iy       = optixGetLaunchIndex().y;
 
-    const int frame_id = g_optix_launch_params.frame_id;
+    const int frame_id = g_optix_launch_params.frame.id;
     const int r        = ((ix + frame_id) % 256);
     const int g        = ((iy + frame_id) % 256);
     const int b        = 0;
@@ -93,6 +93,6 @@ __raygen__renderFrame()
     const uchar4 rgba = { (uint8_t) r, (uint8_t) g, (uint8_t) b, 0xff };
 
     // and write to frame buffer ...
-    const uint32_t fbIndex                      = ix + iy * g_optix_launch_params.size.width;
-    g_optix_launch_params.color_buffer[fbIndex] = rgba;
+    const uint32_t fbIndex                      = ix + iy * g_optix_launch_params.width;
+    g_optix_launch_params.frame.color_buffer[fbIndex] = rgba;
 }
