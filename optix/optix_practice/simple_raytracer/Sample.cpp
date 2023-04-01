@@ -28,7 +28,7 @@ struct alignas(OPTIX_SBT_RECORD_ALIGNMENT) HitgroupRecord
 namespace
 {
 
-void
+__device__ void
 resizeAndUpload(tputil::CudaDeviceBuffer& dest, const void* src, size_t byte_size)
 {
     dest.resize(byte_size);
@@ -48,12 +48,6 @@ void
 context_log_cb(uint32_t level, const char* tag, const char* message, void*)
 {
     LOG_INFO(std::format("[{}][{}]: {}", level, tag, message));
-}
-
-size_t
-roundUp(size_t x, size_t y)
-{
-    return (x + y - 1) / y * y;
 }
 
 }  // namespace
@@ -303,6 +297,7 @@ Sample::render(tputil::CudaOutputBuffer<uchar4>& pixel_buffer)
     pixel_buffer.unmap();
 
     CUDA_SYNC_CHECK();
+    float a;
 }
 
 void

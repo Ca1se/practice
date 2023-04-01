@@ -14,8 +14,13 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include <optix_device.h>
 #include <vector>
+
+#include <cuda_runtime.h>
+#include <optix.h>
+#include <optix_device.h>
+
+#include <VectorMath.h>
 
 #include "LaunchParams.h"
 
@@ -80,8 +85,8 @@ __raygen__renderFrame()
     // ------------------------------------------------------------------
 
     // compute a test pattern based on pixel ID
-    const int ix       = optixGetLaunchIndex().x;
-    const int iy       = optixGetLaunchIndex().y;
+    const int ix = optixGetLaunchIndex().x;
+    const int iy = optixGetLaunchIndex().y;
 
     const int frame_id = g_optix_launch_params.frame.id;
     const int r        = ((ix + frame_id) % 256);
@@ -90,9 +95,10 @@ __raygen__renderFrame()
 
     // convert to 32-bit rgba value (we explicitly set alpha to 0xff
     // to make stb_image_write happy ...
-    const uchar4 rgba = { (uint8_t) r, (uint8_t) g, (uint8_t) b, 0xff };
+    uchar4 rgba = { (uint8_t) r, (uint8_t) g, (uint8_t) b, 0xff };
+    *static_cast<float*>(g_optix_launch_params.debug_data) = tputil::length(make_float3(1, 2, 3));
 
     // and write to frame buffer ...
-    const uint32_t fbIndex                      = ix + iy * g_optix_launch_params.width;
+    const uint32_t fbIndex                            = ix + iy * g_optix_launch_params.width;
     g_optix_launch_params.frame.color_buffer[fbIndex] = rgba;
 }

@@ -33,7 +33,7 @@ createGlShader(const std::string& source, GLuint shader_type)
             std::string info_log(max_length, '\0');
             GL_CHECK(glGetShaderInfoLog(shader, max_length, nullptr, info_log.data()));
 
-            throw std::runtime_error(exceptionMsg(TPFAL, std::format("failed to compile shader: {}", info_log)));
+            throw std::runtime_error(exceptionMsg(TP_LOG_ARGS, std::format("failed to compile shader: {}", info_log)));
         }
 
         return shader;
@@ -68,7 +68,7 @@ createGlProgram(const std::string& vert_source, const std::string& frag_source)
             std::string info_log(max_length, '\0');
             GL_CHECK(glGetProgramInfoLog(program, max_length, nullptr, info_log.data()));
 
-            throw std::runtime_error(exceptionMsg(TPFAL, std::format("failed to link program: {}", info_log)));
+            throw std::runtime_error(exceptionMsg(TP_LOG_ARGS, std::format("failed to link program: {}", info_log)));
         }
 
         glDeleteShader(vert_shader);
@@ -95,7 +95,7 @@ getGlUniformLocation(GLuint program, const std::string& uniform_name)
     GLint location;
     GL_CHECK(location = glGetUniformLocation(program, uniform_name.c_str()));
     if (location == -1)
-        throw std::runtime_error(exceptionMsg(TPFAL, std::format("uniform {} does not exist", uniform_name)));
+        throw std::runtime_error(exceptionMsg(TP_LOG_ARGS, std::format("uniform {} does not exist", uniform_name)));
     return location;
 }
 
@@ -176,7 +176,7 @@ GlDisplay::display(const int32_t screen_width,
                    const int32_t screen_height,
                    const int32_t framebuffer_width,
                    const int32_t framebuffer_height,
-                   const GLuint pbo) const
+                   const uint32_t pbo) const
 {
     GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 

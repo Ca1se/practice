@@ -17,11 +17,14 @@
 #include <Exception.h>
 #include <GlDisplay.h>
 #include <GlUtil.h>
+#include <VectorMath.h>
 #include <Windows.h>
 #include <cuda_runtime.h>
 #include <glfw/glfw3.h>
 #include <optix.h>
 #include <optix_stubs.h>
+#include <vector_functions.h>
+#include <vector_types.h>
 
 #define THROW_EXCEPTION(msg) throw std::exception(std::format("[{}, {}]: {}", __FILE__, __LINE__, msg).c_str())
 

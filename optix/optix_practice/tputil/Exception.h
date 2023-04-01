@@ -1,20 +1,21 @@
 #pragma once
 
+#include <source_location>
 #include <string>
 
-#define OPTIX_CHECK(call) optixCheck(call, #call, __FILE__, __LINE__)
+#define TP_LOG_ARGS __FILE__, __LINE__
 
-#define CUDA_CHECK(call) cudaCheck(call, #call, __FILE__, __LINE__)
+#define OPTIX_CHECK(call) optixCheck(call, #call, TP_LOG_ARGS)
 
-#define CUDA_SYNC_CHECK() cudaSyncCheck(__FILE__, __LINE__)
+#define CUDA_CHECK(call) cudaCheck(call, #call, TP_LOG_ARGS)
+
+#define CUDA_SYNC_CHECK() cudaSyncCheck(TP_LOG_ARGS)
 
 #define GL_CHECK(call)                      \
     {                                       \
         call;                               \
-        glCheck(#call, __FILE__, __LINE__); \
+        glCheck(#call, TP_LOG_ARGS); \
     }
-
-#define TPFAL __FILE__, __LINE__
 
 enum OptixResult;
 enum cudaError;
