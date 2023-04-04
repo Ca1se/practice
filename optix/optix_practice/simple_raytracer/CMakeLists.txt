@@ -1,4 +1,4 @@
-cuda_compile_and_embed(embedded_ptx_code DeviceProgram.cu)
+cuda_compile_and_embed(embedded_ptx_code cuda/DeviceProgram.cu)
 
 file(GLOB OPTIX_PRACTICE1_SRCS
     *.cpp

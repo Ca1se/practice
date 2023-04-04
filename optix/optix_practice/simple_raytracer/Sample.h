@@ -2,14 +2,18 @@
 
 #include "LaunchParams.h"
 
+struct State;
+struct Camera;
+
 class Sample
 {
 public:
-    Sample(int32_t width, int32_t height);
+    Sample();
     ~Sample() noexcept;
 
-    void render(tputil::CudaOutputBuffer<uchar4>& pixel_buffer);
-    void resize(int32_t width, int32_t height) noexcept;
+    void render(State& launch_params);
+
+    void updateCamera(const Camera& camera) noexcept;
 
 protected:
     void initOptix();
@@ -56,13 +60,10 @@ protected:
     std::vector<OptixProgramGroup> m_hitgroup_program_groups = {};
     tputil::CudaDeviceBuffer m_hitgroup_records_buffer       = {};
 
-    OptixShaderBindingTable m_shader_binding_table           = {};
+    OptixShaderBindingTable m_shader_binding_table = {};
 
-    // our launch parameters, on the host, and the buffer to store
-    // them on the device
+    tputil::CudaDeviceBuffer m_gas_buffer = {};
+
     LaunchParams m_launch_params;
     tputil::CudaDeviceBuffer m_launch_params_buffer = { sizeof(LaunchParams) };
-
-    //tputil::CudaDeviceBuffer m_vertex_buffer        = {};
-    tputil::CudaDeviceBuffer m_gas_buffer = {};
 };

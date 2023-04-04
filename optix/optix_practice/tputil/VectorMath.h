@@ -7,6 +7,9 @@
 
 #include "Preprocessor.h"
 
+#define TP_PI     3.14159265358979323846f
+#define TP_PIDIV2 1.57079632679489661923f
+
 TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
 operator+(const float3& a, const float3& b) noexcept
 {

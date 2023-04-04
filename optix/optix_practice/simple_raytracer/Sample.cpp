@@ -1,29 +1,22 @@
 #include "Sample.h"
 
+#include "RecordData.h"
+#include "SimpleRaytracer.h"
+
 #include <optix_function_table_definition.h>
 
 extern "C" char embedded_ptx_code[];
 
-struct alignas(OPTIX_SBT_RECORD_ALIGNMENT) RaygenRecord
+template <typename T>
+struct Record
 {
     alignas(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
-
-    void* data;
+    T data;
 };
 
-struct alignas(OPTIX_SBT_RECORD_ALIGNMENT) MissRecord
-{
-    alignas(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
-
-    void* data;
-};
-
-struct alignas(OPTIX_SBT_RECORD_ALIGNMENT) HitgroupRecord
-{
-    alignas(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
-
-    int object_id;
-};
+using RaygenRecord   = Record<RaygenData>;
+using MissRecord     = Record<MissData>;
+using HitgroupRecord = Record<HitgroupData>;
 
 namespace
 {
@@ -52,7 +45,7 @@ context_log_cb(uint32_t level, const char* tag, const char* message, void*)
 
 }  // namespace
 
-Sample::Sample(int32_t width, int32_t height)
+Sample::Sample()
 {
     initOptix();
     createContext();
@@ -63,8 +56,6 @@ Sample::Sample(int32_t width, int32_t height)
     createPipeline();
     buildSBT();
     m_launch_params = LaunchParams{
-        .width  = width,
-        .height = height,
         .frame  = { .id = 0, .color_buffer = nullptr },
         .handle = buildAccel(),
     };
@@ -131,12 +122,14 @@ Sample::createModule()
     m_pipeline_compile_options =
         OptixPipelineCompileOptions{ .usesMotionBlur                   = false,
                                      .traversableGraphFlags            = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS,
-                                     .numPayloadValues                 = 2,
-                                     .numAttributeValues               = 2,
+                                     .numPayloadValues                 = 3,
+                                     .numAttributeValues               = 3,
                                      .exceptionFlags                   = OPTIX_EXCEPTION_FLAG_NONE,
-                                     .pipelineLaunchParamsVariableName = "g_optix_launch_params" };
+                                     .pipelineLaunchParamsVariableName = "g_optix_launch_params",
+                                     /*.usesPrimitiveTypeFlags = OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE */ };
+    m_pipeline_compile_options.usesPrimitiveTypeFlags = OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE;
 
-    m_pipeline_link_options = OptixPipelineLinkOptions{ .maxTraceDepth = 2 };
+    m_pipeline_link_options = OptixPipelineLinkOptions{ .maxTraceDepth = 1 };
 
     const std::string ptx_code = embedded_ptx_code;
 
@@ -156,10 +149,10 @@ Sample::createRaygenPrograms()
     m_raygen_program_groups.resize(1);
 
     auto options = OptixProgramGroupOptions{};
-    auto desc    = OptixProgramGroupDesc{
-           .kind   = OPTIX_PROGRAM_GROUP_KIND_RAYGEN,
-           .raygen = OptixProgramGroupSingleModule{ .module = m_module, .entryFunctionName = "__raygen__renderFrame" }
-    };
+    auto desc =
+        OptixProgramGroupDesc{ .kind   = OPTIX_PROGRAM_GROUP_KIND_RAYGEN,
+                               .raygen = OptixProgramGroupSingleModule{ .module            = m_module,
+                                                                        .entryFunctionName = "__raygen__pinhole" } };
 
     char log[2048];
     size_t log_size = sizeof(log);
@@ -243,7 +236,6 @@ Sample::buildSBT()
     for (const auto& rpg : m_raygen_program_groups) {
         RaygenRecord rec;
         OPTIX_CHECK(optixSbtRecordPackHeader(rpg, static_cast<void*>(&rec)));
-        rec.data = nullptr;  // for now
         raygen_records.push_back(rec);
     }
     resizeAndUpload(m_raygen_records_buffer, raygen_records.data(), raygen_records.size() * sizeof(RaygenRecord));
@@ -253,7 +245,7 @@ Sample::buildSBT()
     for (const auto& mpg : m_miss_program_groups) {
         MissRecord rec;
         OPTIX_CHECK(optixSbtRecordPackHeader(mpg, static_cast<void*>(&rec)));
-        rec.data = nullptr;
+        rec.data.background_color = make_uchar3(0.5f * 0xff, 0.7f * 0xff, 1.0f * 0xff);
         miss_records.push_back(rec);
     }
     resizeAndUpload(m_miss_records_buffer, miss_records.data(), miss_records.size() * sizeof(MissRecord));
@@ -267,7 +259,7 @@ Sample::buildSBT()
         int object_type = 0;
         HitgroupRecord rec;
         OPTIX_CHECK(optixSbtRecordPackHeader(m_hitgroup_program_groups[object_type], static_cast<void*>(&rec)));
-        rec.object_id = i;
+        rec.data.color = make_uchar3(0xff, 0xff, 0x00);
         hitgroup_records.push_back(rec);
     }
     resizeAndUpload(m_hitgroup_records_buffer,
@@ -279,32 +271,33 @@ Sample::buildSBT()
 }
 
 void
-Sample::render(tputil::CudaOutputBuffer<uchar4>& pixel_buffer)
+Sample::render(State& state)
 {
-    m_launch_params.frame.color_buffer = pixel_buffer.map();
+    m_launch_params.frame.color_buffer = state.pixel_buffer.map();
     m_launch_params_buffer.upload(static_cast<void*>(&m_launch_params), sizeof(LaunchParams));
-
-    m_launch_params.frame.id++;
 
     OPTIX_CHECK(optixLaunch(m_pipeline,
                             m_cuda_stream,
                             m_launch_params_buffer.data(),
                             sizeof(LaunchParams),
                             &m_shader_binding_table,
-                            m_launch_params.width,
-                            m_launch_params.height,
+                            state.output_size.width,
+                            state.output_size.height,
                             1));
-    pixel_buffer.unmap();
+
+    state.pixel_buffer.unmap();
 
     CUDA_SYNC_CHECK();
-    float a;
+
+    m_launch_params.frame.id++;
 }
 
 void
-Sample::resize(int32_t width, int32_t height) noexcept
+Sample::updateCamera(const Camera& camera) noexcept
 {
-    m_launch_params.width  = width;
-    m_launch_params.height = height;
+    auto& [pos, u, v, w] = m_launch_params.camera;
+    pos = camera.position;
+    Camera::computeUVW(camera, u, v, w);
 }
 
 OptixTraversableHandle
@@ -312,9 +305,9 @@ Sample::buildAccel()
 {
     static constexpr std::array<float3, 3> vertices = {
         {
-            { -0.5f, -0.5f, 0.0f },
-            { 0.5f, -0.5f, 0.0f },
-            { 0.0f, 0.5f, 0.0f },
+            { -1.0f, -1.0f, 0.0f },
+            { 1.0f, -1.0f, 0.0f },
+            { 0.0f, 1.0f, 0.0f },
         },
     };
     static constexpr uint32_t triangle_input_flags = OPTIX_GEOMETRY_FLAG_NONE;
