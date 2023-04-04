@@ -296,7 +296,7 @@ void
 Sample::updateCamera(const Camera& camera) noexcept
 {
     auto& [pos, u, v, w] = m_launch_params.camera;
-    pos = camera.position;
+    pos                  = camera.position;
     Camera::computeUVW(camera, u, v, w);
 }
 

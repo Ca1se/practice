@@ -1,8 +1,8 @@
 #include <VectorMath.h>
 #include <optix_device.h>
 
-#include "../LaunchParams.h"
 #include "../RecordData.h"
+#include "LaunchParams.h"
 
 extern "C"
 {
@@ -12,10 +12,6 @@ extern "C"
 extern "C" __global__ void
 __closesthit__radiance()
 {
-    /*
-    HitgroupData* data = reinterpret_cast<HitgroupData*>(optixGetSbtDataPointer());
-    uchar3 color     = data->color;
-    */
     float2 color = optixGetTriangleBarycentrics();
 
     optixSetPayload_0(0xff * color.x);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LaunchParams.h"
+#include "cuda/LaunchParams.h"
 
 struct State;
 struct Camera;
