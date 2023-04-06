@@ -17,7 +17,7 @@ public:
     float3 getUp() const { return m_up; }
     float getFov() const { return m_vfov; }
     float getAspectRatio() const { return m_aspect_ratio; }
-    void getUVW(float3& u, float3& v, float3& w) { u = m_u, v = m_v, w = m_w; }
+    void getUVW(float3& u, float3& v, float3& w) const { u = m_u, v = m_v, w = m_w; }
 
     void zoom(float zoom_length);
     void move(float3 move_distance);

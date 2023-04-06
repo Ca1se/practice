@@ -14,8 +14,10 @@ struct State
 
     tputil::CudaOutputBuffer<uchar4> pixel_buffer;
 
-    int32_t mouse_button = -1;
-    bool window_resized  = true;
-    bool camera_changed  = true;
-    bool minimized       = false;
+    int2 prior_mouse_pos = {};
+
+    bool button_pressed = false;
+    bool window_resized = true;
+    bool camera_changed = true;
+    bool minimized      = false;
 };

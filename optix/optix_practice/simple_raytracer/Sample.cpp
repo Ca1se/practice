@@ -296,8 +296,9 @@ void
 Sample::updateCamera(const Camera& camera) noexcept
 {
     auto& [pos, u, v, w] = m_launch_params.camera;
-    pos                  = camera.position;
-    Camera::computeUVW(camera, u, v, w);
+
+    pos = camera.getPosition();
+    camera.getUVW(u, v, w);
 }
 
 OptixTraversableHandle

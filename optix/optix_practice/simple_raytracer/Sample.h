@@ -3,7 +3,7 @@
 #include "cuda/LaunchParams.h"
 
 struct State;
-struct Camera;
+class Camera;
 
 class Sample
 {
