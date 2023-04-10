@@ -21,5 +21,5 @@ link_directories("${CMAKE_BINARY_DIR}/lib")
 add_subdirectory(third_party)
 add_subdirectory(tputil)
 
-add_subdirectory(optix_practice)
+# add_subdirectory(optix_practice)
 add_subdirectory(simple_raytracer)

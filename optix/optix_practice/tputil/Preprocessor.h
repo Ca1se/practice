@@ -7,3 +7,5 @@
 #    define TPUTIL_HOSTDEVICE
 #    define TPUTIL_INLINE inline
 #endif
+
+#define TPUTIL_DECL TPUTIL_INLINE TPUTIL_HOSTDEVICE

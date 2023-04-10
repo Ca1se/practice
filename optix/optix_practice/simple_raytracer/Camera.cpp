@@ -59,12 +59,17 @@ Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
     };
 
     float2 pm_pos = make_float2(1.0f - unitize_pos(prior_mouse_pos.x, screen_size.x),
-                                unitize_pos(prior_mouse_pos.y, screen_size.y));
-    float2 nm_pos =
-        make_float2(1.0f - unitize_pos(now_mouse_pos.x, screen_size.x), unitize_pos(now_mouse_pos.y, screen_size.y));
+                        unitize_pos(prior_mouse_pos.y, screen_size.y));
+    float2 nm_pos = make_float2(1.0f - unitize_pos(now_mouse_pos.x, screen_size.x),
+                        unitize_pos(now_mouse_pos.y, screen_size.y));
 
+    /*
     float2 dpm = make_float2(2.0f * (pm_pos.x - 0.5f), 2.0f * (pm_pos.y - 0.5f));
     float2 dnm = make_float2(2.0f * (nm_pos.x - 0.5f), 2.0f * (nm_pos.y - 0.5f));
+    */
+
+    float2 dpm = 2.0f * (pm_pos - 0.5f);
+    float2 dnm = 2.0f * (nm_pos - 0.5f);
 
     // x
     float x_delta_theta = std::acosf(dnm.x) - std::acosf(dpm.x);
@@ -72,8 +77,8 @@ Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
     // y
     float y_delta_theta = std::acosf(dnm.y) - std::acosf(dpm.y);
 
-    m_delta_angle = make_float2(m_delta_angle.x + x_delta_theta, m_delta_angle.y + y_delta_theta);
-    m_rotated     = true;
+    m_delta_angle += make_float2(x_delta_theta, y_delta_theta);
+    m_rotated = true;
 }
 
 void

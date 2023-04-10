@@ -19,6 +19,7 @@
 #include <Exception.h>
 #include <GlDisplay.h>
 #include <GlUtil.h>
+#include <Matrix.h>
 #include <VectorMath.h>
 #include <Windows.h>
 #include <cuda_runtime.h>
