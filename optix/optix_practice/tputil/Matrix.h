@@ -171,6 +171,13 @@ operator*(const Matrix<left_rows, left_cols>& a, const Matrix<left_cols, right_c
     return ret;
 }
 
+TPUTIL_DECL float4 operator*(const Matrix<4, 4>& a, const float4& v)
+{
+    Matrix<4, 1> tmp = {{ v.x, v.y, v.z, v.w }};
+    Matrix<4, 1> res = a * tmp;
+    return make_float4(res[0], res[1], res[2], res[3]);
+}
+
 template <size_t rows, size_t cols>
 TPUTIL_DECL Matrix<rows, cols> operator*(const Matrix<rows, cols>& a, float f)
 {
