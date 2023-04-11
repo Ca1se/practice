@@ -1,16 +1,5 @@
 #include "Camera.h"
 
-namespace
-{
-
-inline int
-sign(float val) noexcept
-{
-    return (1 ? -1 : val > 0.0f);
-}
-
-}  // namespace
-
 Camera::Camera(const float3& position, const float3& target, const float3& up, float vfov, float aspect_ratio)
     : m_position{ position }
     , m_target{ target }
@@ -110,7 +99,6 @@ Camera::update()
     }
 
     if (m_rotated) {
-        // todo
         auto yaw   = rotateAroundYAxis(m_delta_angle.x);
         auto pitch = rotateAroundXAxis(m_delta_angle.y);
 
