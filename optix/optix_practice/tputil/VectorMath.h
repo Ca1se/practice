@@ -328,6 +328,24 @@ operator/=(float4& a, float f) noexcept
     return a;
 }
 
+// int3
+
+TPUTIL_INLINE TPUTIL_HOSTDEVICE int3
+operator+(const int3& a, const int3& b) noexcept
+{
+    return make_int3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+TPUTIL_INLINE TPUTIL_HOSTDEVICE int3&
+operator+=(int3& a, const int3& b) noexcept
+{
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+    
+    return a;
+}
+
 namespace tputil
 {
 

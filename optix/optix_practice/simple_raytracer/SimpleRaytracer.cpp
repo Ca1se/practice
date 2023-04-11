@@ -38,7 +38,7 @@ windowIconifyCallback(GLFWwindow* window, int32_t iconified)
 }
 
 static inline void
-mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+mouseButtonCallback(GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
 {
     auto state = static_cast<State*>(glfwGetWindowUserPointer(window));
 
@@ -77,6 +77,49 @@ cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     }
 }
 
+static inline void
+scrollCallback(GLFWwindow* window, double xscroll, double yscroll)
+{
+    auto state = static_cast<State*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+    
+    state->camera.zoom(static_cast<int>(yscroll));
+    state->camera_changed = true;
+}
+
+static inline void
+keyCallback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
+{
+    auto state = static_cast<State*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+
+    if(action == GLFW_PRESS || action == GLFW_REPEAT) {
+        switch(key) {
+        case GLFW_KEY_W:
+            state->camera.move(make_float3(0.0f, 0.0f, 1.0f));
+            break;
+        case GLFW_KEY_S:
+            state->camera.move(make_float3(0.0f, 0.0f, -1.0f));
+            break;
+        case GLFW_KEY_A:
+            state->camera.move(make_float3(-1.0f, 0.0f, 0.0f));
+            break;
+        case GLFW_KEY_D:
+            state->camera.move(make_float3(1.0f, 0.0f, 0.0f));
+            break;
+        case GLFW_KEY_SPACE:
+            state->camera.move(make_float3(0.0f, 1.0f, 0.0f));
+            break;
+        case GLFW_KEY_LEFT_SHIFT:
+            state->camera.move(make_float3(0.0f, -1.0f, 0.0f));
+            break;
+        }
+        state->camera_changed = true;
+    }
+}
+
 // render helper function
 
 static inline void
@@ -90,7 +133,6 @@ update(State& state, Sample& sample)
     }
 
     if (state.camera_changed) {
-        std::cout << "update\n";
         state.camera.setAspectRatio(static_cast<float>(width) / static_cast<float>(height));
         state.camera.update();
         sample.updateCamera(state.camera);
@@ -107,21 +149,7 @@ displaySubframe(tputil::CudaOutputBuffer<uchar4>& pixel_buffer, tputil::GlDispla
     gl_display.display(pixel_buffer.width(), pixel_buffer.height(), res_width, res_height, pixel_buffer.getPbo());
 }
 
-/*
-template <size_t rows, size_t cols>
-void printMatrix(const tputil::Matrix<rows, cols>& m)
-{
-    for(size_t i = 0; i < rows; i++) {
-        for(size_t j = 0; j < cols; j++) {
-            std::cout << m(i, j) << " ";
-        }
-        std::cout << "\n";
-    }
-}
-*/
-
-int
-main()
+int main()
 {
     static constexpr int32_t output_width  = 800;
     static constexpr int32_t output_height = 600;
@@ -146,6 +174,8 @@ main()
         glfwSetWindowIconifyCallback(window, windowIconifyCallback);
         glfwSetMouseButtonCallback(window, mouseButtonCallback);
         glfwSetCursorPosCallback(window, cursorPosCallback);
+        glfwSetScrollCallback(window, scrollCallback);
+        glfwSetKeyCallback(window, keyCallback);
         glfwSetWindowUserPointer(window, static_cast<void*>(&state));
 
         do {

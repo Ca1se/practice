@@ -19,8 +19,8 @@ public:
     float getAspectRatio() const { return m_aspect_ratio; }
     void getUVW(float3& u, float3& v, float3& w) const { u = m_u, v = m_v, w = m_w; }
 
-    void zoom(float zoom_length);
-    void move(float3 move_distance);
+    void zoom(int zoom_length);
+    void move(float3 move_offset);
     void rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size);
 
     void update();
@@ -31,16 +31,16 @@ private:
     float3 m_position;
     float3 m_target;
     float3 m_up;
-    float m_vfov;
-    float m_aspect_ratio;
+    float  m_vfov;
+    float  m_aspect_ratio;
 
     float3 m_u = {};
     float3 m_v = {};
     float3 m_w = {};
 
-    float m_zoom_length    = 0.0f;
-    float2 m_delta_angle   = {};
-    float3 m_move_distance = {};
+    int32_t m_zoom_length = 0;
+    float2  m_delta_angle = {};
+    float3  m_move_offset = {};
 
     bool m_zoomed  = false;
     bool m_moved   = false;

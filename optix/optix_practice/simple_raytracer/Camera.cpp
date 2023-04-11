@@ -40,20 +40,31 @@ Camera::computeUVW()
 }
 
 void
-Camera::zoom(float zoom_length)
+Camera::zoom(int zoom_length)
 {
-    // todo
+    if(m_rotated)
+        update();
+    
+    m_zoom_length += zoom_length;
+    m_zoomed = true;
 }
 
 void
-Camera::move(float3 move_distance)
+Camera::move(float3 move_offset)
 {
-    // todo
+    if(m_rotated)
+        update();
+    
+    m_move_offset += move_offset;
+    m_moved = true;
 }
 
 void
 Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
 {
+    if(m_zoomed || m_moved)
+        update();
+
     constexpr auto unitize_pos = [](int pos, int screen) {
         return static_cast<float>(pos) / static_cast<float>(screen);
     };
@@ -63,18 +74,10 @@ Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
     float2 nm_pos = make_float2(1.0f - unitize_pos(now_mouse_pos.x, screen_size.x),
                         unitize_pos(now_mouse_pos.y, screen_size.y));
 
-    /*
-    float2 dpm = make_float2(2.0f * (pm_pos.x - 0.5f), 2.0f * (pm_pos.y - 0.5f));
-    float2 dnm = make_float2(2.0f * (nm_pos.x - 0.5f), 2.0f * (nm_pos.y - 0.5f));
-    */
-
     float2 dpm = 2.0f * (pm_pos - 0.5f);
     float2 dnm = 2.0f * (nm_pos - 0.5f);
 
-    // x
     float x_delta_theta = std::acosf(dpm.x) - std::acosf(dnm.x);
-
-    // y
     float y_delta_theta = std::acosf(dpm.y) - std::acosf(dnm.y);
 
     m_delta_angle += make_float2(x_delta_theta, y_delta_theta);
@@ -84,29 +87,39 @@ Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
 void
 Camera::update()
 {
+    using namespace tputil;
+
     if (m_zoomed) {
-        // todo
-        m_zoom_length = 0.0f;
+        float3 new_position = m_position + 0.1f * m_zoom_length * m_w;
+
+        if(length(new_position - m_target) >= 0.1f)
+            m_position = new_position;
+
+        m_zoom_length = 0;
         m_zoomed = false;
     }
 
     if (m_moved) {
-        // todo
-        m_move_distance = { 0.0f, 0.0f, 0.0f };
+        float3 move_offset = 0.1f * m_move_offset;
+
+        m_position += move_offset.x * m_u + move_offset.y * m_v + move_offset.z * m_w;
+        m_target   += move_offset.x * m_u + move_offset.y * m_v + move_offset.z * m_w;
+
+        m_move_offset = { 0.0f, 0.0f, 0.0f };
         m_moved = false;
     }
 
     if (m_rotated) {
         // todo
-        auto yaw   = tputil::rotateAroundYAxis(m_delta_angle.x);
-        auto pitch = tputil::rotateAroundXAxis(m_delta_angle.y);
+        auto yaw   = rotateAroundYAxis(m_delta_angle.x);
+        auto pitch = rotateAroundXAxis(m_delta_angle.y);
 
-        auto to_origin = tputil::translate(-m_target);
-        auto to_position = tputil::translate(m_target);
+        auto to_origin = translate(-m_target);
+        auto to_position = translate(m_target);
 
         float3 new_position = to_position * pitch * yaw * to_origin * m_position;
 
-        float3 idir = tputil::normalize(new_position - m_target);
+        float3 idir = normalize(new_position - m_target);
         if(std::abs(1.0f - std::abs(tputil::dot(idir, m_up))) >= 0.1f)
             m_position = new_position;
 
