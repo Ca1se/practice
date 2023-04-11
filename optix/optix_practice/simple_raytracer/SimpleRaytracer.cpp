@@ -90,7 +90,9 @@ update(State& state, Sample& sample)
     }
 
     if (state.camera_changed) {
-        // state.camera.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+        std::cout << "update\n";
+        state.camera.setAspectRatio(static_cast<float>(width) / static_cast<float>(height));
+        state.camera.update();
         sample.updateCamera(state.camera);
         state.camera_changed = false;
     }
@@ -105,6 +107,7 @@ displaySubframe(tputil::CudaOutputBuffer<uchar4>& pixel_buffer, tputil::GlDispla
     gl_display.display(pixel_buffer.width(), pixel_buffer.height(), res_width, res_height, pixel_buffer.getPbo());
 }
 
+/*
 template <size_t rows, size_t cols>
 void printMatrix(const tputil::Matrix<rows, cols>& m)
 {
@@ -115,6 +118,7 @@ void printMatrix(const tputil::Matrix<rows, cols>& m)
         std::cout << "\n";
     }
 }
+*/
 
 int
 main()
@@ -123,13 +127,6 @@ main()
     static constexpr int32_t output_height = 600;
 
     try {
-        tputil::Matrix<3, 3> m = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }};
-        tputil::Matrix<3, 3> m1 = {{ 1, 2, 3, 4, 6, 6, 7, 8, 9 }};
-
-        printMatrix(tputil::elementWiseMultiply(m, m1));
-
-        /*
-
         GLFWwindow* window = tputil::initGl("simple raytracer", output_width, output_height);
 
         State state = {
@@ -141,9 +138,6 @@ main()
                               static_cast<float>(output_width) / static_cast<float>(output_height) },
             .pixel_buffer = tputil::CudaOutputBuffer<uchar4>{ output_width, output_height },
         };
-
-        
-
 
         Sample sample                = {};
         tputil::GlDisplay gl_display = {};
@@ -161,8 +155,6 @@ main()
             displaySubframe(state.pixel_buffer, gl_display, window);
             glfwSwapBuffers(window);
         } while (!glfwWindowShouldClose(window));
-
-        */
     } catch (std::exception& e) {
         LOG_ERROR(std::format("main function caught exception: {}", e.what()));
     }

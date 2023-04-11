@@ -22,6 +22,7 @@
 #include <Matrix.h>
 #include <VectorMath.h>
 #include <Windows.h>
+#include <Transform.h>
 #include <cuda_runtime.h>
 #include <glfw/glfw3.h>
 #include <optix.h>

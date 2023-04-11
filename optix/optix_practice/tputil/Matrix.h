@@ -9,6 +9,7 @@ namespace tputil
 {
 
 template <size_t dim> struct VectorDim { };
+template <> struct VectorDim<1> { using VectorType = float;  };
 template <> struct VectorDim<2> { using VectorType = float2; };
 template <> struct VectorDim<3> { using VectorType = float3; };
 template <> struct VectorDim<4> { using VectorType = float4; };
@@ -109,6 +110,17 @@ TPUTIL_DECL Matrix<rows, cols>& operator+=(Matrix<rows, cols>& a, float f)
     }
 
     return a;
+}
+
+template <size_t rows, size_t cols>
+TPUTIL_DECL Matrix<rows, cols> operator-(const Matrix<rows, cols>& a)
+{
+    Matrix<rows, cols> ret;
+    for(size_t i = 0; i < ret.size(); i++) {
+        ret[i] = -a[i];
+    }
+
+    return ret;
 }
 
 template <size_t rows, size_t cols>
