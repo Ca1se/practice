@@ -54,6 +54,29 @@ TPUTIL_DECL Matrix<4, 4> rotateAroundZAxis(float radian)
     return ret;
 }
 
+TPUTIL_DECL Matrix<4, 4> rotateAroundAxis(const float3& axis, float radian)
+{
+    auto [x, y, z] = normalize(axis);
+    float xx = x * x;
+    float xy = x * y;
+    float xz = x * z;
+    float yy = y * y;
+    float yz = y * z;
+    float zz = z * z;
+
+    float cosr  = std::cosf(radian);
+    float sinr  = std::sinf(radian);
+    float icosr = 1 - cosr;
+    Matrix<4, 4> ret = {{
+        cosr + xx * icosr, xy * icosr - z * sinr, xz * icosr + y * sinr, 0.0f,
+        xy * icosr + z * sinr, cosr + yy * icosr, yz * icosr - x * sinr, 0.0f,
+        xz * icosr - y * sinr, yz * icosr + x * sinr, cosr + zz * icosr, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    }};
+
+    return ret;
+}
+
 TPUTIL_DECL Matrix<4, 4> translate(const float3& offset)
 {
     Matrix<4, 4> ret = {{

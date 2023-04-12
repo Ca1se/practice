@@ -1,9 +1,10 @@
 #include "Sample.h"
 
+#include <optix_function_table_definition.h>
+
 #include "RecordData.h"
 #include "SimpleRaytracer.h"
-
-#include <optix_function_table_definition.h>
+#include "Geometry.h"
 
 extern "C" char embedded_ptx_code[];
 
@@ -21,8 +22,7 @@ using HitgroupRecord = Record<HitgroupData>;
 namespace
 {
 
-__device__ void
-resizeAndUpload(tputil::CudaDeviceBuffer& dest, const void* src, size_t byte_size)
+void resizeAndUpload(tputil::CudaDeviceBuffer& dest, const void* src, size_t byte_size)
 {
     dest.resize(byte_size);
     dest.upload(src, byte_size);
@@ -45,7 +45,7 @@ context_log_cb(uint32_t level, const char* tag, const char* message, void*)
 
 }  // namespace
 
-Sample::Sample()
+Sample::Sample(Mesh&& mesh)
 {
     initOptix();
     createContext();
@@ -57,7 +57,7 @@ Sample::Sample()
     buildSBT();
     m_launch_params = LaunchParams{
         .frame  = { .id = 0, .color_buffer = nullptr },
-        .handle = buildAccel(),
+        .handle = buildAccel(std::forward<Mesh&&>(mesh)),
     };
 }
 
@@ -133,14 +133,14 @@ Sample::createModule()
 
     const std::string ptx_code = embedded_ptx_code;
 
-    OPTIX_CHECK(optixModuleCreateFromPTX(m_optix_context,
-                                         &m_module_compile_options,
-                                         &m_pipeline_compile_options,
-                                         ptx_code.data(),
-                                         ptx_code.size(),
-                                         nullptr,
-                                         nullptr,
-                                         &m_module));
+    OPTIX_CHECK(optixModuleCreate(m_optix_context,
+                                  &m_module_compile_options,
+                                  &m_pipeline_compile_options,
+                                  ptx_code.data(),
+                                  ptx_code.size(),
+                                  nullptr,
+                                  nullptr,
+                                  &m_module));
 }
 
 void
@@ -259,7 +259,7 @@ Sample::buildSBT()
         int object_type = 0;
         HitgroupRecord rec;
         OPTIX_CHECK(optixSbtRecordPackHeader(m_hitgroup_program_groups[object_type], static_cast<void*>(&rec)));
-        rec.data.color = make_uchar3(0xff, 0xff, 0x00);
+        rec.data.color = make_uchar3(190, 190, 190);
         hitgroup_records.push_back(rec);
     }
     resizeAndUpload(m_hitgroup_records_buffer,
@@ -302,47 +302,44 @@ Sample::updateCamera(const Camera& camera) noexcept
 }
 
 OptixTraversableHandle
-Sample::buildAccel()
+Sample::buildAccel(Mesh&& mesh)
 {
-    static constexpr std::array<float3, 3> vertices = {
-        {
-            { -1.0f, -1.0f, 0.0f },
-            { 1.0f, -1.0f, 0.0f },
-            { 0.0f, 1.0f, 0.0f },
-        },
-    };
     static constexpr uint32_t triangle_input_flags = OPTIX_GEOMETRY_FLAG_NONE;
 
-    tputil::CudaDeviceBuffer vertex_buffer = { static_cast<const void*>(vertices.data()), sizeof(vertices) };
+    auto &[vertices, indices] = mesh;
+    auto vertex_buffer = tputil::CudaDeviceBuffer{ static_cast<const void*>(vertices.data()), sizeof(float3) * vertices.size() };
+    auto index_buffer  = tputil::CudaDeviceBuffer{ static_cast<const void*>(indices.data()), sizeof(uint3) * indices.size() };
+    auto vertex_buffer_pointer = CUdeviceptr{ vertex_buffer.data() };
+    auto index_buffer_pointer  = CUdeviceptr{ index_buffer.data() };
 
-    OptixAccelBuildOptions accel_options = {
-        .buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION,
-        .operation  = OPTIX_BUILD_OPERATION_BUILD,
-    };
-    CUdeviceptr buffer_pointer     = vertex_buffer.data();
-    OptixBuildInput triangle_input = {
+    auto accel_options = OptixAccelBuildOptions{ .buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION, .operation  = OPTIX_BUILD_OPERATION_BUILD };
+    auto triangle_input = OptixBuildInput{
         .type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES,
-        .triangleArray =
-            OptixBuildInputTriangleArray{
-                .vertexBuffers       = &buffer_pointer,
-                .numVertices         = vertices.size(),
-                .vertexFormat        = OPTIX_VERTEX_FORMAT_FLOAT3,
-                .vertexStrideInBytes = sizeof(float3),
-                .flags               = &triangle_input_flags,
-                .numSbtRecords       = 1,
-            },
+        .triangleArray = OptixBuildInputTriangleArray{
+            .vertexBuffers       = &vertex_buffer_pointer,
+            .numVertices         = static_cast<uint32_t>(vertices.size()),
+            .vertexFormat        = OPTIX_VERTEX_FORMAT_FLOAT3,
+            .vertexStrideInBytes = sizeof(float3),
+            .indexBuffer         = index_buffer_pointer,
+            .numIndexTriplets    = static_cast<uint32_t>(indices.size()),
+            .indexFormat         = OPTIX_INDICES_FORMAT_UNSIGNED_INT3,
+            .indexStrideInBytes  = sizeof(uint3),
+            .preTransform        = 0,
+            .flags               = &triangle_input_flags,
+            .numSbtRecords       = 1
+        },
     };
 
     OptixAccelBufferSizes gas_buffer_size;
 
     OPTIX_CHECK(optixAccelComputeMemoryUsage(m_optix_context, &accel_options, &triangle_input, 1, &gas_buffer_size));
 
-    tputil::CudaDeviceBuffer temp_buffer           = { gas_buffer_size.tempSizeInBytes };
-    tputil::CudaDeviceBuffer output_buffer         = { gas_buffer_size.outputSizeInBytes };
-    tputil::CudaDeviceBuffer compacted_size_buffer = { sizeof(size_t) };
+    auto temp_buffer           = tputil::CudaDeviceBuffer{ gas_buffer_size.tempSizeInBytes };
+    auto output_buffer         = tputil::CudaDeviceBuffer{ gas_buffer_size.outputSizeInBytes };
+    auto compacted_size_buffer = tputil::CudaDeviceBuffer{ sizeof(size_t) };
 
-    OptixAccelEmitDesc emit_desc = { .result = compacted_size_buffer.data(),
-                                     .type   = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE };
+    auto emit_desc = OptixAccelEmitDesc{ .result = compacted_size_buffer.data(),
+                                         .type   = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE };
 
     OptixTraversableHandle handle;
 

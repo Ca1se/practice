@@ -4,11 +4,12 @@
 
 struct State;
 class Camera;
+struct Mesh;
 
 class Sample
 {
 public:
-    Sample();
+    Sample(Mesh&& mesh);
     ~Sample() noexcept;
 
     void render(State& launch_params);
@@ -32,7 +33,7 @@ protected:
 
     void buildSBT();
 
-    OptixTraversableHandle buildAccel();
+    OptixTraversableHandle buildAccel(Mesh&& mesh);
 
 protected:
     // CUDA device context and stream that optix pipeline will run

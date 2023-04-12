@@ -6,11 +6,11 @@ public:
     Camera(const float3& position, const float3& target, const float3& up, float vfov, float aspect_ratio);
     ~Camera() noexcept = default;
 
-    void setPosition(const float3& position) { m_position = position; }
-    void setTarget(const float3& target) { m_target = target; }
-    void setUp(const float3& up) { m_up = up; }
-    void setFov(float vfov) { m_vfov = vfov; }
-    void setAspectRatio(float aspect_ratio) { m_aspect_ratio = aspect_ratio; }
+    void setPosition(const float3& position) { m_position = position; m_uvw_changed = true; }
+    void setTarget(const float3& target) { m_target = target; m_uvw_changed = true; }
+    void setUp(const float3& up) { m_up = up; m_uvw_changed = true; }
+    void setFov(float vfov) { m_vfov = vfov; m_uvw_changed = true; }
+    void setAspectRatio(float aspect_ratio) { m_aspect_ratio = aspect_ratio; m_uvw_changed = true; }
 
     float3 getPosition() const { return m_position; }
     float3 getTarget() const { return m_target; }
@@ -45,4 +45,5 @@ private:
     bool m_zoomed  = false;
     bool m_moved   = false;
     bool m_rotated = false;
+    bool m_uvw_changed = false;
 };

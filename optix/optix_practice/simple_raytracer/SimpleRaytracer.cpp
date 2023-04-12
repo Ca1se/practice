@@ -1,6 +1,7 @@
 #include "SimpleRaytracer.h"
 
 #include "Sample.h"
+#include "Geometry.h"
 
 extern "C"
 {
@@ -157,18 +158,25 @@ int main()
     try {
         GLFWwindow* window = tputil::initGl("simple raytracer", output_width, output_height);
 
-        State state = {
-            .output_size  = { .width = output_width, .height = output_height },
-            .camera       = Camera{ make_float3(0.0f, 0.0f, 1.0f),
-                              make_float3(0.0f, 0.0f, 0.0f),
-                              make_float3(0.0f, 1.0f, 0.0f),
-                              TP_PIDIV2,
-                              static_cast<float>(output_width) / static_cast<float>(output_height) },
+        auto state = State{
+            .output_size = { .width = output_width, .height = output_height },
+            .camera = Camera{
+                make_float3(3.0f, 0.0f, 0.0f),
+                make_float3(0.0f, 0.0f, 0.0f),
+                make_float3(0.0f, 0.0f, 1.0f),
+                TP_PIDIV2,
+                static_cast<float>(output_width) / static_cast<float>(output_height)
+            },
             .pixel_buffer = tputil::CudaOutputBuffer<uchar4>{ output_width, output_height },
         };
 
-        Sample sample                = {};
-        tputil::GlDisplay gl_display = {};
+        Mesh mesh;
+        Mesh::addCube(mesh, make_float3(3.0f, 3.0f, -1.0f), make_float3(6.0f, 6.0f, 0.3f));
+        Mesh::addUnitCube(mesh, make_float3(0.5f, 0.5f, -0.5f));
+
+        auto sample = Sample{ std::move(mesh) };
+
+        tputil::GlDisplay gl_display;
 
         glfwSetWindowSizeCallback(window, windowSizeCallback);
         glfwSetWindowIconifyCallback(window, windowIconifyCallback);

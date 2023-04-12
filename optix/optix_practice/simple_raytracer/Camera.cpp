@@ -66,8 +66,8 @@ Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
     float2 dpm = 2.0f * (pm_pos - 0.5f);
     float2 dnm = 2.0f * (nm_pos - 0.5f);
 
-    float x_delta_theta = std::acosf(dpm.x) - std::acosf(dnm.x);
-    float y_delta_theta = std::acosf(dpm.y) - std::acosf(dnm.y);
+    float x_delta_theta = std::acosf(dnm.x) - std::acosf(dpm.x);
+    float y_delta_theta = std::acosf(dnm.y) - std::acosf(dpm.y);
 
     m_delta_angle += make_float2(x_delta_theta, y_delta_theta);
     m_rotated = true;
@@ -99,22 +99,28 @@ Camera::update()
     }
 
     if (m_rotated) {
-        auto yaw   = rotateAroundYAxis(m_delta_angle.x);
-        auto pitch = rotateAroundXAxis(m_delta_angle.y);
+        auto yaw = rotateAroundAxis(m_up, m_delta_angle.x);
 
-        auto to_origin = translate(-m_target);
-        auto to_position = translate(m_target);
-
-        float3 new_position = to_position * pitch * yaw * to_origin * m_position;
-
-        float3 idir = normalize(new_position - m_target);
-        if(std::abs(1.0f - std::abs(tputil::dot(idir, m_up))) >= 0.1f)
-            m_position = new_position;
+        m_position = (yaw * (m_position - m_target)) + m_target;
 
         computeUVW();
+
+        auto pitch = rotateAroundAxis(-m_u, m_delta_angle.y);
+
+        float3 new_position = (pitch * (m_position - m_target)) + m_target;
+
+        float3 idir = normalize(new_position - m_target);
+        if (std::abs(1.0f - std::abs(tputil::dot(idir, m_up))) >= 0.001f) {
+            m_position = new_position;
+            m_uvw_changed = true;
+        }
 
         m_delta_angle = { 0.0f, 0.0f };
         m_rotated = false;
     }
 
+    if (m_uvw_changed) {
+        computeUVW();
+        m_uvw_changed = false;
+    }
 }

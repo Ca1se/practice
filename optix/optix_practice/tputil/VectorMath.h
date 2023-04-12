@@ -12,20 +12,17 @@
 
 // float2
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator+(const float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator+(const float2& a, const float2& b) noexcept
 {
     return make_float2(a.x + b.x, a.y + b.y);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator+(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator+(const float2& a, float f) noexcept
 {
     return make_float2(a.x + f, a.y + f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2&
-operator+=(float2& a, const float2& b) noexcept
+TPUTIL_DECL float2& operator+=(float2& a, const float2& b) noexcept
 {
     a.x += b.x;
     a.y += b.y;
@@ -33,26 +30,22 @@ operator+=(float2& a, const float2& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator-(const float2& a) noexcept
+TPUTIL_DECL float2 operator-(const float2& a) noexcept
 {
     return make_float2(-a.x, -a.y);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator-(const float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator-(const float2& a, const float2& b) noexcept
 {
     return make_float2(a.x - b.x, a.y - b.y);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator-(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator-(const float2& a, float f) noexcept
 {
     return make_float2(a.x - f, a.y - f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2&
-operator-=(float2& a, const float2& b) noexcept
+TPUTIL_DECL float2& operator-=(float2& a, const float2& b) noexcept
 {
     a.x -= b.x;
     a.y -= b.y;
@@ -60,14 +53,12 @@ operator-=(float2& a, const float2& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator*(const float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator*(const float2& a, const float2& b) noexcept
 {
     return make_float2(a.x * b.x, a.y * b.y);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2&
-operator*=(float2& a, const float2& b) noexcept
+TPUTIL_DECL float2& operator*=(float2& a, const float2& b) noexcept
 {
     a.x *= b.x;
     a.y *= b.y;
@@ -75,20 +66,17 @@ operator*=(float2& a, const float2& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator*(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator*(const float2& a, float f) noexcept
 {
     return make_float2(a.x * f, a.y * f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator*(float f, const float2& a) noexcept
+TPUTIL_DECL float2 operator*(float f, const float2& a) noexcept
 {
     return a * f;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2&
-operator*=(float2& a, float f) noexcept
+TPUTIL_DECL float2& operator*=(float2& a, float f) noexcept
 {
     a.x *= f;
     a.y *= f;
@@ -96,14 +84,12 @@ operator*=(float2& a, float f) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2
-operator/(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator/(const float2& a, float f) noexcept
 {
     return make_float2(a.x / f, a.y / f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float2&
-operator/=(float2& a, float f) noexcept
+TPUTIL_DECL float2& operator/=(float2& a, float f) noexcept
 {
     a.x /= f;
     a.y /= f;
@@ -113,20 +99,17 @@ operator/=(float2& a, float f) noexcept
 
 // float3
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator+(const float3& a, const float3& b) noexcept
+TPUTIL_DECL float3 operator+(const float3& a, const float3& b) noexcept
 {
     return make_float3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator+(const float3& a, float f) noexcept
+TPUTIL_DECL float3 operator+(const float3& a, float f) noexcept
 {
     return make_float3(a.x + f, a.y + f, a.z + f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3&
-operator+=(float3& a, const float3& b) noexcept
+TPUTIL_DECL float3& operator+=(float3& a, const float3& b) noexcept
 {
     a.x += b.x;
     a.y += b.y;
@@ -135,26 +118,22 @@ operator+=(float3& a, const float3& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator-(const float3& a) noexcept
+TPUTIL_DECL float3 operator-(const float3& a) noexcept
 {
     return make_float3(-a.x, -a.y, -a.z);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator-(const float3& a, const float3& b) noexcept
+TPUTIL_DECL float3 operator-(const float3& a, const float3& b) noexcept
 {
     return make_float3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator-(const float3& a, float f) noexcept
+TPUTIL_DECL float3 operator-(const float3& a, float f) noexcept
 {
     return make_float3(a.x - f, a.y - f, a.z - f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3&
-operator-=(float3& a, const float3& b) noexcept
+TPUTIL_DECL float3& operator-=(float3& a, const float3& b) noexcept
 {
     a.x -= b.x;
     a.y -= b.y;
@@ -163,14 +142,12 @@ operator-=(float3& a, const float3& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator*(const float3& a, const float3& b) noexcept
+TPUTIL_DECL float3 operator*(const float3& a, const float3& b) noexcept
 {
     return make_float3(a.x * b.x, a.y * b.y, a.z * b.z);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3&
-operator*=(float3& a, const float3& b) noexcept
+TPUTIL_DECL float3& operator*=(float3& a, const float3& b) noexcept
 {
     a.x *= b.x;
     a.y *= b.y;
@@ -179,20 +156,17 @@ operator*=(float3& a, const float3& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator*(const float3& a, float f) noexcept
+TPUTIL_DECL float3 operator*(const float3& a, float f) noexcept
 {
     return make_float3(a.x * f, a.y * f, a.z * f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator*(float f, const float3& a) noexcept
+TPUTIL_DECL float3 operator*(float f, const float3& a) noexcept
 {
     return a * f;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3&
-operator*=(float3& a, float f) noexcept
+TPUTIL_DECL float3& operator*=(float3& a, float f) noexcept
 {
     a.x *= f;
     a.y *= f;
@@ -201,14 +175,12 @@ operator*=(float3& a, float f) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-operator/(const float3& a, float f) noexcept
+TPUTIL_DECL float3 operator/(const float3& a, float f) noexcept
 {
     return make_float3(a.x / f, a.y / f, a.z / f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3&
-operator/=(float3& a, float f) noexcept
+TPUTIL_DECL float3& operator/=(float3& a, float f) noexcept
 {
     a.x /= f;
     a.y /= f;
@@ -219,20 +191,17 @@ operator/=(float3& a, float f) noexcept
 
 // float4
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator+(const float4& a, const float4& b) noexcept
+TPUTIL_DECL float4 operator+(const float4& a, const float4& b) noexcept
 {
     return make_float4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator+(const float4& a, float f) noexcept
+TPUTIL_DECL float4 operator+(const float4& a, float f) noexcept
 {
     return make_float4(a.x + f, a.y + f, a.z + f, a.w + f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4&
-operator+=(float4& a, const float4& b) noexcept
+TPUTIL_DECL float4& operator+=(float4& a, const float4& b) noexcept
 {
     a.x += b.x;
     a.y += b.y;
@@ -242,26 +211,22 @@ operator+=(float4& a, const float4& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator-(const float4& a) noexcept
+TPUTIL_DECL float4 operator-(const float4& a) noexcept
 {
     return make_float4(-a.x, -a.y, -a.z, -a.w);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator-(const float4& a, const float4& b) noexcept
+TPUTIL_DECL float4 operator-(const float4& a, const float4& b) noexcept
 {
     return make_float4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator-(const float4& a, float f) noexcept
+TPUTIL_DECL float4 operator-(const float4& a, float f) noexcept
 {
     return make_float4(a.x - f, a.y - f, a.z - f, a.w - f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4&
-operator-=(float4& a, const float4& b) noexcept
+TPUTIL_DECL float4& operator-=(float4& a, const float4& b) noexcept
 {
     a.x -= b.x;
     a.y -= b.y;
@@ -271,14 +236,12 @@ operator-=(float4& a, const float4& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator*(const float4& a, const float4& b) noexcept
+TPUTIL_DECL float4 operator*(const float4& a, const float4& b) noexcept
 {
     return make_float4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4&
-operator*=(float4& a, const float4& b) noexcept
+TPUTIL_DECL float4& operator*=(float4& a, const float4& b) noexcept
 {
     a.x *= b.x;
     a.y *= b.y;
@@ -288,20 +251,17 @@ operator*=(float4& a, const float4& b) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator*(const float4& a, float f) noexcept
+TPUTIL_DECL float4 operator*(const float4& a, float f) noexcept
 {
     return make_float4(a.x * f, a.y * f, a.z * f, a.w * f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator*(float f, const float4& a) noexcept
+TPUTIL_DECL float4 operator*(float f, const float4& a) noexcept
 {
     return a * f;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4&
-operator*=(float4& a, float f) noexcept
+TPUTIL_DECL float4& operator*=(float4& a, float f) noexcept
 {
     a.x *= f;
     a.y *= f;
@@ -311,14 +271,12 @@ operator*=(float4& a, float f) noexcept
     return a;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4
-operator/(const float4& a, float f) noexcept
+TPUTIL_DECL float4 operator/(const float4& a, float f) noexcept
 {
     return make_float4(a.x / f, a.y / f, a.z / f, a.w / f);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float4&
-operator/=(float4& a, float f) noexcept
+TPUTIL_DECL float4& operator/=(float4& a, float f) noexcept
 {
     a.x /= f;
     a.y /= f;
@@ -330,14 +288,27 @@ operator/=(float4& a, float f) noexcept
 
 // int3
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE int3
-operator+(const int3& a, const int3& b) noexcept
+TPUTIL_DECL int3 operator+(const int3& a, const int3& b) noexcept
 {
     return make_int3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE int3&
-operator+=(int3& a, const int3& b) noexcept
+TPUTIL_DECL int3& operator+=(int3& a, const int3& b) noexcept
+{
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+    
+    return a;
+}
+
+// uint3
+TPUTIL_DECL uint3 operator+(const uint3& a, const uint3& b) noexcept
+{
+    return make_uint3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+TPUTIL_DECL uint3& operator+=(uint3& a, const uint3& b) noexcept
 {
     a.x += b.x;
     a.y += b.y;
@@ -349,32 +320,27 @@ operator+=(int3& a, const int3& b) noexcept
 namespace tputil
 {
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float
-dot(const float3& a, const float3& b) noexcept
+TPUTIL_DECL float dot(const float3& a, const float3& b) noexcept
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float
-lengthSquared(const float3& a) noexcept
+TPUTIL_DECL float lengthSquared(const float3& a) noexcept
 {
     return dot(a, a);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float
-length(const float3& a) noexcept
+TPUTIL_DECL float length(const float3& a) noexcept
 {
     return std::sqrtf(lengthSquared(a));
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-cross(const float3& a, const float3& b) noexcept
+TPUTIL_DECL float3 cross(const float3& a, const float3& b) noexcept
 {
     return make_float3(a.y * b.z - b.y * a.z, b.x * a.z - a.x * b.z, a.x * b.y - b.x * a.y);
 }
 
-TPUTIL_INLINE TPUTIL_HOSTDEVICE float3
-normalize(const float3& a) noexcept
+TPUTIL_DECL float3 normalize(const float3& a) noexcept
 {
     return a / length(a);
 }

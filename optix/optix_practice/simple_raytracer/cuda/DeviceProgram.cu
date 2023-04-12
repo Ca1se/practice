@@ -12,11 +12,9 @@ extern "C"
 extern "C" __global__ void
 __closesthit__radiance()
 {
-    float2 color = optixGetTriangleBarycentrics();
+    HitgroupData* data = reinterpret_cast<HitgroupData*>(optixGetSbtDataPointer());
+    uchar3 color = data->color;
 
-    optixSetPayload_0(0xff * color.x);
-    optixSetPayload_1(0xff * color.y);
-    optixSetPayload_2(0xff * (1.0f - color.x - color.y));
 }
 
 extern "C" __global__ void
