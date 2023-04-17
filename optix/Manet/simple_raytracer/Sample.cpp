@@ -2,9 +2,8 @@
 
 #include <optix_function_table_definition.h>
 
-#include "RecordData.h"
+#include "cuda/RecordData.h"
 #include "SimpleRaytracer.h"
-#include "Geometry.h"
 
 template <typename T>
 struct Record
@@ -43,14 +42,15 @@ context_log_cb(uint32_t level, const char* tag, const char* message, void*)
 
 }  // namespace
 
-Sample::Sample(Mesh&& mesh)
+Sample::Sample(const tputil::Model& model)
+    : m_model{ model }
 {
     initOptix();
     createContext();
 
     m_launch_params = LaunchParams{
         .frame  = { .id = 0, .color_buffer = nullptr },
-        .handle = buildAccel(std::forward<Mesh&&>(mesh)),
+        .handle = buildAccel(),
     };
 
     createModule();
@@ -59,7 +59,25 @@ Sample::Sample(Mesh&& mesh)
     createHitgroupPrograms();
     createPipeline();
     buildSBT();
-    
+}
+
+Sample::Sample(tputil::Model&& model)
+    : m_model{ std::forward<tputil::Model>(model) }
+{
+    initOptix();
+    createContext();
+
+    m_launch_params = LaunchParams{
+        .frame  = { .id = 0, .color_buffer = nullptr },
+        .handle = buildAccel(),
+    };
+
+    createModule();
+    createRaygenPrograms();
+    createMissPrograms();
+    createHitgroupPrograms();
+    createPipeline();
+    buildSBT();
 }
 
 Sample::~Sample()
@@ -132,7 +150,6 @@ Sample::createModule()
         .usesPrimitiveTypeFlags = static_cast<uint32_t>(OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE)
     };
 
-    m_pipeline_link_options = OptixPipelineLinkOptions{ .maxTraceDepth = 1 };
 
     size_t code_size = 0;
     const char* code = tputil::getCompiledCudaCode("simple_raytracer", "DeviceProgram.cu", code_size);
@@ -214,10 +231,8 @@ Sample::createHitgroupPrograms()
         .hitgroup = OptixProgramGroupHitgroup{
             .moduleCH            = m_module,
             .entryFunctionNameCH = "__closesthit__radiance",
-            /*
             .moduleAH            = m_module,
-            .entryFunctionNameAH = "__anyhit__radiance"
-            */
+            .entryFunctionNameAH = "__anyhit__back_culling"
         }
     };
 
@@ -235,14 +250,15 @@ Sample::createHitgroupPrograms()
         LOG_INFO(log);
 }
 
-void
-Sample::createPipeline()
+void Sample::createPipeline()
 {
     std::vector<OptixProgramGroup> groups;
 
     groups.insert(groups.end(), m_raygen_program_groups.begin(), m_raygen_program_groups.end());
     groups.insert(groups.end(), m_miss_program_groups.begin(), m_miss_program_groups.end());
     groups.insert(groups.end(), m_hitgroup_program_groups.begin(), m_hitgroup_program_groups.end());
+
+    m_pipeline_link_options = OptixPipelineLinkOptions{ .maxTraceDepth = 2 };
 
     OPTIX_CHECK(optixPipelineCreate(m_optix_context,
                                     &m_pipeline_compile_options,
@@ -253,7 +269,27 @@ Sample::createPipeline()
                                     nullptr,
                                     &m_pipeline));
 
-    OPTIX_CHECK(optixPipelineSetStackSize(m_pipeline, 2 * 1024, 2 * 1024, 2 * 1024, 1));
+    OptixStackSizes stack_sizes = {};
+    for(size_t i = 0; i < groups.size(); i++) {
+        OPTIX_CHECK(optixUtilAccumulateStackSizes(groups[i], &stack_sizes, m_pipeline));
+    }
+
+    uint32_t direct_callable_stack_size_from_traversal;
+    uint32_t direct_callable_stack_size_from_state;
+    uint32_t continuation_stack_size;
+    OPTIX_CHECK(optixUtilComputeStackSizes(&stack_sizes,
+                                           2,
+                                           0,
+                                           0,
+                                           &direct_callable_stack_size_from_traversal,
+                                           &direct_callable_stack_size_from_state,
+                                           &continuation_stack_size));
+                        
+    OPTIX_CHECK(optixPipelineSetStackSize(m_pipeline,
+                                          direct_callable_stack_size_from_traversal,
+                                          direct_callable_stack_size_from_state,
+                                          continuation_stack_size,
+                                          1));
 }
 
 void
@@ -272,9 +308,7 @@ Sample::buildSBT()
     for (const auto& mpg : m_miss_program_groups) {
         MissRecord rec;
         OPTIX_CHECK(optixSbtRecordPackHeader(mpg, static_cast<void*>(&rec)));
-        rec.data.background_color = make_uchar3(static_cast<uint8_t>(0.5f * 0xff),
-                                                static_cast<uint8_t>(0.7f * 0xff),
-                                                static_cast<uint8_t>(1.0f * 0xff));
+        rec.data.background_color = make_float3(0.5f, 0.7f, 1.0f);
         miss_records.push_back(rec);
     }
     resizeAndUpload(m_miss_records_buffer, miss_records.data(), miss_records.size() * sizeof(MissRecord));
@@ -283,21 +317,35 @@ Sample::buildSBT()
     m_shader_binding_table.missRecordCount         = static_cast<int>(miss_records.size());
 
     std::vector<HitgroupRecord> hitgroup_records;
-    for (int i = 0; i < 1; i++) {
-        int object_type = 0;
+    const auto& meshes = m_model.meshes;
+    size_t mesh_num = meshes.size();
+    m_normal_buffers.resize(mesh_num);
+    m_texcoord_buffers.resize(mesh_num);
+    m_normal_index_buffers.resize(mesh_num);
+    m_texcoord_index_buffers.resize(mesh_num);
+    for (int i = 0; i <mesh_num; i++) {
+        resizeAndUpload(m_normal_buffers[i], meshes[i]->normals.data(), sizeof(float3) * meshes[i]->normals.size());
+        resizeAndUpload(m_texcoord_buffers[i], meshes[i]->texcoords.data(), sizeof(float2) * meshes[i]->texcoords.size());
+        resizeAndUpload(m_normal_index_buffers[i], meshes[i]->normal_indices.data(), sizeof(int32_t) * meshes[i]->normal_indices.size());
+        resizeAndUpload(m_texcoord_index_buffers[i], meshes[i]->texcoord_indices.data(), sizeof(int32_t) * meshes[i]->texcoord_indices.size());
         HitgroupRecord rec = {
             .header = {},
             .data = HitgroupData{
-                .vertices = reinterpret_cast<float3*>(m_vertex_buffer.data()),
-                .indices = reinterpret_cast<uint3*>(m_index_buffer.data())
+                .vertices = reinterpret_cast<float3*>(m_vertex_buffers[i].data()),
+                .normals  = reinterpret_cast<float3*>(m_normal_buffers[i].data()),
+                .texcoords = reinterpret_cast<float2*>(m_texcoord_buffers[i].data()),
+                .vertex_indices = reinterpret_cast<int3*>(m_vertex_index_buffers[i].data()),
+                .normal_indices = reinterpret_cast<int3*>(m_normal_index_buffers[i].data()),
+                .texcoord_indices = reinterpret_cast<int3*>(m_texcoord_index_buffers[i].data()),
+                .diffuse_color = m_model.meshes[i]->diffuse_color
             }
         };
-        OPTIX_CHECK(optixSbtRecordPackHeader(m_hitgroup_program_groups[object_type], static_cast<void*>(&rec)));
+        OPTIX_CHECK(optixSbtRecordPackHeader(m_hitgroup_program_groups[0], static_cast<void*>(&rec)));
         hitgroup_records.push_back(rec);
     }
     resizeAndUpload(m_hitgroup_records_buffer,
                     hitgroup_records.data(),
-                    hitgroup_records.size() * sizeof(HitgroupRecord));
+                    sizeof(HitgroupRecord) * hitgroup_records.size());
     m_shader_binding_table.hitgroupRecordBase          = m_hitgroup_records_buffer.data();
     m_shader_binding_table.hitgroupRecordStrideInBytes = sizeof(HitgroupRecord);
     m_shader_binding_table.hitgroupRecordCount         = static_cast<int>(hitgroup_records.size());
@@ -334,39 +382,59 @@ Sample::updateCamera(const Camera& camera) noexcept
     camera.getUVW(u, v, w);
 }
 
-OptixTraversableHandle Sample::buildAccel(Mesh&& mesh)
+OptixTraversableHandle Sample::buildAccel()
 {
     static constexpr uint32_t triangle_input_flags = OPTIX_GEOMETRY_FLAG_NONE;
 
-    auto &[vertices, indices] = mesh;
-    resizeAndUpload(m_vertex_buffer, static_cast<void*>(vertices.data()), sizeof(float3) * vertices.size());
-    resizeAndUpload(m_index_buffer, static_cast<void*>(indices.data()), sizeof(uint3) * indices.size());
+    const std::vector<std::shared_ptr<tputil::Mesh>>& meshes = m_model.meshes;
+    size_t input_size = meshes.size();
+    std::vector<CUdeviceptr> vertex_buffer_cuptr(input_size);
+    std::vector<CUdeviceptr> index_buffer_cuptr(input_size);
+    std::vector<OptixBuildInput> build_inputs(input_size);
+    m_vertex_buffers.resize(input_size);
+    m_vertex_index_buffers.resize(input_size);
 
-    CUdeviceptr vertex_buffer_pointer = m_vertex_buffer.data();
-    CUdeviceptr index_buffer_pointer  = m_index_buffer.data();
+    for(size_t i = 0; i < input_size; i++) {
+        const auto& vertices = meshes[i]->vertices;
+        const auto& vertex_indices = meshes[i]->vertex_indices;
+        tputil::CudaDeviceBuffer vb{ static_cast<const void*>(vertices.data()),
+                                     sizeof(float3) * vertices.size() };
+        tputil::CudaDeviceBuffer ib{ static_cast<const void*>(vertex_indices.data()),
+                                     sizeof(int32_t) * vertex_indices.size() };
 
-    OptixAccelBuildOptions accel_options = { .buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION,
-                                             .operation  = OPTIX_BUILD_OPERATION_BUILD };
-    OptixBuildInput triangle_input = {
-        .type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES,
-        .triangleArray = OptixBuildInputTriangleArray{
-            .vertexBuffers       = &vertex_buffer_pointer,
-            .numVertices         = static_cast<uint32_t>(vertices.size()),
-            .vertexFormat        = OPTIX_VERTEX_FORMAT_FLOAT3,
-            .vertexStrideInBytes = sizeof(float3),
-            .indexBuffer         = index_buffer_pointer,
-            .numIndexTriplets    = static_cast<uint32_t>(indices.size()),
-            .indexFormat         = OPTIX_INDICES_FORMAT_UNSIGNED_INT3,
-            .indexStrideInBytes  = sizeof(uint3),
-            .preTransform        = 0,
-            .flags               = &triangle_input_flags,
-            .numSbtRecords       = 1
-        }
-    };
+        vertex_buffer_cuptr[i] = vb.data();
+        index_buffer_cuptr[i] = ib.data();
 
+        m_vertex_buffers[i] = std::move(vb);
+        m_vertex_index_buffers[i] = std::move(ib);
+
+        OptixBuildInput triangle_input = {
+            .type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES,
+            .triangleArray = OptixBuildInputTriangleArray{
+                .vertexBuffers               = &vertex_buffer_cuptr[i],
+                .numVertices                 = static_cast<uint32_t>(vertices.size()),
+                .vertexFormat                = OPTIX_VERTEX_FORMAT_FLOAT3,
+                .vertexStrideInBytes         = sizeof(float3),
+                .indexBuffer                 = index_buffer_cuptr[i],
+                .numIndexTriplets            = static_cast<uint32_t>(vertex_indices.size() / 3),
+                .indexFormat                 = OPTIX_INDICES_FORMAT_UNSIGNED_INT3,
+                .indexStrideInBytes          = sizeof(int3),
+                .preTransform                = 0,
+                .flags                       = &triangle_input_flags,
+                .numSbtRecords               = 1,
+                .sbtIndexOffsetBuffer        = 0,
+                .sbtIndexOffsetSizeInBytes   = 0,
+                .sbtIndexOffsetStrideInBytes = 0
+            }
+        };
+        build_inputs[i] = triangle_input;
+    }
+
+    OptixAccelBuildOptions accel_options  = { .buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION,
+                                              .operation  = OPTIX_BUILD_OPERATION_BUILD };
     OptixAccelBufferSizes gas_buffer_size = {};
 
-    OPTIX_CHECK(optixAccelComputeMemoryUsage(m_optix_context, &accel_options, &triangle_input, 1, &gas_buffer_size));
+    OPTIX_CHECK(optixAccelComputeMemoryUsage(m_optix_context, &accel_options, build_inputs.data(), static_cast<uint32_t>(input_size), &gas_buffer_size));
 
     tputil::CudaDeviceBuffer temp_buffer{ gas_buffer_size.tempSizeInBytes };
     tputil::CudaDeviceBuffer output_buffer{ gas_buffer_size.outputSizeInBytes };
@@ -380,8 +448,8 @@ OptixTraversableHandle Sample::buildAccel(Mesh&& mesh)
     OPTIX_CHECK(optixAccelBuild(m_optix_context,
                                 m_cuda_stream,
                                 &accel_options,
-                                &triangle_input,
-                                1,
+                                build_inputs.data(),
+                                static_cast<uint32_t>(input_size),
                                 temp_buffer.data(),
                                 temp_buffer.size(),
                                 output_buffer.data(),
@@ -389,6 +457,7 @@ OptixTraversableHandle Sample::buildAccel(Mesh&& mesh)
                                 &handle,
                                 &emit_desc,
                                 1));
+    CUDA_SYNC_CHECK();
 
     size_t compacted_size = 0;
     compacted_size_buffer.download(static_cast<void*>(&compacted_size), sizeof(size_t));
@@ -401,6 +470,7 @@ OptixTraversableHandle Sample::buildAccel(Mesh&& mesh)
                                       m_gas_buffer.data(),
                                       m_gas_buffer.size(),
                                       &handle));
+        CUDA_SYNC_CHECK();
     } else {
         m_gas_buffer = std::move(output_buffer);
     }

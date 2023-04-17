@@ -1,8 +1,8 @@
 #include <optix_device.h>
 #include <VectorMath.h>
 
-#include "../RecordData.h"
 #include "LaunchParams.h"
+#include "RecordData.h"
 #include "Helper.h"
 
 extern "C"
@@ -16,34 +16,49 @@ __closesthit__radiance()
     const HitgroupData* data = reinterpret_cast<HitgroupData*>(optixGetSbtDataPointer());
 
     const uint32_t primitive_id = optixGetPrimitiveIndex();
-    const uint3& vid = data->indices[primitive_id];
-    const float3& A  = data->vertices[vid.x];
-    const float3& B  = data->vertices[vid.y];
-    const float3& C  = data->vertices[vid.z];
+    const int3& nid = data->normal_indices[primitive_id];
+    const int3& tid = data->texcoord_indices[primitive_id];
+
+    const float2 barycentrics = optixGetTriangleBarycentrics();
+    const float3 v0_normal = tputil::normalize(data->normals[nid.x]);
+    const float3 v1_normal = tputil::normalize(data->normals[nid.y]);
+    const float3 v2_normal = tputil::normalize(data->normals[nid.z]);
+    const float3 face_normal = tputil::normalize(barycentrics.x * v0_normal + barycentrics.y * v1_normal + (1.0f - barycentrics.x - barycentrics.y) * v2_normal);
 
     const float3 ray_direction = optixGetWorldRayDirection();
-    const float3 face_normal   = tputil::normalize(tputil::cross(C - A, B - A));
 
-    const float3 gray_color = make_float3(211.0f, 211.0f, 211.0f);
     const float dotr = tputil::dot(ray_direction, face_normal);
 
-    const float3 color = fmaxf(0.0f, -dotr) * gray_color;
+    const float3 color = powf(fmaxf(0.0f, -dotr), 2.0f) * data->diffuse_color;
 
-    uchar4& payload = getPayload<uchar4>();
-    payload = make_uchar4(static_cast<uint8_t>(color.x),
-                          static_cast<uint8_t>(color.y),
-                          static_cast<uint8_t>(color.z),
-                          0xff);
+    float4& payload = getPayload<float4>();
+    payload = make_float4(color, 1.0f);
+}
+
+extern "C" __global__ void
+__anyhit__back_culling()
+{
+    const HitgroupData* data = reinterpret_cast<HitgroupData*>(optixGetSbtDataPointer());
+
+    const uint32_t primitive_id = optixGetPrimitiveIndex();
+    const int3& vid = data->vertex_indices[primitive_id];
+    const float3& v0 = data->vertices[vid.x];
+    const float3& v1 = data->vertices[vid.y];
+    const float3& v2 = data->vertices[vid.z];
+    const float3 ray_direction = optixGetWorldRayDirection();
+    const float3 face_normal = tputil::cross(v2 - v0, v1 - v0);
+    if(tputil::dot(ray_direction, face_normal) < 0.0f)
+        optixIgnoreIntersection();
 }
 
 extern "C" __global__ void
 __miss__radiance()
 {
-    MissData* data = reinterpret_cast<MissData*>(optixGetSbtDataPointer());
-    uchar3 color   = data->background_color;
+    const MissData* data = reinterpret_cast<MissData*>(optixGetSbtDataPointer());
+    const float3& color   = data->background_color;
 
-    uchar4& payload = getPayload<uchar4>();
-    payload = make_uchar4(color.x, color.y, color.z, 0xff);
+    float4& payload = getPayload<float4>();
+    payload = make_float4(color, 1.0f);
 }
 
 static __device__ void
@@ -71,7 +86,7 @@ __raygen__pinhole()
     float3 direction;
     computeRay(origin, direction);
 
-    uchar4 color;
+    float4 color;
     uint32_t i0, i1;
     packPointer(static_cast<void*>(&color), i0, i1);
 
@@ -91,5 +106,5 @@ __raygen__pinhole()
 
     const size_t pixel_index = dim.x * idx.y + idx.x;
 
-    g_optix_launch_params.frame.color_buffer[pixel_index] = color;
+    g_optix_launch_params.frame.color_buffer[pixel_index] = make_uchar4(255.99f * color);
 }

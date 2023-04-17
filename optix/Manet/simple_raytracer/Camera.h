@@ -17,7 +17,7 @@ public:
     float3 getUp() const { return m_up; }
     float getFov() const { return m_vfov; }
     float getAspectRatio() const { return m_aspect_ratio; }
-    void getUVW(float3& u, float3& v, float3& w) const { u = m_u, v = m_v, w = m_w; }
+    void getUVW(float3& u, float3& v, float3& w) const { u = m_ulen * m_u, v = m_vlen * m_v, w = m_wlen * m_w; }
 
     void zoom(int zoom_length);
     void move(float3 move_offset);
@@ -37,6 +37,10 @@ private:
     float3 m_u = {};
     float3 m_v = {};
     float3 m_w = {};
+
+    float m_ulen;
+    float m_vlen;
+    float m_wlen;
 
     int32_t m_zoom_length = 0;
     float2  m_delta_angle = {};

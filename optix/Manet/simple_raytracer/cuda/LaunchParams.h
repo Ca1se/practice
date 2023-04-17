@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
-#include <optix_types.h>
-
 struct LaunchParams
 {
     struct

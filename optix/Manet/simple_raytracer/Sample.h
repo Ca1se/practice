@@ -9,7 +9,8 @@ struct Mesh;
 class Sample
 {
 public:
-    Sample(Mesh&& mesh);
+    Sample(const tputil::Model& model);
+    Sample(tputil::Model&& model);
     ~Sample() noexcept;
 
     void render(State& launch_params);
@@ -33,7 +34,7 @@ protected:
 
     void buildSBT();
 
-    OptixTraversableHandle buildAccel(Mesh&& mesh);
+    OptixTraversableHandle buildAccel();
 
 protected:
     // CUDA device context and stream that optix pipeline will run
@@ -68,6 +69,11 @@ protected:
     LaunchParams m_launch_params;
     tputil::CudaDeviceBuffer m_launch_params_buffer{ sizeof(LaunchParams) };
 
-    tputil::CudaDeviceBuffer m_vertex_buffer = {};
-    tputil::CudaDeviceBuffer m_index_buffer  = {};
+    tputil::Model m_model = {};
+    std::vector<tputil::CudaDeviceBuffer> m_vertex_buffers         = {};
+    std::vector<tputil::CudaDeviceBuffer> m_normal_buffers         = {};
+    std::vector<tputil::CudaDeviceBuffer> m_texcoord_buffers       = {};
+    std::vector<tputil::CudaDeviceBuffer> m_vertex_index_buffers   = {};
+    std::vector<tputil::CudaDeviceBuffer> m_normal_index_buffers   = {};
+    std::vector<tputil::CudaDeviceBuffer> m_texcoord_index_buffers = {};
 };

@@ -20,6 +20,7 @@
 #include <GlDisplay.h>
 #include <TpUtil.h>
 #include <Matrix.h>
+#include <Model.h>
 #include <VectorMath.h>
 #include <Windows.h>
 #include <Transform.h>
@@ -27,6 +28,7 @@
 #include <glfw/glfw3.h>
 #include <optix.h>
 #include <optix_stubs.h>
+#include <optix_stack_size.h>
 #include <vector_functions.h>
 #include <vector_types.h>
 

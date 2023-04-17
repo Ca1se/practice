@@ -367,16 +367,9 @@ endif()
 
 set(SAMPLES_PTX_DIR "${CMAKE_BINARY_DIR}/lib/ptx")
 set(SAMPLES_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(SAMPLES_RESOURCE_DIR "${CMAKE_SOURCE_DIR}/resource")
 
 set(CUDA_GENERATED_OUTPUT_DIR ${SAMPLES_PTX_DIR})
-
-if( WIN32 )
-  string(REPLACE "/" "\\\\" SAMPLES_PTX_DIR ${SAMPLES_PTX_DIR})
-else( WIN32 )
-  if( USING_GNU_C AND NOT APPLE )
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DM_PI=3.14159265358979323846" )
-  endif()
-endif( WIN32 )
 
 # Build a null-terminated option list for NVRTC
 set( config_suffixes "_RELEASE" "_DEBUG" )
@@ -488,8 +481,8 @@ add_subdirectory(simple_raytracer)
 #################################################################
 # Add third party lib and tputil
 
-add_subdirectory(third_party)
 add_subdirectory(tputil)
+add_subdirectory(third_party)
 
 #################################################################
 

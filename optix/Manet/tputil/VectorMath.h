@@ -10,6 +10,19 @@
 #define TP_PI     3.14159265358979323846f
 #define TP_PIDIV2 1.57079632679489661923f
 
+TPUTIL_DECL float4 make_float4(const float3& xyz, float w) noexcept
+{
+    return make_float4(xyz.x, xyz.y, xyz.z, w);
+}
+
+TPUTIL_DECL uchar4 make_uchar4(const float4& f4) noexcept
+{
+    return make_uchar4(static_cast<uint8_t>(f4.x),
+                       static_cast<uint8_t>(f4.y),
+                       static_cast<uint8_t>(f4.z),
+                       static_cast<uint8_t>(f4.w));
+}
+
 // float2
 
 TPUTIL_DECL float2 operator+(const float2& a, const float2& b) noexcept

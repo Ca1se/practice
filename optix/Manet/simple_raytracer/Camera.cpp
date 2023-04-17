@@ -15,17 +15,15 @@ Camera::computeUVW()
 {
     using namespace tputil;
 
-    float3 ww = m_target - m_position;
-    float3 uu = normalize(cross(m_up, ww));
-    float3 vv = normalize(cross(ww, uu));
+    m_w = m_target - m_position;
+    m_u = normalize(cross(m_up, m_w));
+    m_v = normalize(cross(m_w, m_u));
 
-    float wlen = length(ww);
-    float vlen = wlen * std::tanf(0.5f * m_vfov);
-    float ulen = vlen * m_aspect_ratio;
+    m_wlen = length(m_w);
+    m_vlen = m_wlen * std::tanf(0.5f * m_vfov);
+    m_ulen = m_vlen * m_aspect_ratio;
 
-    m_u = ulen * uu;
-    m_v = vlen * vv;
-    m_w = ww;
+    m_w = normalize(m_w);
 }
 
 void
@@ -33,7 +31,7 @@ Camera::zoom(int zoom_length)
 {
     if(m_rotated)
         update();
-    
+
     m_zoom_length += zoom_length;
     m_zoomed = true;
 }
@@ -43,7 +41,7 @@ Camera::move(float3 move_offset)
 {
     if(m_rotated)
         update();
-    
+
     m_move_offset += move_offset;
     m_moved = true;
 }
@@ -79,9 +77,9 @@ Camera::update()
     using namespace tputil;
 
     if (m_zoomed) {
-        float3 new_position = m_position + 0.1f * m_zoom_length * m_w;
+        float3 new_position = m_position + 10.0f * m_zoom_length * m_w;
 
-        if(length(new_position - m_target) >= 0.1f)
+        if(length(new_position - m_target) >= 0.1f && dot(normalize(m_target - new_position), normalize(m_target - m_position)) > 0.0f)
             m_position = new_position;
 
         m_zoom_length = 0;
@@ -89,10 +87,10 @@ Camera::update()
     }
 
     if (m_moved) {
-        float3 move_offset = 0.1f * m_move_offset;
+        float3 move_offset = 10.0f * m_move_offset;
 
-        m_position += move_offset.x * m_u + move_offset.y * m_v + move_offset.z * m_w;
-        m_target   += move_offset.x * m_u + move_offset.y * m_v + move_offset.z * m_w;
+        m_position += move_offset.x * m_u + move_offset.y * m_up + move_offset.z * m_w;
+        m_target   += move_offset.x * m_u + move_offset.y * m_up + move_offset.z * m_w;
 
         m_move_offset = { 0.0f, 0.0f, 0.0f };
         m_moved = false;

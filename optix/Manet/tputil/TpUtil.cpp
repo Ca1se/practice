@@ -56,9 +56,21 @@ void loadGl()
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
 }
 
+} // namespace
+
+namespace
+{
+std::map<std::string, std::string> g_code_cache;
+} // namespace
+
 std::string getCudaSourcePath(const std::string& filename)
 {
-    return std::string{ SAMPLES_PTX_DIR } + "\\" + filename;
+    return std::string{ SAMPLES_PTX_DIR } + "/" + filename;
+}
+
+std::string getModelPath(const std::string& filename)
+{
+    return std::string{ SAMPLES_RESOURCE_DIR } + "/model/" + filename;
 }
 
 std::string readDataFromFile(const std::string filename)
@@ -70,13 +82,6 @@ std::string readDataFromFile(const std::string filename)
     } else {
         throw std::runtime_error{ EXCEPTION_MSG("failed to read file") };
     }
-}
-
-}  // namespace
-
-namespace
-{
-    std::map<std::string, std::string> g_code_cache;
 }
 
 GLFWwindow* initGl(const std::string& title, int32_t width, int32_t height)
@@ -108,5 +113,7 @@ const char* getCompiledCudaCode(const std::string& sample_name, const std::strin
 
     return pcode;
 }
+
+
 
 }  // namespace tputil

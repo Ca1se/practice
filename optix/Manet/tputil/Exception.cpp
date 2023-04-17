@@ -9,14 +9,12 @@
 #include <glfw/glfw3.h>
 #include <optix.h>
 
-std::string
-exceptionMessageFormat(const std::string& file, int line, const std::string& msg)
+std::string exceptionMessageFormat(const std::string& file, int line, const std::string& msg)
 {
     return std::format("[{}, {}]: {}", file, line, msg);
 }
 
-void
-optixCheck(const OptixResult& res, const std::string& call, const std::string& file, int line)
+void optixCheck(const OptixResult& res, const std::string& call, const std::string& file, int line)
 {
     if (res != OPTIX_SUCCESS) {
         std::string msg = std::format("optix call ({}) failed with code {:#010x}", call, static_cast<int>(res));
@@ -24,8 +22,7 @@ optixCheck(const OptixResult& res, const std::string& call, const std::string& f
     }
 }
 
-void
-cudaCheck(const cudaError_t& res, const std::string& call, const std::string& file, int line)
+void cudaCheck(const cudaError_t& res, const std::string& call, const std::string& file, int line)
 {
     if (res != cudaSuccess) {
         std::string err_name = cudaGetErrorName(res);
@@ -35,8 +32,7 @@ cudaCheck(const cudaError_t& res, const std::string& call, const std::string& fi
     }
 }
 
-void
-cudaSyncCheck(const std::string& file, int line)
+void cudaSyncCheck(const std::string& file, int line)
 {
     cudaDeviceSynchronize();
     cudaError_t err = cudaGetLastError();
@@ -48,8 +44,7 @@ cudaSyncCheck(const std::string& file, int line)
     }
 }
 
-void
-glCheck(const std::string& call, const std::string& file, int line)
+void glCheck(const std::string& call, const std::string& file, int line)
 {
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
