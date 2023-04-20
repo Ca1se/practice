@@ -163,7 +163,7 @@ int main()
                 make_float3(10.0f, 10.0f, 0.0f),
                 make_float3(0.0f, 10.0f, 0.0f),
                 make_float3(0.0f, 1.0f, 0.0f),
-                TP_PIDIV2,
+                TP_PI / 4.0f,
                 static_cast<float>(output_width) / static_cast<float>(output_height)
             },
             .pixel_buffer = tputil::CudaOutputBuffer<uchar4>{ output_width, output_height },

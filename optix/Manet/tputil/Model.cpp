@@ -4,9 +4,12 @@
 #include <set>
 #include <iostream>
 #include <format>
+#include <vector_functions.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
-#include <vector_functions.h>
 
 #include "TpUtil.h"
 #include "Exception.h"
@@ -109,12 +112,58 @@ void addVertex(Mesh& mesh,
     addTexcoord(mesh, known_texcoords, attributes, index.texcoord_index);
 }
 
+int32_t loadTexture(Model& model,
+                    std::map<std::string, uint32_t>& known_texture,
+                    const std::string& texture_name,
+                    const std::string& model_dir_path)
+{
+    if (texture_name.size() == 0)
+        return -1;
+    
+    if (auto itr = known_texture.find(texture_name); itr != known_texture.end())
+        return itr->second;
+    
+    std::string texture_path = model_dir_path + '/' + texture_name;
+
+    int texture_index = -1;
+    int width, height, comp;
+    uint8_t* image = stbi_load(texture_path.c_str(), &width, &height, &comp, STBI_rgb_alpha);
+
+    if (image != nullptr) {
+        std::shared_ptr<Texture> texture{ new Texture{
+            .width  = width,
+            .height = height,
+            .data   = std::vector<uint32_t>(width * height)
+        } };
+
+        const uint32_t* image_u32 = reinterpret_cast<const uint32_t*>(image);
+        auto& data = texture->data;
+        for (int y = 0; y < height; y++) {
+            int y1 = height - y - 1;
+            int image_line_begin = y * width;
+            int data_line_begin = y1 * width;
+            for (int x = 0; x < width; x++)
+                data[data_line_begin + x] = image_u32[image_line_begin + x];
+        }
+
+        texture_index = static_cast<int>(model.textures.size());
+        model.textures.push_back(texture);
+        free(image);
+    } else {
+        std::cerr << EXCEPTION_MSG(std::format("failed to load texture {}", texture_name)) << std::endl;
+    }
+
+    known_texture[texture_name] = texture_index;
+    return texture_index;
+}
+
 } // namespace
+
 
 void loadObjModel(Model& model, const std::string& filename)
 {
     std::string obj_file_path = getModelPath(filename);
-    std::string mtl_dir_path = obj_file_path.substr(0, obj_file_path.rfind('/') + 1);
+    std::string model_dir_path  = obj_file_path.substr(0, obj_file_path.rfind('/') + 1);
 
     tinyobj::attrib_t attributes;
     std::vector<tinyobj::shape_t> shapes;
@@ -128,7 +177,7 @@ void loadObjModel(Model& model, const std::string& filename)
                                 &warn,
                                 &err,
                                 obj_file_path.c_str(),
-                                mtl_dir_path.c_str());
+                                model_dir_path.c_str());
     
     if (!res)
         throw std::runtime_error{ EXCEPTION_MSG(std::format("failed to load OBJ model {}", filename)) };
@@ -137,8 +186,9 @@ void loadObjModel(Model& model, const std::string& filename)
         throw std::runtime_error{ EXCEPTION_MSG(std::format("failed to parse materials when loading model {}", filename)) };
     
     if (!warn.empty())
-        std::cerr << std::format("Get a warning when loading model {}: {}\n", filename, warn);
+        std::cerr << EXCEPTION_MSG(std::format("get a warning when loading model {}: {}", filename, warn)) << std::endl;
     
+    std::map<std::string, uint32_t> known_textures;
     for (size_t i = 0; i < shapes.size(); i++) {
         const tinyobj::shape_t& shape = shapes[i];
         const std::vector<tinyobj::index_t>& indices = shape.mesh.indices;
@@ -167,13 +217,11 @@ void loadObjModel(Model& model, const std::string& filename)
                 addVertex(*mesh, known_vertices, known_normals, known_texcoords, attributes, idx0);
                 addVertex(*mesh, known_vertices, known_normals, known_texcoords, attributes, idx1);
                 addVertex(*mesh, known_vertices, known_normals, known_texcoords, attributes, idx2);
-
-                
-                
             }
             mesh->diffuse_color = make_float3(materials[material_id].diffuse[0],
                                               materials[material_id].diffuse[1],
                                               materials[material_id].diffuse[2]);
+            mesh->texture_index = loadTexture(model, known_textures, materials[material_id].diffuse_texname, model_dir_path);
 
             if(!mesh->vertices.empty())
                 model.meshes.push_back(mesh);

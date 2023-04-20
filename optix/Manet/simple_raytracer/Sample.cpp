@@ -2,19 +2,7 @@
 
 #include <optix_function_table_definition.h>
 
-#include "cuda/RecordData.h"
 #include "SimpleRaytracer.h"
-
-template <typename T>
-struct Record
-{
-    alignas(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
-    T data;
-};
-
-using RaygenRecord   = Record<RaygenData>;
-using MissRecord     = Record<MissData>;
-using HitgroupRecord = Record<HitgroupData>;
 
 namespace
 {
@@ -25,8 +13,7 @@ void resizeAndUpload(tputil::CudaDeviceBuffer& dest, const void* src, size_t byt
     dest.upload(src, byte_size);
 }
 
-void
-destoryProgramGroups(std::vector<OptixProgramGroup>& program_groups) noexcept
+void destoryProgramGroups(std::vector<OptixProgramGroup>& program_groups) noexcept
 {
     for (auto group : program_groups)
         OPTIX_CHECK(optixProgramGroupDestroy(group));
@@ -34,8 +21,7 @@ destoryProgramGroups(std::vector<OptixProgramGroup>& program_groups) noexcept
     program_groups.clear();
 }
 
-void
-context_log_cb(uint32_t level, const char* tag, const char* message, void*)
+void context_log_cb(uint32_t level, const char* tag, const char* message, void*)
 {
     LOG_INFO(std::format("[{}][{}]: {}", level, tag, message));
 }
@@ -58,6 +44,7 @@ Sample::Sample(const tputil::Model& model)
     createMissPrograms();
     createHitgroupPrograms();
     createPipeline();
+    createTextures();
     buildSBT();
 }
 
@@ -77,6 +64,7 @@ Sample::Sample(tputil::Model&& model)
     createMissPrograms();
     createHitgroupPrograms();
     createPipeline();
+    createTextures();
     buildSBT();
 }
 
@@ -89,7 +77,12 @@ Sample::~Sample()
         destoryProgramGroups(m_miss_program_groups);
         destoryProgramGroups(m_hitgroup_program_groups);
 
-        OPTIX_CHECK(optixModuleDestroy(m_module));
+        for (auto texture_array: m_texture_arrays)
+            CUDA_CHECK(cudaFreeArray(texture_array));
+        for (auto texture_object: m_texture_objects)
+            CUDA_CHECK(cudaDestroyTextureObject(texture_object));
+
+        OPTIX_CHECK(optixModuleDestroy(m_radiance_module));
         OPTIX_CHECK(optixDeviceContextDestroy(m_optix_context));
         CUDA_CHECK(cudaStreamDestroy(m_cuda_stream));
     } catch (std::exception& e) {
@@ -97,48 +90,84 @@ Sample::~Sample()
     }
 }
 
-void
-Sample::initOptix()
+void Sample::initOptix()
 {
-    cudaFree(nullptr);
+    CUDA_CHECK(cudaFree(nullptr));
 
     int device_num;
-    cudaGetDeviceCount(&device_num);
+    CUDA_CHECK(cudaGetDeviceCount(&device_num));
     if (device_num == 0)
         THROW_EXCEPTION("no CUDA capable device available");
 
     OPTIX_CHECK(optixInit());
 }
 
-void
-Sample::createContext()
+void Sample::createContext()
 {
-    // Always use the first device
-    static constexpr int device_id = 0;
-
-    CUDA_CHECK(cudaSetDevice(device_id));
+    CUDA_CHECK(cudaSetDevice(m_cuda_device_id));
     CUDA_CHECK(cudaStreamCreate(&m_cuda_stream));
 
     auto device_prop = cudaDeviceProp{};
-    CUDA_CHECK(cudaGetDeviceProperties(&device_prop, device_id));
-    LOG_INFO(std::format("running on device: {}", device_prop.name));
-
-    CUresult cu_res = cuCtxGetCurrent(&m_cuda_context);
-    if (cu_res != CUDA_SUCCESS)
-        THROW_EXCEPTION(std::format("error querying current context (error code: {})", static_cast<int>(cu_res)));
+    CUDA_CHECK(cudaGetDeviceProperties(&device_prop, m_cuda_device_id));
+    LOG_INFO(EXCEPTION_MSG(std::format("running on device: {}", device_prop.name)));
 
     OPTIX_CHECK(optixDeviceContextCreate(m_cuda_context, 0, &m_optix_context));
     OPTIX_CHECK(optixDeviceContextSetLogCallback(m_optix_context, context_log_cb, nullptr, 4));
 }
 
-void
-Sample::createModule()
+void Sample::createTextures()
 {
-    m_module_compile_options = OptixModuleCompileOptions{};
+    size_t texture_num = m_model.textures.size();
+
+    m_texture_arrays.resize(texture_num);
+    m_texture_objects.resize(texture_num);
+
+    for (size_t tid = 0; tid < texture_num; tid++) {
+        auto texture = m_model.textures[tid];
+
+        cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc<uchar4>();
+
+        size_t pitch = sizeof(uint32_t) * texture->width;
+        cudaArray_t& cuda_array = m_texture_arrays[tid];
+        CUDA_CHECK(cudaMallocArray(&cuda_array, &channel_desc, texture->width, texture->height));
+        CUDA_CHECK(cudaMemcpy2DToArray(cuda_array,
+                                       0,
+                                       0,
+                                       texture->data.data(),
+                                       pitch,
+                                       pitch,
+                                       texture->height,
+                                       cudaMemcpyHostToDevice));
+        
+        cudaResourceDesc res_desc = { .resType = cudaResourceTypeArray, .res = cuda_array };
+
+        cudaTextureDesc tex_desc = {
+            .addressMode = { cudaAddressModeWrap, cudaAddressModeWrap },
+            .filterMode = cudaFilterModeLinear,
+            .readMode = cudaReadModeNormalizedFloat,
+            .sRGB = 0,
+            .borderColor = { 1.0f },
+            .normalizedCoords = 1,
+            .maxAnisotropy = 1,
+            .mipmapFilterMode = cudaFilterModePoint,
+            .minMipmapLevelClamp = 0,
+            .maxMipmapLevelClamp = 99,
+        };
+
+        cudaTextureObject_t cuda_tex = 0;
+        CUDA_CHECK(cudaCreateTextureObject(&cuda_tex, &res_desc, &tex_desc, nullptr));
+        m_texture_objects[tid] = cuda_tex;
+    }
+}
+
+void Sample::createModule()
+{
+    m_module_compile_options = OptixModuleCompileOptions{
 #if !defined(NDEBUG)
-    m_module_compile_options.optLevel   = OPTIX_COMPILE_OPTIMIZATION_LEVEL_0;
-    m_module_compile_options.debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_FULL;
+        .optLevel   = OPTIX_COMPILE_OPTIMIZATION_LEVEL_0,
+        .debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_FULL
 #endif
+    };
 
     m_pipeline_compile_options = OptixPipelineCompileOptions{
         .usesMotionBlur                   = false,
@@ -147,25 +176,39 @@ Sample::createModule()
         .numAttributeValues               = 2,
         .exceptionFlags                   = OPTIX_EXCEPTION_FLAG_NONE,
         .pipelineLaunchParamsVariableName = "g_optix_launch_params",
-        .usesPrimitiveTypeFlags = static_cast<uint32_t>(OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE)
+        .usesPrimitiveTypeFlags           = static_cast<uint32_t>(OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE)
     };
 
+    { // radiance module
+        size_t code_size = 0;
+        const char* code = tputil::getCompiledCudaCode(SAMPLE_NAME, "Radiance.cu", code_size);
 
-    size_t code_size = 0;
-    const char* code = tputil::getCompiledCudaCode("simple_raytracer", "DeviceProgram.cu", code_size);
+        OPTIX_CHECK(optixModuleCreate(m_optix_context,
+                                     &m_module_compile_options,
+                                     &m_pipeline_compile_options,
+                                     code,
+                                     code_size,
+                                     nullptr,
+                                     nullptr,
+                                     &m_radiance_module));
+    }
 
-    OPTIX_CHECK(optixModuleCreate(m_optix_context,
-                                  &m_module_compile_options,
-                                  &m_pipeline_compile_options,
-                                  code,
-                                  code_size,
-                                  nullptr,
-                                  nullptr,
-                                  &m_module));
+    { // shadow module
+        size_t code_size = 0;
+        const char* code = tputil::getCompiledCudaCode(SAMPLE_NAME, "Shadow.cu", code_size);
+
+        OPTIX_CHECK(optixModuleCreate(m_optix_context,
+                                      &m_module_compile_options,
+                                      &m_pipeline_compile_options,
+                                      code,
+                                      code_size,
+                                      nullptr,
+                                      nullptr,
+                                      &m_shadow_module));
+    }
 }
 
-void
-Sample::createRaygenPrograms()
+void Sample::createRaygenPrograms()
 {
     m_raygen_program_groups.resize(1);
 
@@ -173,7 +216,7 @@ Sample::createRaygenPrograms()
     OptixProgramGroupDesc desc = {
         .kind   = OPTIX_PROGRAM_GROUP_KIND_RAYGEN,
         .raygen = OptixProgramGroupSingleModule{
-            .module            = m_module,
+            .module            = m_radiance_module,
             .entryFunctionName = "__raygen__pinhole"
         }
     };
@@ -192,62 +235,86 @@ Sample::createRaygenPrograms()
         LOG_INFO(log);
 }
 
-void
-Sample::createMissPrograms()
+void Sample::createMissPrograms()
 {
-    m_miss_program_groups.resize(1);
+    m_miss_program_groups.resize(2);
 
-    OptixProgramGroupOptions options = {};
-    OptixProgramGroupDesc desc = {
-        .kind = OPTIX_PROGRAM_GROUP_KIND_MISS,
-        .miss = OptixProgramGroupSingleModule{
-            .module            = m_module,
-            .entryFunctionName = "__miss__radiance"
-        }
-    };
+    {
+        OptixProgramGroupOptions options = {};
+        OptixProgramGroupDesc desc = {
+            .kind = OPTIX_PROGRAM_GROUP_KIND_MISS,
+            .miss = OptixProgramGroupSingleModule{
+                .module            = m_radiance_module,
+                .entryFunctionName = "__miss__radiance"
+            }
+        };
 
-    char log[2048];
-    size_t log_size = sizeof(log);
-    OPTIX_CHECK(optixProgramGroupCreate(m_optix_context,
-                                        &desc,
-                                        1,
-                                        &options,
-                                        log,
-                                        &log_size,
-                                        &m_miss_program_groups[0]));
+        char log[2048];
+        size_t log_size = sizeof(log);
+        OPTIX_CHECK(optixProgramGroupCreate(m_optix_context,
+                                            &desc,
+                                            1,
+                                            &options,
+                                            log,
+                                            &log_size,
+                                            &m_miss_program_groups[0]));
 
-    if (log_size > 1)
-        LOG_INFO(log);
+        if (log_size > 1)
+            LOG_INFO(log);
+    }
+
+    {
+        OptixProgramGroupOptions options = {};
+        OptixProgramGroupDesc desc = {
+            .kind = OPTIX_PROGRAM_GROUP_KIND_MISS,
+            .miss = OptixProgramGroupSingleModule{
+                .module            = m_shadow_module,
+                .entryFunctionName = "__miss__shadow"
+            }
+        };
+
+        char log[2048];
+        size_t log_size = sizeof(log);
+        OPTIX_CHECK(optixProgramGroupCreate(m_optix_context,
+                                            &desc,
+                                            1,
+                                            &options,
+                                            log,
+                                            &log_size,
+                                            &m_miss_program_groups[1]));
+
+        if (log_size > 1)
+            LOG_INFO(log);
+    }
 }
 
-void
-Sample::createHitgroupPrograms()
+void Sample::createHitgroupPrograms()
 {
     m_hitgroup_program_groups.resize(1);
 
-    OptixProgramGroupOptions options = {};
-    OptixProgramGroupDesc desc = {
-        .kind     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP,
-        .hitgroup = OptixProgramGroupHitgroup{
-            .moduleCH            = m_module,
-            .entryFunctionNameCH = "__closesthit__radiance",
-            .moduleAH            = m_module,
-            .entryFunctionNameAH = "__anyhit__back_culling"
-        }
-    };
+    {
+        OptixProgramGroupOptions options = {};
+        OptixProgramGroupDesc desc = {
+            .kind     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP,
+            .hitgroup = OptixProgramGroupHitgroup{
+                .moduleCH            = m_radiance_module,
+                .entryFunctionNameCH = "__closesthit__radiance",
+            }
+        };
 
-    char log[2048];
-    size_t log_size = sizeof(log);
-    OPTIX_CHECK(optixProgramGroupCreate(m_optix_context,
-                                        &desc,
-                                        1,
-                                        &options,
-                                        log,
-                                        &log_size,
-                                        &m_hitgroup_program_groups[0]));
+        char log[2048];
+        size_t log_size = sizeof(log);
+        OPTIX_CHECK(optixProgramGroupCreate(m_optix_context,
+                                            &desc,
+                                            1,
+                                            &options,
+                                            log,
+                                            &log_size,
+                                            &m_hitgroup_program_groups[0]));
 
-    if (log_size > 1)
-        LOG_INFO(log);
+        if (log_size > 1)
+            LOG_INFO(log);
+    }
 }
 
 void Sample::createPipeline()
@@ -278,7 +345,7 @@ void Sample::createPipeline()
     uint32_t direct_callable_stack_size_from_state;
     uint32_t continuation_stack_size;
     OPTIX_CHECK(optixUtilComputeStackSizes(&stack_sizes,
-                                           2,
+                                           m_pipeline_link_options.maxTraceDepth,
                                            0,
                                            0,
                                            &direct_callable_stack_size_from_traversal,
@@ -292,25 +359,29 @@ void Sample::createPipeline()
                                           1));
 }
 
-void
-Sample::buildSBT()
+void Sample::buildSBT()
 {
-    std::vector<RaygenRecord> raygen_records;
-    for (const auto& rpg : m_raygen_program_groups) {
-        RaygenRecord rec;
-        OPTIX_CHECK(optixSbtRecordPackHeader(rpg, static_cast<void*>(&rec)));
-        raygen_records.push_back(rec);
+    { // raygen
+        EmptyRecord raygen_record;
+        OPTIX_CHECK(optixSbtRecordPackHeader(m_raygen_program_groups[0], static_cast<void*>(&raygen_record)));
+        resizeAndUpload(m_raygen_records_buffer, &raygen_record, sizeof(EmptyRecord));
+        m_shader_binding_table.raygenRecord = m_raygen_records_buffer.data();
     }
-    resizeAndUpload(m_raygen_records_buffer, raygen_records.data(), raygen_records.size() * sizeof(RaygenRecord));
-    m_shader_binding_table.raygenRecord = m_raygen_records_buffer.data();
 
-    std::vector<MissRecord> miss_records;
-    for (const auto& mpg : m_miss_program_groups) {
-        MissRecord rec;
-        OPTIX_CHECK(optixSbtRecordPackHeader(mpg, static_cast<void*>(&rec)));
-        rec.data.background_color = make_float3(0.5f, 0.7f, 1.0f);
+    std::vector<EmptyRecord> miss_records;
+
+    {
+        EmptyRecord rec;
+        OPTIX_CHECK(optixSbtRecordPackHeader(m_miss_program_groups[0], static_cast<void*>(&rec)));
         miss_records.push_back(rec);
     }
+
+    {
+        EmptyRecord rec;
+        OPTIX_CHECK(optixSbtRecordPackHeader(m_miss_program_groups[1], static_cast<void*>(&rec)));
+        miss_records.push_back(rec);
+    }
+
     resizeAndUpload(m_miss_records_buffer, miss_records.data(), miss_records.size() * sizeof(MissRecord));
     m_shader_binding_table.missRecordBase          = m_miss_records_buffer.data();
     m_shader_binding_table.missRecordStrideInBytes = sizeof(MissRecord);
@@ -323,29 +394,29 @@ Sample::buildSBT()
     m_texcoord_buffers.resize(mesh_num);
     m_normal_index_buffers.resize(mesh_num);
     m_texcoord_index_buffers.resize(mesh_num);
-    for (int i = 0; i <mesh_num; i++) {
+    for (int i = 0; i < mesh_num; i++) {
         resizeAndUpload(m_normal_buffers[i], meshes[i]->normals.data(), sizeof(float3) * meshes[i]->normals.size());
         resizeAndUpload(m_texcoord_buffers[i], meshes[i]->texcoords.data(), sizeof(float2) * meshes[i]->texcoords.size());
         resizeAndUpload(m_normal_index_buffers[i], meshes[i]->normal_indices.data(), sizeof(int32_t) * meshes[i]->normal_indices.size());
         resizeAndUpload(m_texcoord_index_buffers[i], meshes[i]->texcoord_indices.data(), sizeof(int32_t) * meshes[i]->texcoord_indices.size());
+        int texture_index = m_model.meshes[i]->texture_index;
         HitgroupRecord rec = {
             .header = {},
             .data = HitgroupData{
-                .vertices = reinterpret_cast<float3*>(m_vertex_buffers[i].data()),
-                .normals  = reinterpret_cast<float3*>(m_normal_buffers[i].data()),
-                .texcoords = reinterpret_cast<float2*>(m_texcoord_buffers[i].data()),
-                .vertex_indices = reinterpret_cast<int3*>(m_vertex_index_buffers[i].data()),
-                .normal_indices = reinterpret_cast<int3*>(m_normal_index_buffers[i].data()),
+                .vertices         = reinterpret_cast<float3*>(m_vertex_buffers[i].data()),
+                .normals          = reinterpret_cast<float3*>(m_normal_buffers[i].data()),
+                .texcoords        = reinterpret_cast<float2*>(m_texcoord_buffers[i].data()),
+                .vertex_indices   = reinterpret_cast<int3*>(m_vertex_index_buffers[i].data()),
+                .normal_indices   = reinterpret_cast<int3*>(m_normal_index_buffers[i].data()),
                 .texcoord_indices = reinterpret_cast<int3*>(m_texcoord_index_buffers[i].data()),
-                .diffuse_color = m_model.meshes[i]->diffuse_color
+                .diffuse_color    = m_model.meshes[i]->diffuse_color,
+                .texture          = texture_index == -1 ? 0 : m_texture_objects[texture_index]
             }
         };
         OPTIX_CHECK(optixSbtRecordPackHeader(m_hitgroup_program_groups[0], static_cast<void*>(&rec)));
         hitgroup_records.push_back(rec);
     }
-    resizeAndUpload(m_hitgroup_records_buffer,
-                    hitgroup_records.data(),
-                    sizeof(HitgroupRecord) * hitgroup_records.size());
+    resizeAndUpload(m_hitgroup_records_buffer, hitgroup_records.data(), sizeof(HitgroupRecord) * hitgroup_records.size());
     m_shader_binding_table.hitgroupRecordBase          = m_hitgroup_records_buffer.data();
     m_shader_binding_table.hitgroupRecordStrideInBytes = sizeof(HitgroupRecord);
     m_shader_binding_table.hitgroupRecordCount         = static_cast<int>(hitgroup_records.size());

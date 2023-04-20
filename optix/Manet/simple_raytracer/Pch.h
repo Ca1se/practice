@@ -42,6 +42,10 @@
     std::cerr << "\033[0;31m" << msg << "\n" \
               << "\033[0m"
 
+#define TO_STRING(x) #x
+#define SAMPLE_NAME_STRING(name) TO_STRING(name)
+#define SAMPLE_NAME SAMPLE_NAME_STRING(OPTIX_SAMPLE_NAME_DEFINE)
+
 inline void
 ensureMinimumSize(int32_t& width, int32_t& height)
 {

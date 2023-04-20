@@ -22,6 +22,8 @@ protected:
 
     void createContext();
 
+    void createTextures();
+
     void createModule();
 
     void createRaygenPrograms();
@@ -37,9 +39,8 @@ protected:
     OptixTraversableHandle buildAccel();
 
 protected:
-    // CUDA device context and stream that optix pipeline will run
-    // on, as well as device properties for this device
-    CUcontext m_cuda_context = nullptr;
+    int32_t m_cuda_device_id = 0;       // use first device
+    CUcontext m_cuda_context = nullptr; // use current cuda context
     CUstream m_cuda_stream   = nullptr;
 
     // the optix context that our pipeline will run in.
@@ -51,7 +52,8 @@ protected:
     OptixPipelineLinkOptions m_pipeline_link_options       = {};
 
     // the module that contains out device programs
-    OptixModule m_module = nullptr;
+    OptixModule m_radiance_module = nullptr;
+    OptixModule m_shadow_module   = nullptr;
     OptixModuleCompileOptions m_module_compile_options = {};
 
     // vector of all our program(group)s, and the SBT built around them
@@ -76,4 +78,7 @@ protected:
     std::vector<tputil::CudaDeviceBuffer> m_vertex_index_buffers   = {};
     std::vector<tputil::CudaDeviceBuffer> m_normal_index_buffers   = {};
     std::vector<tputil::CudaDeviceBuffer> m_texcoord_index_buffers = {};
+
+    std::vector<cudaArray_t> m_texture_arrays          = {};
+    std::vector<cudaTextureObject_t> m_texture_objects = {};
 };

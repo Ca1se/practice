@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cuda.h>
-#include <cstddef>
+
+#include "Exception.h"
 
 namespace tputil
 {
@@ -9,17 +10,17 @@ namespace tputil
 class CudaDeviceBuffer
 {
 public:
-    CudaDeviceBuffer();
+    CudaDeviceBuffer() = default;
     ~CudaDeviceBuffer() noexcept;
 
     CudaDeviceBuffer(size_t byte_size);
     CudaDeviceBuffer(const void* src, size_t byte_size);
 
-    CudaDeviceBuffer(CudaDeviceBuffer&& other);
-    CudaDeviceBuffer& operator=(CudaDeviceBuffer&& other);
-
     CudaDeviceBuffer(const CudaDeviceBuffer&)            = delete;
     CudaDeviceBuffer& operator=(const CudaDeviceBuffer&) = delete;
+
+    CudaDeviceBuffer(CudaDeviceBuffer&& other);
+    CudaDeviceBuffer& operator=(CudaDeviceBuffer&& other);
 
     CUdeviceptr data() const noexcept { return m_data; }
 
@@ -34,9 +35,9 @@ public:
     void destory();
 
 private:
-    CUdeviceptr m_data;
+    CUdeviceptr m_data = 0;
 
-    size_t m_size;
+    size_t m_size = 0;
 };
 
 }  // namespace tputil

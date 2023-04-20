@@ -28,9 +28,6 @@ public:
     PixelFormat* map();
     void unmap();
 
-    void setDevice(int32_t device_idx) { m_device_idx = device_idx; }
-    void setStream(CUstream stream) { m_stream = stream; }
-
     GLuint getPbo() { return m_pbo; }
     PixelFormat* getHostPointer();
 
@@ -38,8 +35,6 @@ public:
     int32_t height() const noexcept { return m_height; }
 
 private:
-    void makeCurrent() const { CUDA_CHECK(cudaSetDevice(m_device_idx)); }
-
     static void ensureMinimumSize(int32_t width, int32_t height)
     {
         if (width <= 0)
@@ -49,16 +44,17 @@ private:
     }
 
 private:
-    int32_t m_width                           = 0;
-    int32_t m_height                          = 0;
+    int32_t m_width  = 0;
+    int32_t m_height = 0;
 
     cudaGraphicsResource* m_cuda_gfx_resource = nullptr;
     GLuint m_pbo                              = 0u;
-    PixelFormat* m_device_buffer              = nullptr;
-    std::vector<PixelFormat> m_host_buffer    = {};
 
-    CUstream m_stream                         = nullptr;
-    int32_t m_device_idx                      = 0;
+    PixelFormat* m_device_buffer           = nullptr;
+    std::vector<PixelFormat> m_host_buffer = {};
+
+    CUstream m_stream        = nullptr;
+    int32_t m_cuda_device_id = 0;
 };
 
 template <typename PixelFormat>
@@ -90,7 +86,6 @@ CudaOutputBuffer<PixelFormat>::resize(int32_t width, int32_t height)
 
     destory();
 
-    makeCurrent();
     GL_CHECK(glGenBuffers(1, &m_pbo));
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, m_pbo));
     GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(PixelFormat) * m_width * m_height, nullptr, GL_STREAM_DRAW));
@@ -107,8 +102,6 @@ CudaOutputBuffer<PixelFormat>::destory()
     if (m_pbo == 0u)
         return;
 
-    makeCurrent();
-
     if (m_device_buffer != nullptr)
         unmap();
 
@@ -123,8 +116,6 @@ template <typename PixelFormat>
 PixelFormat*
 CudaOutputBuffer<PixelFormat>::map()
 {
-    makeCurrent();
-
     size_t buffer_size = 0ull;
     CUDA_CHECK(cudaGraphicsMapResources(1, &m_cuda_gfx_resource, m_stream));
     CUDA_CHECK(cudaGraphicsResourceGetMappedPointer(reinterpret_cast<void**>(&m_device_buffer),
@@ -137,8 +128,6 @@ template <typename PixelFormat>
 void
 CudaOutputBuffer<PixelFormat>::unmap()
 {
-    makeCurrent();
-
     CUDA_CHECK(cudaGraphicsUnmapResources(1, &m_cuda_gfx_resource, m_stream));
     m_device_buffer = nullptr;
 }
@@ -149,7 +138,6 @@ CudaOutputBuffer<PixelFormat>::getHostPointer()
 {
     m_host_buffer.resize(m_width * m_height);
 
-    makeCurrent();
     CUDA_CHECK(cudaMemcpy(static_cast<void*>(m_host_buffer.data()),
                           map(),
                           m_width * m_height * sizeof(PixelFormat),

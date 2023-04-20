@@ -40,12 +40,6 @@ memoryCopyDeviceToHost(void* dest, CUdeviceptr src, size_t byte_size)
 
 }  // namespace
 
-CudaDeviceBuffer::CudaDeviceBuffer()
-    : m_data{ 0 }
-    , m_size{ 0 }
-{
-}
-
 CudaDeviceBuffer::~CudaDeviceBuffer() noexcept
 {
     try {

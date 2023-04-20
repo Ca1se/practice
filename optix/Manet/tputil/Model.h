@@ -21,17 +21,22 @@ struct Mesh
     std::vector<int32_t> texcoord_indices;
 
     float3 diffuse_color;
-    // texture
+    int32_t texture_index;
+};
 
+struct Texture
+{
+    int32_t width;
+    int32_t height;
+    std::vector<uint32_t> data;
 };
 
 struct Model
 {
     std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Texture>> textures;
 };
 
 void loadObjModel(Model& model, const std::string& filename);
 
-}
-
-
+} // namespace tputil

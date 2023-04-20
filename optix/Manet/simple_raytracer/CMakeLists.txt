@@ -1,8 +1,9 @@
 OPTIX_add_sample_executable(simple_raytracer target_name
-    cuda/DeviceProgram.cu
+    cuda/Radiance.cu
+    cuda/Shadow.cu
+    cuda/DeviceCamera.h
     cuda/Helper.h
     cuda/LaunchParams.h
-    cuda/RecordData.h
     Camera.h
     Camera.cpp 
     Sample.h
@@ -13,7 +14,6 @@ OPTIX_add_sample_executable(simple_raytracer target_name
 
 target_link_libraries(${target_name}
     CUDA::cudart
-    CUDA::cuda_driver
 )
 
 target_precompile_headers(${target_name} PRIVATE
