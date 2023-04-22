@@ -1,9 +1,9 @@
 OPTIX_add_sample_executable(simple_raytracer target_name
     cuda/Radiance.cu
     cuda/Shadow.cu
-    cuda/DeviceCamera.h
     cuda/Helper.h
     cuda/LaunchParams.h
+    cuda/random.h
     Camera.h
     Camera.cpp 
     Sample.h

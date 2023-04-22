@@ -3,8 +3,6 @@
 #include <device_types.h>
 #include <optix_types.h>
 
-#include "DeviceCamera.h"
-
 template <typename T>
 struct Record
 {
@@ -48,11 +46,18 @@ struct LaunchParams
 {
     struct
     {
-        uint64_t id;
+        uint32_t accum_id;
+        float4* accum_buffer;
         uchar4* color_buffer;
     } frame;
 
-    DeviceCamera camera;
+    struct
+    {
+        float3 position;
+        float3 u;
+        float3 v;
+        float3 w;
+    } camera;
 
     OptixTraversableHandle handle;
 };

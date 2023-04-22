@@ -115,6 +115,10 @@ keyCallback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, i
         case GLFW_KEY_LEFT_SHIFT:
             state->camera.move(make_float3(0.0f, -1.0f, 0.0f));
             break;
+        case GLFW_KEY_P:
+            auto pos = state->camera.getPosition();
+            std::cout << std::format("({}, {}, {})\n", pos.x, pos.y, pos.z);
+            break;
         }
         state->camera_changed = true;
     }
@@ -128,25 +132,33 @@ update(State& state, Sample& sample)
     auto [width, height] = state.output_size;
 
     if (state.window_resized) {
-        state.pixel_buffer.resize(width, height);
+        state.accum_buffer.resize(sizeof(float4) * width * height);
+        state.color_buffer.resize(width, height);
+        state.launch_params.frame.accum_id = 0;
         state.window_resized = false;
     }
 
     if (state.camera_changed) {
+        auto& [pos, u, v, w] = state.launch_params.camera;
+
         state.camera.setAspectRatio(static_cast<float>(width) / static_cast<float>(height));
         state.camera.update();
-        sample.updateCamera(state.camera);
+
+        pos = state.camera.getPosition();
+        state.camera.getUVW(u, v, w);
+        state.launch_params.frame.accum_id = 0;
+
         state.camera_changed = false;
     }
 }
 
 static inline void
-displaySubframe(tputil::CudaOutputBuffer<uchar4>& pixel_buffer, tputil::GlDisplay& gl_display, GLFWwindow* window)
+displaySubframe(tputil::CudaOutputBuffer<uchar4>& color_buffer, tputil::GlDisplay& gl_display, GLFWwindow* window)
 {
     int32_t res_width;
     int32_t res_height;
     glfwGetFramebufferSize(window, &res_width, &res_height);
-    gl_display.display(pixel_buffer.width(), pixel_buffer.height(), res_width, res_height, pixel_buffer.getPbo());
+    gl_display.display(color_buffer.width(), color_buffer.height(), res_width, res_height, color_buffer.getPbo());
 }
 
 int main()
@@ -165,8 +177,7 @@ int main()
                 make_float3(0.0f, 1.0f, 0.0f),
                 TP_PI / 4.0f,
                 static_cast<float>(output_width) / static_cast<float>(output_height)
-            },
-            .pixel_buffer = tputil::CudaOutputBuffer<uchar4>{ output_width, output_height },
+            }
         };
 
         tputil::Model model;
@@ -188,7 +199,7 @@ int main()
             glfwPollEvents();
             update(state, sample);
             sample.render(state);
-            displaySubframe(state.pixel_buffer, gl_display, window);
+            displaySubframe(state.color_buffer, gl_display, window);
             glfwSwapBuffers(window);
         } while (!glfwWindowShouldClose(window));
     } catch (std::exception& e) {

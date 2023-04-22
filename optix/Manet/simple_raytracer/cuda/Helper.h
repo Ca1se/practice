@@ -2,8 +2,9 @@
 
 #include <optix_device.h>
 #include <VectorMath.h>
+#include <curand_kernel.h>
 
-#include "DeviceCamera.h"
+#include "random.h"
 
 static __forceinline__ __device__ void packPointer(const void* ptr, uint32_t& i0, uint32_t& i1)
 {
@@ -26,22 +27,4 @@ static __forceinline__ __device__ T& getPayload()
 
     T* payload_ptr = static_cast<T*>(unpackPointer(i0, i1));
     return *payload_ptr;
-}
-
-
-static __forceinline__ __device__ void computeRay(const DeviceCamera& camera, float3& origin, float3& direction)
-{
-    const uint3 idx = optixGetLaunchIndex();
-    const uint3 dim = optixGetLaunchDimensions();
-
-    const float s = 2.0f * (static_cast<float>(idx.x) / static_cast<float>(dim.x)) - 1.0f;
-    const float t = 2.0f * (static_cast<float>(idx.y) / static_cast<float>(dim.y)) - 1.0f;
-
-    origin    = camera.position;
-    direction = tputil::normalize(s * camera.u + t * camera.v + camera.w);
-}
-
-static __forceinline__ __device__ float3 plainNormal(const float3& a, const float3& b,const float3& c)
-{
-    return tputil::normalize(tputil::cross(b - a, c - a));
 }

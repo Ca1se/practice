@@ -1,10 +1,6 @@
 #pragma once
 
-#include "cuda/LaunchParams.h"
-
 struct State;
-class Camera;
-struct Mesh;
 
 class Sample
 {
@@ -13,9 +9,7 @@ public:
     Sample(tputil::Model&& model);
     ~Sample() noexcept;
 
-    void render(State& launch_params);
-
-    void updateCamera(const Camera& camera) noexcept;
+    void render(State& state);
 
 protected:
     void initOptix();
@@ -36,7 +30,7 @@ protected:
 
     void buildSBT();
 
-    OptixTraversableHandle buildAccel();
+    void buildAccel();
 
 protected:
     int32_t m_cuda_device_id = 0;       // use first device
@@ -67,9 +61,7 @@ protected:
     OptixShaderBindingTable m_shader_binding_table = {};
 
     tputil::CudaDeviceBuffer m_gas_buffer = {};
-
-    LaunchParams m_launch_params;
-    tputil::CudaDeviceBuffer m_launch_params_buffer{ sizeof(LaunchParams) };
+    OptixTraversableHandle m_gas_handle   = 0;
 
     tputil::Model m_model = {};
     std::vector<tputil::CudaDeviceBuffer> m_vertex_buffers         = {};

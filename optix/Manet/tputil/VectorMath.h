@@ -35,6 +35,11 @@ TPUTIL_DECL float2 operator+(const float2& a, float f) noexcept
     return make_float2(a.x + f, a.y + f);
 }
 
+TPUTIL_DECL float2 operator+(float f, const float2& a) noexcept
+{
+    return a + f;
+}
+
 TPUTIL_DECL float2& operator+=(float2& a, const float2& b) noexcept
 {
     a.x += b.x;
@@ -120,6 +125,11 @@ TPUTIL_DECL float3 operator+(const float3& a, const float3& b) noexcept
 TPUTIL_DECL float3 operator+(const float3& a, float f) noexcept
 {
     return make_float3(a.x + f, a.y + f, a.z + f);
+}
+
+TPUTIL_DECL float3 operator+(float f, const float3& a) noexcept
+{
+    return a + f;
 }
 
 TPUTIL_DECL float3& operator+=(float3& a, const float3& b) noexcept
@@ -212,6 +222,11 @@ TPUTIL_DECL float4 operator+(const float4& a, const float4& b) noexcept
 TPUTIL_DECL float4 operator+(const float4& a, float f) noexcept
 {
     return make_float4(a.x + f, a.y + f, a.z + f, a.w + f);
+}
+
+TPUTIL_DECL float4 operator+(float f, const float4& a) noexcept
+{
+    return a + f;
 }
 
 TPUTIL_DECL float4& operator+=(float4& a, const float4& b) noexcept

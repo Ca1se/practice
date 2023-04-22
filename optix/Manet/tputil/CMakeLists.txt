@@ -7,12 +7,12 @@ set(sources
     Exception.cpp
     GlDisplay.h
     GlDisplay.cpp
+    Preprocessor.h
     TpUtil.h
     TpUtil.cpp
     Matrix.h
     Model.h
     Model.cpp
-    Preprocessor.h
     Transform.h
     VectorMath.h
 )

@@ -20,19 +20,6 @@ namespace tputil
 namespace
 {
 
-struct Vec3f
-{
-    float x;
-    float y;
-    float z;
-};
-
-struct Vec2f
-{
-    float u;
-    float v;
-};
-
 void addPosition(Mesh& mesh,
                  std::map<int32_t, uint32_t>& known_vertices,
                  const tinyobj::attrib_t& attributes,
@@ -46,10 +33,8 @@ void addPosition(Mesh& mesh,
     known_vertices[vertex_index_attr] = static_cast<uint32_t>(mesh.vertex_indices.size());
     mesh.vertex_indices.push_back(static_cast<int32_t>(mesh.vertices.size()));
 
-    const Vec3f* vec3f_view = reinterpret_cast<const Vec3f*>(attributes.vertices.data());
-    const Vec3f& vertex = vec3f_view[vertex_index_attr];
-
-    mesh.vertices.push_back(make_float3(vertex.x, vertex.y, vertex.z));
+    const float3* vec3f_view = reinterpret_cast<const float3*>(attributes.vertices.data());
+    mesh.vertices.push_back(vec3f_view[vertex_index_attr]);
 }
 
 void addNormal(Mesh& mesh,
@@ -70,10 +55,8 @@ void addNormal(Mesh& mesh,
     known_normals[normal_index_attr] = static_cast<uint32_t>(mesh.normal_indices.size());
     mesh.normal_indices.push_back(static_cast<int32_t>(mesh.normals.size()));
 
-    const Vec3f* vec3f_view = reinterpret_cast<const Vec3f*>(attributes.normals.data());
-    const Vec3f& normal = vec3f_view[normal_index_attr];
-
-    mesh.normals.push_back(make_float3(normal.x, normal.y, normal.z));
+    const float3* vec3f_view = reinterpret_cast<const float3*>(attributes.normals.data());
+    mesh.normals.push_back(vec3f_view[normal_index_attr]);
 }
 
 void addTexcoord(Mesh& mesh,
@@ -94,10 +77,8 @@ void addTexcoord(Mesh& mesh,
     known_texcoords[texcoord_index_attr] = static_cast<uint32_t>(mesh.texcoord_indices.size());
     mesh.texcoord_indices.push_back(static_cast<int32_t>(mesh.texcoords.size()));
 
-    const Vec2f* vec2f_view = reinterpret_cast<const Vec2f*>(attributes.texcoords.data());
-    const Vec2f& texcoord = vec2f_view[texcoord_index_attr];
-
-    mesh.texcoords.push_back(make_float2(texcoord.u, texcoord.v));
+    const float2* vec2f_view = reinterpret_cast<const float2*>(attributes.texcoords.data());
+    mesh.texcoords.push_back(vec2f_view[texcoord_index_attr]);
 }
 
 void addVertex(Mesh& mesh,

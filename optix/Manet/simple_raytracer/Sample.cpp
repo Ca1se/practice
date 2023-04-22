@@ -33,12 +33,7 @@ Sample::Sample(const tputil::Model& model)
 {
     initOptix();
     createContext();
-
-    m_launch_params = LaunchParams{
-        .frame  = { .id = 0, .color_buffer = nullptr },
-        .handle = buildAccel(),
-    };
-
+    buildAccel();
     createModule();
     createRaygenPrograms();
     createMissPrograms();
@@ -53,12 +48,7 @@ Sample::Sample(tputil::Model&& model)
 {
     initOptix();
     createContext();
-
-    m_launch_params = LaunchParams{
-        .frame  = { .id = 0, .color_buffer = nullptr },
-        .handle = buildAccel(),
-    };
-
+    buildAccel(),
     createModule();
     createRaygenPrograms();
     createMissPrograms();
@@ -422,38 +412,30 @@ void Sample::buildSBT()
     m_shader_binding_table.hitgroupRecordCount         = static_cast<int>(hitgroup_records.size());
 }
 
-void
-Sample::render(State& state)
+void Sample::render(State& state)
 {
-    m_launch_params.frame.color_buffer = state.pixel_buffer.map();
-    m_launch_params_buffer.upload(static_cast<void*>(&m_launch_params), sizeof(LaunchParams));
+    state.launch_params.frame.accum_buffer = reinterpret_cast<float4*>(state.accum_buffer.data());
+    state.launch_params.frame.color_buffer = state.color_buffer.map();
+    state.launch_params.handle = m_gas_handle;
+    state.launch_param_buffer.upload(static_cast<void*>(&state.launch_params), sizeof(LaunchParams));
 
     OPTIX_CHECK(optixLaunch(m_pipeline,
                             m_cuda_stream,
-                            m_launch_params_buffer.data(),
+                            state.launch_param_buffer.data(),
                             sizeof(LaunchParams),
                             &m_shader_binding_table,
                             state.output_size.width,
                             state.output_size.height,
                             1));
 
-    state.pixel_buffer.unmap();
+    state.color_buffer.unmap();
 
     CUDA_SYNC_CHECK();
 
-    m_launch_params.frame.id++;
+    state.launch_params.frame.accum_id++;
 }
 
-void
-Sample::updateCamera(const Camera& camera) noexcept
-{
-    auto& [pos, u, v, w] = m_launch_params.camera;
-
-    pos = camera.getPosition();
-    camera.getUVW(u, v, w);
-}
-
-OptixTraversableHandle Sample::buildAccel()
+void Sample::buildAccel()
 {
     static constexpr uint32_t triangle_input_flags = OPTIX_GEOMETRY_FLAG_NONE;
 
@@ -546,5 +528,5 @@ OptixTraversableHandle Sample::buildAccel()
         m_gas_buffer = std::move(output_buffer);
     }
 
-    return handle;
+    m_gas_handle = handle;
 }
