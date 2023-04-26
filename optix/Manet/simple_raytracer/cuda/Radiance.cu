@@ -1,6 +1,5 @@
 #include <optix_device.h>
 #include <VectorMath.h>
-#include <texture_fetch_functions.h>
 
 #include "LaunchParams.h"
 #include "Helper.h"
@@ -25,17 +24,19 @@ extern "C" __global__ void __closesthit__radiance()
     const float b0 = 1.0f - b1 - b2;
 
     const float3 ray_direction = optixGetWorldRayDirection();
-    const float3 intersection = b0 * data->vertices[vid.x]
-                              + b1 * data->vertices[vid.y]
-                              + b2 * data->vertices[vid.z];
-    const float3 normal   = tputil::normalize(b0 * data->normals[nid.x]
-                                            + b1 * data->normals[nid.y]
-                                            + b2 * data->normals[nid.z]);
-    const float2 texcoord = b0 * data->texcoords[tid.x]
-                          + b1 * data->texcoords[tid.y]
-                          + b2 * data->texcoords[tid.z];
+    const float3 intersection = optixGetWorldRayOrigin() + optixGetRayTmax() * ray_direction;
+    const float3 normal   = nid.x != -1
+                            ? tputil::normalize(b0 * data->normals[nid.x]
+                                              + b1 * data->normals[nid.y]
+                                              + b2 * data->normals[nid.z])
+                            : plainNormal(data->vertices[vid.x], data->vertices[vid.y], data->vertices[vid.z]);
+    const float2 texcoord = tid.x != -1
+                            ? b0 * data->texcoords[tid.x]
+                            + b1 * data->texcoords[tid.y]
+                            + b2 * data->texcoords[tid.z]
+                            : make_float2(0.0f, 0.0f);
 
-    const float3 light_position = make_float3(-237.79f, 909.66f, -54.52f);
+    const float3 light_position = make_float3(115.57f, 923.70f, -11.59f);
     const float3 shadow_direction = light_position - intersection;
 
     float light_visibility = 0.0f;
@@ -69,6 +70,18 @@ extern "C" __global__ void __closesthit__radiance()
 
     float4& payload = getPayload<float4>();
     payload = make_float4(color, 1.0f);
+}
+
+extern "C" __global__ void __anyhit__back_culling()
+{
+    const HitgroupData* data = reinterpret_cast<HitgroupData*>(optixGetSbtDataPointer());
+
+    const uint32_t primitive_id = optixGetPrimitiveIndex();
+    const int3& vid = data->vertex_indices[primitive_id];
+    const float3 normal = plainNormal(data->vertices[vid.x], data->vertices[vid.y], data->vertices[vid.z]);
+    const float3 ray_direction = optixGetWorldRayDirection();
+    if (tputil::dot(normal, ray_direction) >= 0.0f)
+        optixIgnoreIntersection();
 }
 
 extern "C" __global__ void __miss__radiance()

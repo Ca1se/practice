@@ -172,10 +172,10 @@ int main()
         State state = {
             .output_size = { .width = output_width, .height = output_height },
             .camera = Camera{
-                make_float3(10.0f, 10.0f, 0.0f),
-                make_float3(0.0f, 10.0f, 0.0f),
+                make_float3(3.0f, 0.0f, 0.0f),
+                make_float3(0.0f, 0.0f, 0.0f),
                 make_float3(0.0f, 1.0f, 0.0f),
-                TP_PI / 4.0f,
+                TP_PIDIV4,
                 static_cast<float>(output_width) / static_cast<float>(output_height)
             }
         };

@@ -10,6 +10,7 @@ OPTIX_add_sample_executable(simple_raytracer target_name
     Sample.cpp
     SimpleRaytracer.h
     SimpleRaytracer.cpp
+    OPTIONS -rdc true
 )
 
 target_link_libraries(${target_name}

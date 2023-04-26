@@ -3,7 +3,7 @@
 #include <format>
 #include <stdexcept>
 
-#include <glad/glad.h>
+#include <glad.h>
 
 #include "Exception.h"
 

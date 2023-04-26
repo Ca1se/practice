@@ -9,8 +9,8 @@
 #include <cstdint>
 #include <vector>
 
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
+#include <glad.h>
+#include <glfw3.h>
 #include <cuda_runtime_api.h>
 #include <Config.h>
 

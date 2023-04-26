@@ -58,7 +58,7 @@ Sample::Sample(tputil::Model&& model)
     buildSBT();
 }
 
-Sample::~Sample()
+Sample::~Sample() noexcept
 {
     try {
         OPTIX_CHECK(optixPipelineDestroy(m_pipeline));
@@ -129,7 +129,7 @@ void Sample::createTextures()
                                        texture->height,
                                        cudaMemcpyHostToDevice));
         
-        cudaResourceDesc res_desc = { .resType = cudaResourceTypeArray, .res = cuda_array };
+        cudaResourceDesc res_desc = { .resType = cudaResourceTypeArray, .res = { .array = { cuda_array } } };
 
         cudaTextureDesc tex_desc = {
             .addressMode = { cudaAddressModeWrap, cudaAddressModeWrap },
@@ -288,7 +288,7 @@ void Sample::createHitgroupPrograms()
             .kind     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP,
             .hitgroup = OptixProgramGroupHitgroup{
                 .moduleCH            = m_radiance_module,
-                .entryFunctionNameCH = "__closesthit__radiance",
+                .entryFunctionNameCH = "__closesthit__radiance"
             }
         };
 
@@ -437,7 +437,7 @@ void Sample::render(State& state)
 
 void Sample::buildAccel()
 {
-    static constexpr uint32_t triangle_input_flags = OPTIX_GEOMETRY_FLAG_NONE;
+    static constexpr uint32_t triangle_input_flags = OPTIX_GEOMETRY_FLAG_DISABLE_ANYHIT;
 
     const std::vector<std::shared_ptr<tputil::Mesh>>& meshes = m_model.meshes;
     size_t input_size = meshes.size();

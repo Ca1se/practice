@@ -7,8 +7,10 @@
 
 #include "Preprocessor.h"
 
-#define TP_PI     3.14159265358979323846f
-#define TP_PIDIV2 1.57079632679489661923f
+#define TP_PI     3.14159265358f
+#define TP_PIDIV2 1.57079632679f
+#define TP_PIDIV4 0.78539816339f
+
 
 TPUTIL_DECL float4 make_float4(const float3& xyz, float w) noexcept
 {

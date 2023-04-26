@@ -5,8 +5,8 @@
 #include <string>
 
 #include <cuda_runtime_api.h>
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
+#include <glad.h>
+#include <glfw3.h>
 #include <optix.h>
 
 std::string exceptionMessageFormat(const std::string& file, int line, const std::string& msg)

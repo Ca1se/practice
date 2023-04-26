@@ -2,7 +2,6 @@
 
 #include <optix_device.h>
 #include <VectorMath.h>
-#include <curand_kernel.h>
 
 #include "random.h"
 
@@ -27,4 +26,9 @@ static __forceinline__ __device__ T& getPayload()
 
     T* payload_ptr = static_cast<T*>(unpackPointer(i0, i1));
     return *payload_ptr;
+}
+
+static __forceinline__ __device__ float3 plainNormal(const float3& A, const float3& B, const float3& C)
+{
+    return tputil::normalize(tputil::cross(B - A, C - A));
 }

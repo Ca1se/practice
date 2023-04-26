@@ -12,7 +12,7 @@
 #include <tuple>
 #include <vector>
 
-#include <glad/glad.h>
+#include <glad.h>
 
 #include <CudaDeviceBuffer.h>
 #include <CudaOutputBuffer.h>
@@ -25,7 +25,7 @@
 #include <Windows.h>
 #include <Transform.h>
 #include <cuda_runtime.h>
-#include <glfw/glfw3.h>
+#include <glfw3.h>
 #include <optix.h>
 #include <optix_stubs.h>
 #include <optix_stack_size.h>
