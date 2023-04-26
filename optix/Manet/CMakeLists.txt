@@ -387,13 +387,13 @@ endforeach()
 
 configure_file(Config.h.in Config.h @ONLY)
 
-include_directories( ${CMAKE_SOURCE_DIR}/tputil
-                     ${CMAKE_SOURCE_DIR}/third_party
-                     ${CMAKE_SOURCE_DIR}/third_party/GLFW/include
-                     ${CMAKE_BINARY_DIR}/include
-                     ${CMAKE_CURRENT_BINARY_DIR}
-                     ${CUDA_INCLUDE_DIRS}
-                     )
+include_directories(${CMAKE_SOURCE_DIR}/third_party/glad
+                    ${CMAKE_SOURCE_DIR}/third_party/glfw/include/GLFW
+                    ${CMAKE_SOURCE_DIR}/third_party/tinygltf
+                    # ${CMAKE_BINARY_DIR}/include
+                    ${CMAKE_CURRENT_BINARY_DIR}
+                    ${CUDA_INCLUDE_DIRS}
+                    )
 
 #########################################################
 # OPTIX_add_sample_executable

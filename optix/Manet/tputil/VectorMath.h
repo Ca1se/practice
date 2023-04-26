@@ -11,6 +11,35 @@
 #define TP_PIDIV2 1.57079632679f
 #define TP_PIDIV4 0.78539816339f
 
+TPUTIL_DECL float2 min_float2(float2 a, float2 b) noexcept
+{
+    return make_float2(fminf(a.x, b.x), fminf(a.y, b.y));
+}
+
+TPUTIL_DECL float3 min_float3(const float3& a, const float3& b) noexcept
+{
+    return make_float3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z));
+}
+
+TPUTIL_DECL float4 min_float4(const float4& a, const float4& b) noexcept
+{
+    return make_float4(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z), fminf(a.w, b.w));
+}
+
+TPUTIL_DECL float2 max_float2(float2 a, float2 b) noexcept
+{
+    return make_float2(fmaxf(a.x, b.x), fmaxf(a.y, b.y));
+}
+
+TPUTIL_DECL float3 max_float3(const float3& a, const float3& b) noexcept
+{
+    return make_float3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z));
+}
+
+TPUTIL_DECL float4 max_float4(const float4& a, const float4& b) noexcept
+{
+    return make_float4(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z), fmaxf(a.w, b.w));
+}
 
 TPUTIL_DECL float4 make_float4(const float3& xyz, float w) noexcept
 {
@@ -27,22 +56,22 @@ TPUTIL_DECL uchar4 make_uchar4(const float4& f4) noexcept
 
 // float2
 
-TPUTIL_DECL float2 operator+(const float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator+(float2 a, float2 b) noexcept
 {
     return make_float2(a.x + b.x, a.y + b.y);
 }
 
-TPUTIL_DECL float2 operator+(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator+(float2 a, float f) noexcept
 {
     return make_float2(a.x + f, a.y + f);
 }
 
-TPUTIL_DECL float2 operator+(float f, const float2& a) noexcept
+TPUTIL_DECL float2 operator+(float f, float2 a) noexcept
 {
     return a + f;
 }
 
-TPUTIL_DECL float2& operator+=(float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator+=(float2 a, float2 b) noexcept
 {
     a.x += b.x;
     a.y += b.y;
@@ -50,22 +79,22 @@ TPUTIL_DECL float2& operator+=(float2& a, const float2& b) noexcept
     return a;
 }
 
-TPUTIL_DECL float2 operator-(const float2& a) noexcept
+TPUTIL_DECL float2 operator-(float2 a) noexcept
 {
     return make_float2(-a.x, -a.y);
 }
 
-TPUTIL_DECL float2 operator-(const float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator-(float2 a, float2 b) noexcept
 {
     return make_float2(a.x - b.x, a.y - b.y);
 }
 
-TPUTIL_DECL float2 operator-(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator-(float2 a, float f) noexcept
 {
     return make_float2(a.x - f, a.y - f);
 }
 
-TPUTIL_DECL float2& operator-=(float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator-=(float2 a, float2 b) noexcept
 {
     a.x -= b.x;
     a.y -= b.y;
@@ -73,12 +102,12 @@ TPUTIL_DECL float2& operator-=(float2& a, const float2& b) noexcept
     return a;
 }
 
-TPUTIL_DECL float2 operator*(const float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator*(float2 a, float2 b) noexcept
 {
     return make_float2(a.x * b.x, a.y * b.y);
 }
 
-TPUTIL_DECL float2& operator*=(float2& a, const float2& b) noexcept
+TPUTIL_DECL float2 operator*=(float2 a, float2 b) noexcept
 {
     a.x *= b.x;
     a.y *= b.y;
@@ -86,17 +115,17 @@ TPUTIL_DECL float2& operator*=(float2& a, const float2& b) noexcept
     return a;
 }
 
-TPUTIL_DECL float2 operator*(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator*(float2 a, float f) noexcept
 {
     return make_float2(a.x * f, a.y * f);
 }
 
-TPUTIL_DECL float2 operator*(float f, const float2& a) noexcept
+TPUTIL_DECL float2 operator*(float f, float2 a) noexcept
 {
     return a * f;
 }
 
-TPUTIL_DECL float2& operator*=(float2& a, float f) noexcept
+TPUTIL_DECL float2 operator*=(float2 a, float f) noexcept
 {
     a.x *= f;
     a.y *= f;
@@ -104,12 +133,12 @@ TPUTIL_DECL float2& operator*=(float2& a, float f) noexcept
     return a;
 }
 
-TPUTIL_DECL float2 operator/(const float2& a, float f) noexcept
+TPUTIL_DECL float2 operator/(float2 a, float f) noexcept
 {
     return make_float2(a.x / f, a.y / f);
 }
 
-TPUTIL_DECL float2& operator/=(float2& a, float f) noexcept
+TPUTIL_DECL float2 operator/=(float2 a, float f) noexcept
 {
     a.x /= f;
     a.y /= f;

@@ -218,12 +218,6 @@ IF (USING_WINDOWS_ICL)
   APPEND_TO_STRING(CXX_FLAGS         ${WARNING_FLAGS})
 ENDIF(USING_WINDOWS_ICL)
 
-# Add /utf-8 flag
-if(WIN32)
-  APPEND_TO_STRING(C_FLAGS   "/utf-8")
-  APPEND_TO_STRING(CXX_FLAGS "/utf-8")
-endif()
-
 ##############################################################
 ## Check for SSE 4.1 support
 ##############################################################
@@ -419,3 +413,6 @@ set_flags(CMAKE_C_FLAGS_RELEASE C_FLAGS_RELEASE)
 set_flags(CMAKE_CXX_FLAGS         CXX_FLAGS)
 set_flags(CMAKE_CXX_FLAGS_DEBUG   CXX_FLAGS_DEBUG)
 set_flags(CMAKE_CXX_FLAGS_RELEASE CXX_FLAGS_RELEASE)
+
+
+

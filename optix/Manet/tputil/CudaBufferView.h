@@ -13,6 +13,10 @@ class CudaBufferView
 public:
     TPUTIL_DECL CudaBufferView()  = default;
     TPUTIL_DECL ~CudaBufferView() = default;
+
+    TPUTIL_DECL CudaBufferView(const CudaBufferView&) = default;
+    TPUTIL_DECL CudaBufferView& operator=(const CudaBufferView&) = default;
+
     TPUTIL_DECL CudaBufferView(CUdeviceptr buffer_ptr) : m_buffer_ptr(buffer_ptr) {}
 
     TPUTIL_DECL void setBufferPtr(CUdeviceptr buffer_ptr) { m_buffer_ptr = buffer_ptr; }
