@@ -48,8 +48,8 @@ private:
     float2  m_delta_angle = {};
     float3  m_move_offset = {};
 
-    bool m_zoomed  = false;
-    bool m_moved   = false;
-    bool m_rotated = false;
+    bool m_zoomed      = false;
+    bool m_moved       = false;
+    bool m_rotated     = false;
     bool m_uvw_changed = false;
 };

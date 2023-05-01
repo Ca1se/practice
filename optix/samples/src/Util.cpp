@@ -16,9 +16,6 @@
 
 #include "Exception.h"
 
-namespace tputil
-{
-
 namespace
 {
 
@@ -113,7 +110,3 @@ const char* getCompiledCudaCode(const std::string& sample_name, const std::strin
 
     return pcode;
 }
-
-
-
-}  // namespace tputil

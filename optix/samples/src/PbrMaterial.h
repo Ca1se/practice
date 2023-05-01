@@ -34,15 +34,13 @@ struct PbrMaterial
     AlphaMode alpha_mode   = ALPHA_MODE_OPAQUE;
     float     alpha_cutoff = 0.0f;
 
-    float3  emissive_factor  = make_float3(0.0f, 0.0f, 0.0f);
-    Texture emissive_texture = {};
+    float4  base_color       = { 1.0f, 1.0f, 1.0f, 1.0f };
+    float3  emissive_factor  = { 0.0f, 0.0f, 0.0f };
+    float   metallic         = 1.0f;
+    float   roughness        = 1.0f;
     
-    float4 base_color = make_float4(1.0f, 1.0f, 1.0f, 1.0f);
-    float  metallic   = 1.0f;
-    float  roughness  = 0.0f;
-
     Texture base_color_texture         = {};
+    Texture emissive_texture           = {};
     Texture metallic_roughness_texture = {};
-
-    Texture normal_texture = {};
+    Texture normal_texture             = {};
 };

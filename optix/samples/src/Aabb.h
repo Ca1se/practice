@@ -1,9 +1,18 @@
 #pragma once
 
+#include <numeric>
+
 #include <vector_types.h>
 #include <vector_functions.h>
 
 #include "VectorMath.h"
+
+namespace 
+{
+
+constexpr float inf = std::numeric_limits<float>::infinity();
+
+}
 
 class Aabb
 {
@@ -18,6 +27,8 @@ public:
 
     bool isValid() const noexcept;
     operator bool() const noexcept;
+
+    void invalidate() noexcept;
 
     void set(const float3& min, const float3& max) noexcept;
     float3 getMin() const noexcept;
@@ -36,8 +47,8 @@ private:
 };
 
 inline Aabb::Aabb()
-    : m_min{ make_float3(1e37f, 1e37f, 1e37f) }
-    , m_max{ make_float3(-1e37f, -1e37f, -1e37f) }
+    : m_min{ make_float3(inf, inf, inf) }
+    , m_max{ make_float3(-inf, -inf, -inf) }
 {
 }
 
@@ -48,12 +59,17 @@ inline Aabb::Aabb(const float3& min, const float3& max)
 
 inline bool Aabb::isValid() const noexcept
 {
-    return m_min.x <= m_max.x && m_min.y <= m_max.y && m_min.z <= m_max.z;
+    return (m_min.x <= m_max.x && m_min.y <= m_max.y && m_min.z <= m_max.z);
 }
 
 inline Aabb::operator bool() const noexcept
 {
     return isValid();
+}
+
+inline void Aabb::invalidate() noexcept
+{
+    set(make_float3(inf, inf, inf), make_float3(-inf, -inf, -inf));
 }
 
 inline void Aabb::set(const float3 &min, const float3 &max) noexcept
