@@ -70,17 +70,18 @@ struct
 } g_mapper;
 
 template <typename TextureInfo>
-void loadTextureInfo(const Scene& scene, const TextureInfo& gltf_tex, PbrMaterial::Texture& tex)
+void loadTextureInfo(PbrMaterial::Texture& tex, const Scene& scene, const TextureInfo& gltf_tex)
 {
     tex.texture        = 0;
     tex.texcoord_index = 0;
     if (gltf_tex.index >= 0) {
+        if (tex.texcoord_index >= 1) {
+            std::cerr << "\t\tUnsupported multiple texcoords" << std::endl;
+            return;
+        }
+
         tex.texture        = scene.getTextures()[gltf_tex.index];
         tex.texcoord_index = gltf_tex.texCoord;
-        if (tex.texcoord_index >= 1) {
-            std::cerr << "\t\tMultiple texcoords are not supported" << std::endl;
-            tex.texcoord_index = 0;
-        }
 
         float2& offset   = tex.texcoord_offset;
         float2& rotation = tex.texcoord_rotation;
@@ -126,6 +127,19 @@ CudaBufferView<T> createBufferViewFromGltf(const tinygltf::Model& model,
         ret.index_format   = g_mapper.indexFormat(accessor.componentType);
     }
     return ret;
+}
+
+void loadAabb(Aabb& aabb, const tinygltf::Model& model, int32_t attribute_index)
+{
+    const tinygltf::Accessor& accessor = model.accessors[attribute_index];
+    if (!accessor.minValues.empty() && !accessor.maxValues.empty()) {
+        aabb.include(Aabb(make_float3(static_cast<float>(accessor.minValues[0]),
+                                      static_cast<float>(accessor.minValues[1]),
+                                      static_cast<float>(accessor.minValues[2])),
+                          make_float3(static_cast<float>(accessor.maxValues[0]),
+                                      static_cast<float>(accessor.maxValues[1]),
+                                      static_cast<float>(accessor.maxValues[2]))));
+    }
 }
 
 }
@@ -369,13 +383,13 @@ void loadGltfScene(Scene& scene, const std::string &filename)
                                  pbr_material.roughness) << std::endl;
 
         // normal texture
-        loadTextureInfo(scene, material.normalTexture, pbr_material.normal_texture);
+        loadTextureInfo(pbr_material.normal_texture, scene, material.normalTexture);
         // emissive texture
-        loadTextureInfo(scene, material.emissiveTexture, pbr_material.emissive_texture);
+        loadTextureInfo(pbr_material.emissive_texture, scene, material.emissiveTexture);
         // base color texture
-        loadTextureInfo(scene, material.pbrMetallicRoughness.baseColorTexture, pbr_material.base_color_texture);
+        loadTextureInfo(pbr_material.base_color_texture, scene, material.pbrMetallicRoughness.baseColorTexture);
         // metallic roughness texture
-        loadTextureInfo(scene, material.pbrMetallicRoughness.metallicRoughnessTexture, pbr_material.metallic_roughness_texture);
+        loadTextureInfo(pbr_material.metallic_roughness_texture, scene, material.pbrMetallicRoughness.metallicRoughnessTexture);
 
         scene.addMaterial(pbr_material);
     }
@@ -386,7 +400,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
                                  mesh.name,
                                  mesh.primitives.size()) << std::endl;
         auto new_mesh = std::make_shared<Scene::Mesh>();
-        size_t triangles_count = 0;
+        size_t triangle_num = 0;
         for (const auto& primitive: mesh.primitives) {
             if (primitive.mode != TINYGLTF_MODE_TRIANGLES) {
                 std::cerr << "\t\tSkipping primitive: non-triangle" << std::endl;
@@ -397,19 +411,50 @@ void loadGltfScene(Scene& scene, const std::string &filename)
             
             // index
             new_mesh->indices.push_back(createBufferViewFromGltf<TriangleIndexType>(model, buffers, primitive.indices));
-            triangles_count += new_mesh->indices.back().element_count;
-            // position
+            triangle_num += new_mesh->indices.back().element_count;
+            // position and aabb
             const auto& position_index_itr = primitive.attributes.find("POSITION");
             if (position_index_itr == primitive.attributes.end()) {
                 std::cerr << "\t\tSkipping primitive: no position data" << std::endl;
                 continue;
             }
             new_mesh->positions.push_back(createBufferViewFromGltf<float3>(model, buffers, position_index_itr->second));
+            loadAabb(new_mesh->aabb, model, position_index_itr->second);
             // normal
+            const auto& normal_index_itr = primitive.attributes.find("NORMAL");
+            if (normal_index_itr != primitive.attributes.end()) {
+                new_mesh->normals.push_back(createBufferViewFromGltf<float3>(model, buffers, normal_index_itr->second));
+            } else {
+                new_mesh->normals.push_back(CudaBufferView<float3>{});
+            }
             // texcoord
+            const auto& texcoord_index_itr = primitive.attributes.find("TEXCOORD_0");
+            if (texcoord_index_itr != primitive.attributes.end()) {
+                new_mesh->texcoords.push_back(createBufferViewFromGltf<float2>(model, buffers, texcoord_index_itr->second));
+            } else {
+                new_mesh->texcoords.push_back(CudaBufferView<float2>{});
+            }
             // color
+            const auto& color_index_itr = primitive.attributes.find("COLOR_0");
+            if (color_index_itr != primitive.attributes.end()) {
+                new_mesh->colors.push_back(createBufferViewFromGltf<float4>(model, buffers, color_index_itr->second));
+            } else {
+                new_mesh->colors.push_back(CudaBufferView<float4>{});
+            }
             // material index
-            // aabb
+            new_mesh->material_indices.push_back(primitive.material);
         }
+        std::cerr << std::format("\t\tNumber of triangles: {}", triangle_num) << std::endl;
+    }
+
+    std::vector<int32_t> is_root(model.nodes.size(), 1);
+    for (const auto& node: model.nodes) {
+        for (int32_t child: node.children) {
+            is_root[child] = 0;
+        }
+    }
+    for (size_t i = 0; i < is_root.size(); i++) {
+        if (!is_root[i])
+            continue;
     }
 }

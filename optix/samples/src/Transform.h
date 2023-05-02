@@ -77,7 +77,19 @@ MANET_DECL Matrix<4, 4> rotateAroundAxis(const float3& axis, float radian)
     return ret;
 }
 
-MANET_DECL Matrix<4, 4> translate(const float3& offset)
+MANET_DECL Matrix<4, 4> identityMatrix()
+{
+    Matrix<4, 4> ret = {{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    }};
+
+    return ret;
+}
+
+MANET_DECL Matrix<4, 4> translateMatrix(const float3& offset)
 {
     Matrix<4, 4> ret = {{
         1.0f, 0.0f, 0.0f, offset.x,
@@ -88,5 +100,7 @@ MANET_DECL Matrix<4, 4> translate(const float3& offset)
 
     return ret;
 }
+
+// to do
 
 }

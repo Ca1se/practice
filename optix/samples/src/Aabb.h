@@ -10,7 +10,7 @@
 namespace 
 {
 
-constexpr float inf = std::numeric_limits<float>::infinity();
+inline constexpr float inf = std::numeric_limits<float>::infinity();
 
 }
 

@@ -3,7 +3,7 @@
 #include <cstdint>
 
 #include <cuda.h>
-#include <host_defines.h>
+#include <cuda_runtime_api.h>
 
 #include "ManetMacros.h"
 

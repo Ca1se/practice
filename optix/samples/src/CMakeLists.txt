@@ -12,6 +12,7 @@ OPTIX_add_sample_executable(pathtracer target_name
     GlDisplay.h
     Manet.cpp
     Manet.h
+    ManetMacros.h
     Matrix.h
     PbrMaterial.h
     Scene.cpp
