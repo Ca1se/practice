@@ -17,7 +17,7 @@ namespace
 
 struct
 {
-    cudaTextureAddressMode constexpr wrappingMode(int tinygltf_mode)
+    cudaTextureAddressMode constexpr wrappingMode(int32_t tinygltf_mode)
     {
         switch (tinygltf_mode) {
         case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
@@ -30,7 +30,7 @@ struct
         }
     }
 
-    cudaTextureFilterMode constexpr filterMode(int tinygltf_mode)
+    cudaTextureFilterMode constexpr filterMode(int32_t tinygltf_mode)
     {
         switch (tinygltf_mode) {
         case TINYGLTF_TEXTURE_FILTER_NEAREST:
@@ -54,6 +54,18 @@ struct
         }
 
         return alpha_mode;
+    }
+
+    CudaTriangleIndexBufferView::TriangleIndexFormat constexpr indexFormat(int32_t tinygltf_type)
+    {
+        switch (tinygltf_type) {
+            case TINYGLTF_COMPONENT_TYPE_SHORT:
+                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_USHORT3;
+            case TINYGLTF_COMPONENT_TYPE_INT:
+                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_UINT3;
+            default:
+                throw std::runtime_error{ EXCEPTION_MSG(std::format("unsupported index byte size: {}", tinygltf_type)) };
+        }
     }
 } g_mapper;
 
@@ -90,6 +102,30 @@ void loadTextureInfo(const Scene& scene, const TextureInfo& gltf_tex, PbrMateria
             }
         }
     }
+}
+
+template <typename T>
+CudaBufferView<T> createBufferViewFromGltf(const tinygltf::Model& model,
+                                           const std::vector<CudaDeviceBuffer>& buffers,
+                                           int32_t attribute_index)
+{
+    if (attribute_index < 0)
+        return CudaBufferView<T>{};
+
+    const tinygltf::Accessor&   accessor    = model.accessors[attribute_index];
+    const tinygltf::BufferView& buffer_view = model.bufferViews[accessor.bufferView];
+
+    const auto& buffer = buffers[buffer_view.buffer];
+    CudaBufferView<T> ret = {
+        .buffer_ptr       = buffer.data() + accessor.byteOffset + buffer_view.byteOffset,
+        .element_count    = static_cast<uint32_t>(accessor.count),
+        .stride_byte_size = static_cast<uint32_t>(buffer_view.byteStride)
+    };
+    if constexpr (std::is_same_v<T, TriangleIndexType>) {
+        ret.element_count /= 3;
+        ret.index_format   = g_mapper.indexFormat(accessor.componentType);
+    }
+    return ret;
 }
 
 }
@@ -318,17 +354,19 @@ void loadGltfScene(Scene& scene, const std::string &filename)
         // roughness
         pbr_material.roughness = static_cast<float>(material.pbrMetallicRoughness.roughnessFactor);
 
-        std::cerr << std::format("\t\tBase color: ({}, {}, {}, {})",
+        std::cerr << std::format("\t\tBase color: ({}, {}, {}, {})\n"
+                                 "\t\tEmissive factor: ({}, {}, {})\n"
+                                 "\t\tMetallic factor: {}\n"
+                                 "\t\tRoughness factor: {}",
                                  pbr_material.base_color.x,
                                  pbr_material.base_color.y,
                                  pbr_material.base_color.z,
-                                 pbr_material.base_color.w) << std::endl
-                  << std::format("\t\tEmissive factor: ({}, {}, {})",
+                                 pbr_material.base_color.w,
                                  pbr_material.emissive_factor.x,
                                  pbr_material.emissive_factor.y,
-                                 pbr_material.emissive_factor.z) << std::endl
-                  << std::format("\t\tMetallic factor: {}", pbr_material.metallic) << std::endl
-                  << std::format("\t\tRoughness factor: {}", pbr_material.roughness) << std::endl;
+                                 pbr_material.emissive_factor.z,
+                                 pbr_material.metallic,
+                                 pbr_material.roughness) << std::endl;
 
         // normal texture
         loadTextureInfo(scene, material.normalTexture, pbr_material.normal_texture);
@@ -348,6 +386,30 @@ void loadGltfScene(Scene& scene, const std::string &filename)
                                  mesh.name,
                                  mesh.primitives.size()) << std::endl;
         auto new_mesh = std::make_shared<Scene::Mesh>();
+        size_t triangles_count = 0;
+        for (const auto& primitive: mesh.primitives) {
+            if (primitive.mode != TINYGLTF_MODE_TRIANGLES) {
+                std::cerr << "\t\tSkipping primitive: non-triangle" << std::endl;
+                continue;
+            }
 
+            const std::vector<CudaDeviceBuffer>& buffers = scene.getBuffers();
+            
+            // index
+            new_mesh->indices.push_back(createBufferViewFromGltf<TriangleIndexType>(model, buffers, primitive.indices));
+            triangles_count += new_mesh->indices.back().element_count;
+            // position
+            const auto& position_index_itr = primitive.attributes.find("POSITION");
+            if (position_index_itr == primitive.attributes.end()) {
+                std::cerr << "\t\tSkipping primitive: no position data" << std::endl;
+                continue;
+            }
+            new_mesh->positions.push_back(createBufferViewFromGltf<float3>(model, buffers, position_index_itr->second));
+            // normal
+            // texcoord
+            // color
+            // material index
+            // aabb
+        }
     }
 }

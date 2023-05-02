@@ -14,13 +14,13 @@ struct Scene
 public:
     struct Mesh
     {
-        std::vector<CudaIndexBufferView>    indices;
-        std::vector<CudaBufferView<float3>> positions;
-        std::vector<CudaBufferView<float3>> normals;
-        std::vector<CudaBufferView<float2>> texcoords;
-        std::vector<CudaBufferView<float4>> colors;
-        std::vector<int32_t>                material_indices;
-        Aabb                                aabb;
+        std::vector<CudaTriangleIndexBufferView> indices;
+        std::vector<CudaBufferView<float3>>      positions;
+        std::vector<CudaBufferView<float3>>      normals;
+        std::vector<CudaBufferView<float2>>      texcoords;
+        std::vector<CudaBufferView<float4>>      colors;
+        std::vector<int32_t>                     material_indices;
+        Aabb                                     aabb;
     };
 
     Scene();
@@ -42,6 +42,7 @@ public:
     auto& getImages() const noexcept { return m_images; }
     auto& getTextures() const noexcept { return m_textures; }
     auto& getAabb() const noexcept { return m_aabb; }
+    auto& getBuffers() const noexcept { return m_buffers; }
 
     void cleanup();
 
