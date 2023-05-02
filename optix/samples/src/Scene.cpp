@@ -142,6 +142,8 @@ void loadAabb(Aabb& aabb, const tinygltf::Model& model, int32_t attribute_index)
     }
 }
 
+void loadGltfNode(Scene& scene, )
+
 }
 
 Scene::Scene()
@@ -456,5 +458,6 @@ void loadGltfScene(Scene& scene, const std::string &filename)
     for (size_t i = 0; i < is_root.size(); i++) {
         if (!is_root[i])
             continue;
+        
     }
 }
