@@ -376,9 +376,6 @@ MANET_DECL uint3& operator+=(uint3& a, const uint3& b) noexcept
     return a;
 }
 
-namespace tputil
-{
-
 MANET_DECL float dot(const float3& a, const float3& b) noexcept
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
@@ -403,5 +400,3 @@ MANET_DECL float3 normalize(const float3& a) noexcept
 {
     return a / length(a);
 }
-
-}  // namespace tputil

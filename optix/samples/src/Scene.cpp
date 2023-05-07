@@ -11,6 +11,7 @@
 #include <tiny_gltf.h>
 
 #include "Util.h"
+#include "Transform.h"
 
 namespace
 {
@@ -60,8 +61,12 @@ struct
     {
         switch (tinygltf_type) {
             case TINYGLTF_COMPONENT_TYPE_SHORT:
+                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_SHORT3;
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
                 return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_USHORT3;
             case TINYGLTF_COMPONENT_TYPE_INT:
+                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_INT3;
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
                 return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_UINT3;
             default:
                 throw std::runtime_error{ EXCEPTION_MSG(std::format("unsupported index byte size: {}", tinygltf_type)) };
@@ -142,7 +147,79 @@ void loadAabb(Aabb& aabb, const tinygltf::Model& model, int32_t attribute_index)
     }
 }
 
-void loadGltfNode(Scene& scene, )
+void loadGltfNode(Scene& scene,
+                  std::vector<Camera>& cameras,
+                  const tinygltf::Model& model,
+                  uint32_t node_index,
+                  const Matrix<4, 4>& transform = identityMatrix())
+{
+    const tinygltf::Node& node = model.nodes[node_index];
+
+    std::cerr << std::format("\tLoading node '{}':", node.name) << std::endl;
+
+    Matrix<4, 4> translation = node.translation.empty()
+                               ? identityMatrix()
+                               : translateMatrix(make_float3(static_cast<float>(node.translation[0]),
+                                                             static_cast<float>(node.translation[1]),
+                                                             static_cast<float>(node.translation[2])));
+    Matrix<4, 4> rotation = node.rotation.empty()
+                            ? identityMatrix()
+                            : rotateMatrix(make_float4(static_cast<float>(node.rotation[0]),
+                                                       static_cast<float>(node.rotation[1]),
+                                                       static_cast<float>(node.rotation[2]),
+                                                       static_cast<float>(node.rotation[3])));
+    Matrix<4, 4> scale = node.scale.empty()
+                         ? identityMatrix()
+                         : scaleMatrix(make_float3(static_cast<float>(node.scale[0]),
+                                                   static_cast<float>(node.scale[1]),
+                                                   static_cast<float>(node.scale[2])));
+    std::vector<float> matrix_arr;
+    for (double f: node.matrix)
+        matrix_arr.push_back(static_cast<float>(f));
+    Matrix<4, 4> matrix = matrix_arr.empty() ? identityMatrix() : Matrix<4, 4>(matrix_arr);
+
+    Matrix<4, 4> new_transform = transform * matrix * translation * rotation * scale;
+    do {
+        if (node.camera != -1) {
+            const auto& camera = model.cameras[node.camera];
+            if (camera.type != "perspective") {
+                std::cerr << "\t\tSkipping camera: non-perspective" << std::endl;
+                break;
+            }
+
+            std::cerr << std::format("\t\tHas camera '{}':", camera.name) << std::endl;
+            
+            float3 position     = new_transform * make_float3(0.0f, 0.0f, 0.0f);
+            float3 up           = new_transform * make_float3(0.0f, 1.0f, 0.0f);
+            float  vfov         = static_cast<float>(camera.perspective.yfov);
+            float  aspect_ratio = static_cast<float>(camera.perspective.aspectRatio);
+
+            std::cerr << std::format("\t\t\tposition:     ({}, {}, {})\n"
+                                     "\t\t\tup:           ({}, {}, {})\n"
+                                     "\t\t\tvfov:         {}\n"
+                                     "\t\t\taspect ratio: {}",
+                                     position.x, position.y, position.z,
+                                     up.x, up.y, up.z,
+                                     vfov,
+                                     aspect_ratio) << std::endl;
+            Camera cam(position, make_float3(0.0f, 0.0f, 0.0f), up, vfov, aspect_ratio);
+            cameras.push_back(cam);
+        } else if (node.mesh != -1) {
+            auto instance = std::make_shared<Scene::Instance>();
+            instance->transform  = new_transform;
+            instance->aabb       = scene.getMeshes()[node.mesh]->aabb;
+            instance->mesh_index = node.mesh;
+            instance->aabb.transform(new_transform);
+            scene.addInstance(instance);
+        }
+    } while (false);
+
+    if (!node.children.empty()) {
+        for (int32_t child: node.children) {
+            loadGltfNode(scene, cameras, model, child, new_transform);
+        }
+    }
+}
 
 }
 
@@ -231,35 +308,35 @@ void loadGltfScene(Scene& scene, const std::string &filename)
 {
     scene.cleanup();
 
-    std::cerr << std::format("Loading GLTF file {}", filename) << std::endl;
+    std::cerr << std::format("Loading GLTF file '{}':", filename) << std::endl;
 
     std::string full_file_path = getModelPath(filename);
 
     tinygltf::Model model;
     tinygltf::TinyGLTF gltf_loader;
-    std::string err;
+    std::string error;
     std::string warning;
 
     bool ok;
     if (filename.ends_with(".gltf")) {
-        ok = gltf_loader.LoadASCIIFromFile(&model, &err, &warning, full_file_path);
+        ok = gltf_loader.LoadASCIIFromFile(&model, &error, &warning, full_file_path);
     }else if (filename.ends_with(".glb")) {
-        ok = gltf_loader.LoadBinaryFromFile(&model, &err, &warning, full_file_path);
+        ok = gltf_loader.LoadBinaryFromFile(&model, &error, &warning, full_file_path);
     }else {
-        throw std::runtime_error{ EXCEPTION_MSG(std::format("unrecognized filename: {}, the filename must end with '.gltf' or '.glb'", filename)) };
+        throw std::runtime_error{ EXCEPTION_MSG(std::format("unrecognized filename '{}', the filename must end with '.gltf' or '.glb'", filename)) };
     }
 
     if (!ok)
-        throw std::runtime_error{ EXCEPTION_MSG(std::format("failed to load GLTF file {}: {}", filename, err)) };
+        throw std::runtime_error{ EXCEPTION_MSG(std::format("GLTF error (when loading file '{}'): {}", filename, error)) };
 
     if (!warning.empty())
-        std::cerr << std::format("\tGLTF warning (when loading file {}): {}", filename, warning) << std::endl;
+        std::cerr << std::format("\tGLTF warning (when loading file '{}'): {}", filename, warning) << std::endl;
 
     for (const auto& buffer: model.buffers) {
         size_t byte_size = buffer.data.size();
-        std::cerr << std::format("\tLoading buffer '{}'\n"
+        std::cerr << std::format("\tLoading buffer '{}':\n"
                                  "\t\tbyte size: {}\n"
-                                 "\t\turi: {}",
+                                 "\t\turi:       {}",
                                  buffer.name,
                                  byte_size,
                                  buffer.uri) << std::endl;
@@ -267,11 +344,11 @@ void loadGltfScene(Scene& scene, const std::string &filename)
     }
     
     for (const auto& image: model.images) {
-        std::cerr << std::format("\tLoading image '{}'\n"
-                                 "\t\twidth: {}\n"
-                                 "\t\theight: {}\n"
+        std::cerr << std::format("\tLoading image '{}':\n"
+                                 "\t\twidth:      {}\n"
+                                 "\t\theight:     {}\n"
                                  "\t\tcomponents: {}\n"
-                                 "\t\tbits: {}",
+                                 "\t\tbits:       {}",
                                  image.name,
                                  image.width,
                                  image.height,
@@ -285,7 +362,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
     }
 
     for (const auto& texture: model.textures) {
-        std::cerr << std::format("\tLoading texture '{}'", texture.name) << std::endl;
+        std::cerr << std::format("\tLoading texture '{}':", texture.name) << std::endl;
         if (texture.sampler == -1) {
             scene.addTexture(cudaAddressModeWrap, cudaAddressModeWrap, cudaFilterModeLinear, texture.source);
             continue;
@@ -298,7 +375,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
     }
 
     for (const auto& material: model.materials) {
-        std::cerr << std::format("\tLoading PBR material '{}'", material.name) << std::endl;
+        std::cerr << std::format("\tLoading PBR material '{}':", material.name) << std::endl;
 
         PbrMaterial pbr_material;
         pbr_material.back_culling = (material.doubleSided == false);
@@ -370,9 +447,9 @@ void loadGltfScene(Scene& scene, const std::string &filename)
         // roughness
         pbr_material.roughness = static_cast<float>(material.pbrMetallicRoughness.roughnessFactor);
 
-        std::cerr << std::format("\t\tBase color: ({}, {}, {}, {})\n"
-                                 "\t\tEmissive factor: ({}, {}, {})\n"
-                                 "\t\tMetallic factor: {}\n"
+        std::cerr << std::format("\t\tBase color:       ({}, {}, {}, {})\n"
+                                 "\t\tEmissive factor:  ({}, {}, {})\n"
+                                 "\t\tMetallic factor:  {}\n"
                                  "\t\tRoughness factor: {}",
                                  pbr_material.base_color.x,
                                  pbr_material.base_color.y,
@@ -397,7 +474,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
     }
 
     for (const auto& mesh: model.meshes) {
-        std::cerr << std::format("\tLoading mesh '{}'\n"
+        std::cerr << std::format("\tLoading mesh '{}':\n"
                                  "\t\tNumber of mesh primitive groups: {}",
                                  mesh.name,
                                  mesh.primitives.size()) << std::endl;
@@ -446,6 +523,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
             // material index
             new_mesh->material_indices.push_back(primitive.material);
         }
+        scene.addMesh(new_mesh);
         std::cerr << std::format("\t\tNumber of triangles: {}", triangle_num) << std::endl;
     }
 
@@ -455,9 +533,21 @@ void loadGltfScene(Scene& scene, const std::string &filename)
             is_root[child] = 0;
         }
     }
-    for (size_t i = 0; i < is_root.size(); i++) {
+    std::vector<Camera> cameras;
+    for (uint32_t i = 0; i < is_root.size(); i++) {
         if (!is_root[i])
             continue;
-        
+        loadGltfNode(scene, cameras, model, i, identityMatrix());
+    }
+
+    Aabb aabb;
+    for (auto instance: scene.getInstances())
+        aabb.include(instance->aabb);
+    scene.setAabb(aabb);
+    
+    float3 center = aabb.center();
+    for (auto& camera: cameras) {
+        camera.setTarget(center);
+        scene.addCamera(camera);
     }
 }

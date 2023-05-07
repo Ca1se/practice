@@ -2,10 +2,16 @@
 
 #include "Transform.h"
 
+bool Camera::isValid() const
+{
+    float3 vec = m_target - m_position;
+    return (length(vec) > 0.1f) && (fabsf(dot(normalize(vec), m_up)) < 0.9999f);
+}
+
 Camera::Camera(const float3& position, const float3& target, const float3& up, float vfov, float aspect_ratio)
     : m_position{ position }
     , m_target{ target }
-    , m_up{ tputil::normalize(up) }
+    , m_up{ normalize(up) }
     , m_vfov{ vfov }
     , m_aspect_ratio{ aspect_ratio }
 {
@@ -15,8 +21,6 @@ Camera::Camera(const float3& position, const float3& target, const float3& up, f
 void
 Camera::computeUVW()
 {
-    using namespace tputil;
-
     m_w = m_target - m_position;
     m_u = normalize(cross(m_up, m_w));
     m_v = normalize(cross(m_w, m_u));
@@ -76,13 +80,12 @@ Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
 void
 Camera::update()
 {
-    using namespace tputil;
-
     if (m_zoomed) {
-        float3 new_position = m_position + 10.0f * m_zoom_length * m_w;
+        float3 old_position = m_position;
+        m_position = m_position + 10.0f * m_zoom_length * m_w;
 
-        if(length(new_position - m_target) >= 0.1f && dot(normalize(m_target - new_position), normalize(m_target - m_position)) > 0.0f)
-            m_position = new_position;
+        if(!isValid() || dot(normalize(m_target - m_position), normalize(m_target - old_position)) <= 0.0f)
+            m_position = old_position;
 
         m_zoom_length = 0;
         m_zoomed = false;
@@ -107,12 +110,13 @@ Camera::update()
 
         auto pitch = rotateAroundAxis(-m_u, m_delta_angle.y);
 
-        float3 new_position = (pitch * (m_position - m_target)) + m_target;
+        float3 old_position = m_position;
+        m_position = (pitch * (m_position - m_target)) + m_target;
+        m_uvw_changed = true;
 
-        float3 idir = normalize(new_position - m_target);
-        if (std::abs(1.0f - std::abs(tputil::dot(idir, m_up))) >= 0.001f) {
-            m_position = new_position;
-            m_uvw_changed = true;
+        if (!isValid()) {
+            m_position = old_position;
+            m_uvw_changed = false;
         }
 
         m_delta_angle = { 0.0f, 0.0f };

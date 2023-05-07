@@ -1,11 +1,11 @@
 #pragma once
 
+#include <vector>
+#include <cassert>
+
 #include <vector_types.h>
 
 #include "VectorMath.h"
-
-namespace tputil
-{
 
 template <size_t dim> struct VectorDim { };
 template <> struct VectorDim<1> { using VectorType = float;  };
@@ -29,6 +29,7 @@ public:
     MANET_HOSTDEVICE Matrix& operator=(const Matrix& other);
 
     MANET_HOSTDEVICE Matrix(const float (&arr)[rows * cols]);
+    MANET_HOSTDEVICE Matrix(const std::vector<float>& arr);
 
     MANET_HOSTDEVICE float operator[](size_t index) const noexcept { return m_data[index]; }
     MANET_HOSTDEVICE float& operator[](size_t index) noexcept { return m_data[index]; }
@@ -64,9 +65,16 @@ MANET_DECL Matrix<rows, cols>& Matrix<rows, cols>::operator=(const Matrix& other
 template <size_t rows, size_t cols>
 MANET_DECL Matrix<rows, cols>::Matrix(const float (&arr)[rows * cols])
 {
-    for (size_t i = 0; i < s_size; i++) {
+    for (size_t i = 0; i < s_size; i++)
         m_data[i] = arr[i];
-    }
+}
+
+template <size_t rows, size_t cols>
+MANET_DECL Matrix<rows, cols>::Matrix(const std::vector<float>& arr)
+{
+    assert(arr.size() == 16);
+    for (size_t i = 0; i < s_size; i++)
+        m_data[i] = arr[i];
 }
 
 template <size_t rows, size_t cols>
@@ -226,5 +234,3 @@ MANET_DECL Matrix<rows, cols> elementWiseMultiply(const Matrix<rows, cols>& a, c
 
     return ret;
 }
-
-}  // namespace tputil

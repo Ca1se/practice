@@ -30,8 +30,10 @@ struct CudaBufferView<TriangleIndexType>
 {
     enum TriangleIndexFormat
     {
-        TRIANGLE_INDEX_FORMAT_USHORT3 = 6,
-        TRIANGLE_INDEX_FORMAT_UINT3   = 12
+        TRIANGLE_INDEX_FORMAT_SHORT3,
+        TRIANGLE_INDEX_FORMAT_USHORT3,
+        TRIANGLE_INDEX_FORMAT_INT3,
+        TRIANGLE_INDEX_FORMAT_UINT3
     };
 
     CUdeviceptr         buffer_ptr       = 0;

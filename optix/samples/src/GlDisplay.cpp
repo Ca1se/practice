@@ -7,9 +7,6 @@
 
 #include "Exception.h"
 
-namespace tputil
-{
-
 namespace
 {
 
@@ -225,5 +222,3 @@ GlDisplay::cleanup() noexcept
         m_program = 0;
     }
 }
-
-}  // namespace tputil

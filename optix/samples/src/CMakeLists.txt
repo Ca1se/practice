@@ -17,6 +17,8 @@ OPTIX_add_sample_executable(pathtracer target_name
     PbrMaterial.h
     Scene.cpp
     Scene.h
+    Tracer.cpp
+    Tracer.h
     Transform.h
     Util.cpp
     Util.h

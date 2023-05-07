@@ -3,9 +3,6 @@
 #include <cstdint>
 #include <string>
 
-namespace tputil
-{
-
 class GlDisplay
 {
 public:
@@ -34,5 +31,3 @@ private:
     static const std::string s_vert_source;
     static const std::string s_frag_source;
 };
-
-}  // namespace tputil
