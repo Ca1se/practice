@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <cassert>
 
 #include <vector_types.h>
 
@@ -22,8 +21,8 @@ public:
     using ElementType = float;
 
 public:
-    MANET_HOSTDEVICE Matrix()           = default;
-    MANET_HOSTDEVICE ~Matrix() noexcept = default;
+    MANET_HOSTDEVICE Matrix() {}
+    MANET_HOSTDEVICE ~Matrix() noexcept {}
 
     MANET_HOSTDEVICE Matrix(const Matrix& other);
     MANET_HOSTDEVICE Matrix& operator=(const Matrix& other);
@@ -72,7 +71,6 @@ MANET_DECL Matrix<rows, cols>::Matrix(const float (&arr)[rows * cols])
 template <size_t rows, size_t cols>
 MANET_DECL Matrix<rows, cols>::Matrix(const std::vector<float>& arr)
 {
-    assert(arr.size() == 16);
     for (size_t i = 0; i < s_size; i++)
         m_data[i] = arr[i];
 }

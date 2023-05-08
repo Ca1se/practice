@@ -27,6 +27,7 @@ struct
             return cudaAddressModeMirror;
         default:
             std::cerr << std::format("Unsupported GLTF wrapping mode '{}', using the default wrapping mode 'Wrap'", tinygltf_mode) << std::endl;
+        case TINYGLTF_TEXTURE_WRAP_REPEAT:
             return cudaAddressModeWrap;
         }
     }
@@ -35,26 +36,30 @@ struct
     {
         switch (tinygltf_mode) {
         case TINYGLTF_TEXTURE_FILTER_NEAREST:
+        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
+        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
             return cudaFilterModePoint;
         default:
             std::cerr << std::format("Unsupported GLTF filter mode '{}', using the default filter mode 'Linear'", tinygltf_mode) << std::endl;
+        case TINYGLTF_TEXTURE_FILTER_LINEAR:
+        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
+        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
             return cudaFilterModeLinear;
         }
     }
 
     PbrMaterial::AlphaMode constexpr alphaMode(const std::string& tinygltf_mode)
     {
-        PbrMaterial::AlphaMode alpha_mode = PbrMaterial::ALPHA_MODE_OPAQUE;
-
-        if (tinygltf_mode == "MASK") {
+        if (tinygltf_mode == "OPAQUE"){
+            return PbrMaterial::ALPHA_MODE_OPAQUE;
+        } else if (tinygltf_mode == "MASK") {
             return PbrMaterial::ALPHA_MODE_MASK;
         } else if (tinygltf_mode == "BLEND") {
             return PbrMaterial::ALPHA_MODE_BLEND;
-        } else if (tinygltf_mode != "OPAQUE"){
+        } else {
             std::cerr << std::format("Unsupported GLTF alpha mode '{}', using the default alpha mode 'OPAQUE'", tinygltf_mode) << std::endl;
+            return PbrMaterial::ALPHA_MODE_OPAQUE;
         }
-
-        return alpha_mode;
     }
 
     CudaTriangleIndexBufferView::TriangleIndexFormat constexpr indexFormat(int32_t tinygltf_type)
@@ -74,19 +79,67 @@ struct
     }
 } g_mapper;
 
+void addImage(Scene& scene, int32_t width, int32_t height, int32_t bits_per_component, const void *data)
+{
+    static constexpr int32_t components_num = 4;
+
+    int32_t pitch = sizeof(uint8_t) * components_num * width;
+    cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc<uchar4>();
+
+    if(bits_per_component == 16) {
+        pitch = sizeof(uint16_t) * components_num * width;
+        channel_desc = cudaCreateChannelDesc<ushort4>();
+    }else if(bits_per_component != 8) {
+        throw std::runtime_error{ EXCEPTION_MSG("Unsupported bits per component") };
+    }
+
+    cudaArray_t cuda_array = nullptr;
+    CUDA_CHECK(cudaMallocArray(&cuda_array, &channel_desc, width, height));
+    CUDA_CHECK(cudaMemcpy2DToArray(cuda_array, 0, 0, data, pitch, pitch, height, cudaMemcpyHostToDevice));
+
+    scene.images.push_back(cuda_array);
+}
+
+void addTexture(Scene& scene,
+                cudaTextureAddressMode address_s,
+                cudaTextureAddressMode address_t,
+                cudaTextureFilterMode  filter_mode,
+                int32_t                image_index)
+{
+    cudaResourceDesc res_desc = {
+        .resType = cudaResourceTypeArray,
+        .res = { .array = { .array = scene.images[image_index] } }
+    };
+
+    cudaTextureDesc tex_desc = {
+        .addressMode         = { address_s, address_t },
+        .filterMode          = filter_mode,
+        .readMode            = cudaReadModeNormalizedFloat,
+        .sRGB                = 0,
+        .borderColor         = { 1.0f },
+        .normalizedCoords    = 1,
+        .maxAnisotropy       = 1,
+        .mipmapFilterMode    = cudaFilterModePoint,
+        .minMipmapLevelClamp = 0,
+        .maxMipmapLevelClamp = 99,
+    };
+
+    cudaTextureObject_t tex = 0;
+    CUDA_CHECK(cudaCreateTextureObject(&tex, &res_desc, &tex_desc, nullptr));
+    scene.textures.push_back(tex);
+}
+
 template <typename TextureInfo>
 void loadTextureInfo(PbrMaterial::Texture& tex, const Scene& scene, const TextureInfo& gltf_tex)
 {
     tex.texture        = 0;
-    tex.texcoord_index = 0;
     if (gltf_tex.index >= 0) {
-        if (tex.texcoord_index >= 1) {
+        if (gltf_tex.texCoord >= 1) {
             std::cerr << "\t\tUnsupported multiple texcoords" << std::endl;
             return;
         }
 
-        tex.texture        = scene.getTextures()[gltf_tex.index];
-        tex.texcoord_index = gltf_tex.texCoord;
+        tex.texture        = scene.textures[gltf_tex.index];
 
         float2& offset   = tex.texcoord_offset;
         float2& rotation = tex.texcoord_rotation;
@@ -148,7 +201,6 @@ void loadAabb(Aabb& aabb, const tinygltf::Model& model, int32_t attribute_index)
 }
 
 void loadGltfNode(Scene& scene,
-                  std::vector<Camera>& cameras,
                   const tinygltf::Model& model,
                   uint32_t node_index,
                   const Matrix<4, 4>& transform = identityMatrix())
@@ -203,110 +255,46 @@ void loadGltfNode(Scene& scene,
                                      vfov,
                                      aspect_ratio) << std::endl;
             Camera cam(position, make_float3(0.0f, 0.0f, 0.0f), up, vfov, aspect_ratio);
-            cameras.push_back(cam);
+            scene.cameras.push_back(cam);
         } else if (node.mesh != -1) {
             auto instance = std::make_shared<Scene::Instance>();
             instance->transform  = new_transform;
-            instance->aabb       = scene.getMeshes()[node.mesh]->aabb;
+            instance->aabb       = scene.meshes[node.mesh]->aabb;
             instance->mesh_index = node.mesh;
             instance->aabb.transform(new_transform);
-            scene.addInstance(instance);
+            scene.instances.push_back(instance);
         }
     } while (false);
 
     if (!node.children.empty()) {
         for (int32_t child: node.children) {
-            loadGltfNode(scene, cameras, model, child, new_transform);
+            loadGltfNode(scene, model, child, new_transform);
         }
     }
 }
 
 }
 
-Scene::Scene()
+void Scene::cleanup(Scene& scene)
 {
-    cudaFree(nullptr);
-}
-
-Scene::~Scene() noexcept
-{
-    try {
-        
-    } catch(std::exception& e) {
-        std::cerr << std::format("Scene::~Scene(): cought a exception: {}", e.what()) << std::endl;
-    }
-}
-
-void Scene::addImage(int32_t width,
-                     int32_t height,
-                     int32_t bits_per_component,
-                     const void *data)
-{
-    static constexpr int32_t components_num = 4;
-
-    int32_t pitch = sizeof(uint8_t) * components_num * width;
-    cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc<uchar4>();
-
-    if(bits_per_component == 16) {
-        pitch = sizeof(uint16_t) * components_num * width;
-        channel_desc = cudaCreateChannelDesc<ushort4>();
-    }else if(bits_per_component != 8) {
-        throw std::runtime_error{ EXCEPTION_MSG("Unsupported bits per component") };
-    }
-
-    cudaArray_t cuda_array = nullptr;
-    CUDA_CHECK(cudaMallocArray(&cuda_array, &channel_desc, width, height));
-    CUDA_CHECK(cudaMemcpy2DToArray(cuda_array, 0, 0, data, pitch, pitch, height, cudaMemcpyHostToDevice));
-
-    m_images.push_back(cuda_array);
-}
-
-void Scene::addTexture(cudaTextureAddressMode address_s,
-                       cudaTextureAddressMode address_t,
-                       cudaTextureFilterMode  filter_mode,
-                       int32_t                image_index)
-{
-    cudaResourceDesc res_desc = {
-        .resType = cudaResourceTypeArray,
-        .res = { .array = { .array = m_images[image_index] } }
-    };
-
-    cudaTextureDesc tex_desc = {
-        .addressMode         = { address_s, address_t },
-        .filterMode          = filter_mode,
-        .readMode            = cudaReadModeNormalizedFloat,
-        .sRGB                = 0,
-        .borderColor         = { 1.0f },
-        .normalizedCoords    = 1,
-        .maxAnisotropy       = 1,
-        .mipmapFilterMode    = cudaFilterModePoint,
-        .minMipmapLevelClamp = 0,
-        .maxMipmapLevelClamp = 99,
-    };
-
-    cudaTextureObject_t tex = 0;
-    CUDA_CHECK(cudaCreateTextureObject(&tex, &res_desc, &tex_desc, nullptr));
-    m_textures.push_back(tex);
-}
-
-void Scene::cleanup()
-{
-    for (auto texture: m_textures)
+    for (auto texture: scene.textures)
         CUDA_CHECK(cudaDestroyTextureObject(texture));
-    for (auto image: m_images)
+    for (auto image: scene.images)
         CUDA_CHECK(cudaFreeArray(image));
-    m_cameras.clear();
-    m_meshes.clear();
-    m_materials.clear();
-    m_images.clear();
-    m_textures.clear();
-    m_buffers.clear();
-    m_aabb.invalidate();
+    scene.cameras.clear();
+    scene.meshes.clear();
+    scene.materials.clear();
+    scene.images.clear();
+    scene.textures.clear();
+    scene.buffers.clear();
+    scene.aabb.invalidate();
 }
 
-void loadGltfScene(Scene& scene, const std::string &filename)
+void Scene::loadFromGltf(Scene& scene, const std::string &filename)
 {
-    scene.cleanup();
+    CUDA_CHECK(cudaFree(nullptr));
+
+    cleanup(scene);
 
     std::cerr << std::format("Loading GLTF file '{}':", filename) << std::endl;
 
@@ -340,7 +328,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
                                  buffer.name,
                                  byte_size,
                                  buffer.uri) << std::endl;
-        scene.addBuffer(buffer.data.data(), byte_size);
+        scene.buffers.push_back(CudaDeviceBuffer(buffer.data.data(), byte_size));
     }
     
     for (const auto& image: model.images) {
@@ -355,23 +343,20 @@ void loadGltfScene(Scene& scene, const std::string &filename)
                                  image.component,
                                  image.bits) << std::endl;
         assert(image.component == 4 && (image.bits == 8 || image.bits == 16));
-        scene.addImage(image.width,
-                       image.height,
-                       image.bits,
-                       image.image.data());
+        addImage(scene, image.width, image.height, image.bits, image.image.data());
     }
 
     for (const auto& texture: model.textures) {
         std::cerr << std::format("\tLoading texture '{}':", texture.name) << std::endl;
         if (texture.sampler == -1) {
-            scene.addTexture(cudaAddressModeWrap, cudaAddressModeWrap, cudaFilterModeLinear, texture.source);
+            addTexture(scene, cudaAddressModeWrap, cudaAddressModeWrap, cudaFilterModeLinear, texture.source);
             continue;
         }
         const auto& sampler  = model.samplers[texture.sampler];
         const auto address_s = g_mapper.wrappingMode(sampler.wrapS);
         const auto address_t = g_mapper.wrappingMode(sampler.wrapT);
         const auto filter    = g_mapper.filterMode(sampler.minFilter);
-        scene.addTexture(address_s, address_t, filter, texture.source);
+        addTexture(scene, address_s, address_t, filter, texture.source);
     }
 
     for (const auto& material: model.materials) {
@@ -470,7 +455,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
         // metallic roughness texture
         loadTextureInfo(pbr_material.metallic_roughness_texture, scene, material.pbrMetallicRoughness.metallicRoughnessTexture);
 
-        scene.addMaterial(pbr_material);
+        scene.materials.push_back(pbr_material);
     }
 
     for (const auto& mesh: model.meshes) {
@@ -486,7 +471,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
                 continue;
             }
 
-            const std::vector<CudaDeviceBuffer>& buffers = scene.getBuffers();
+            const std::vector<CudaDeviceBuffer>& buffers = scene.buffers;
             
             // index
             new_mesh->indices.push_back(createBufferViewFromGltf<TriangleIndexType>(model, buffers, primitive.indices));
@@ -523,7 +508,7 @@ void loadGltfScene(Scene& scene, const std::string &filename)
             // material index
             new_mesh->material_indices.push_back(primitive.material);
         }
-        scene.addMesh(new_mesh);
+        scene.meshes.push_back(new_mesh);
         std::cerr << std::format("\t\tNumber of triangles: {}", triangle_num) << std::endl;
     }
 
@@ -533,21 +518,16 @@ void loadGltfScene(Scene& scene, const std::string &filename)
             is_root[child] = 0;
         }
     }
-    std::vector<Camera> cameras;
     for (uint32_t i = 0; i < is_root.size(); i++) {
         if (!is_root[i])
             continue;
-        loadGltfNode(scene, cameras, model, i, identityMatrix());
+        loadGltfNode(scene, model, i, identityMatrix());
     }
 
-    Aabb aabb;
-    for (auto instance: scene.getInstances())
-        aabb.include(instance->aabb);
-    scene.setAabb(aabb);
+    for (auto instance: scene.instances)
+        scene.aabb.include(instance->aabb);
     
-    float3 center = aabb.center();
-    for (auto& camera: cameras) {
+    float3 center = scene.aabb.center();
+    for (auto& camera: scene.cameras)
         camera.setTarget(center);
-        scene.addCamera(camera);
-    }
 }

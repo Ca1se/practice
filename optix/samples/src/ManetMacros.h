@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #if defined(__CUDACC__) || defined(__CUDABE__)
     #define MANET_INLINE __forceinline__
     #define MANET_HOST   __host__

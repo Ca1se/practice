@@ -7,8 +7,8 @@ int main()
 {
     Scene scene;
     try {
-        loadGltfScene(scene, "sponza/sponza.gltf");
-        std::cerr << "hello\n";
+        Scene::loadFromGltf(scene, "sponza/sponza.gltf");
+        Scene::cleanup(scene);
     } catch (std::exception& e) {
         std::cerr << std::format("Caught a exception: {}", e.what()) << std::endl;
     }

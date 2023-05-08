@@ -21,6 +21,11 @@ struct CudaBufferView
     {
         return *reinterpret_cast<T*>(buffer_ptr + (stride_byte_size != 0 ? stride_byte_size : sizeof(T)) * index);
     }
+
+    __forceinline__ __device__ ElementType& operator[](size_t index) const
+    {
+        return *reinterpret_cast<ElementType*>(buffer_ptr + (stride_byte_size != 0 ? stride_byte_size : sizeof(ElementType)) * index);
+    }
 };
 
 struct TriangleIndexType {};
