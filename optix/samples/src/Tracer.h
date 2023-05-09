@@ -8,7 +8,21 @@
 
 struct TracerState
 {
+    OptixDeviceContext          context                  = nullptr;
+    OptixModule                 module                   = nullptr;
+    OptixPipeline               pipeline                 = nullptr;
+    OptixPipelineCompileOptions pipeline_compile_options = {};
+    OptixShaderBindingTable     shader_binding_table     = {};
 
+    OptixProgramGroup raygen_pinhole_pg = nullptr;
+    OptixProgramGroup hit_radiance_pg   = nullptr;
+    OptixProgramGroup hit_occlusion_pg  = nullptr;
+    OptixProgramGroup miss_radiance_pg  = nullptr;
+    OptixProgramGroup miss_occlusion_pg = nullptr;
+
+    OptixTraversableHandle ias_handle;
+
+    std::vector<CudaDeviceBuffer> buffers;
 };
 
 class Tracer
@@ -28,18 +42,6 @@ private:
     void buildShaderBindingTable();
 
 private:
-    OptixDeviceContext          m_context                  = nullptr;
-    OptixModule                 m_module                   = nullptr;
-    OptixPipeline               m_pipeline                 = nullptr;
-    OptixPipelineCompileOptions m_pipeline_compile_options = {};
-    OptixShaderBindingTable     m_shader_binding_table     = {};
-
-    OptixProgramGroup m_raygen_pinhole_pg = nullptr;
-    OptixProgramGroup m_hit_radiance_pg   = nullptr;
-    OptixProgramGroup m_hit_occlusion_pg  = nullptr;
-    OptixProgramGroup m_miss_radiance_pg  = nullptr;
-    OptixProgramGroup m_miss_occlusion_pg = nullptr;
-
     std::shared_ptr<Scene> m_scene = nullptr;
 
     TracerState m_state;
