@@ -18,6 +18,7 @@
 #include "Exception.h"
 #include "Util.h"
 #include "CudaBufferView.h"
+#include "CudaObjectView.h"
 #include "Record.h"
 
 namespace
@@ -83,6 +84,7 @@ Tracer::~Tracer() noexcept
 
 void Tracer::loadScene(std::shared_ptr<Scene> scene)
 {
+    m_state.shader_binding_table = {};
     m_state.ias_handle = 0;
     m_state.buffers.clear();
 
@@ -446,12 +448,11 @@ void Tracer::buildShaderBindingTable()
 
     {
         EmptyRecord record = {};
-        OPTIX_CHECK(optixSbtRecordPackHeader(m_state.raygen_pinhole_pg, &record));
+        OPTIX_CHECK(optixSbtRecordPackHeader(m_state.raygen_pinhole_pg, static_cast<void*>(&record)));
 
         CudaDeviceBuffer record_buffer(static_cast<void*>(&record), sizeof(EmptyRecord));
         sbt.raygenRecord = record_buffer.data();
         m_state.buffers.push_back(std::move(record_buffer));
-        
     }
 
     {
@@ -460,12 +461,50 @@ void Tracer::buildShaderBindingTable()
         OPTIX_CHECK(optixSbtRecordPackHeader(m_state.miss_occlusion_pg, static_cast<void*>(&records[1])));
 
         CudaDeviceBuffer record_buffer(static_cast<void*>(records), sizeof(records));
-        sbt.missRecordBase = record_buffer.data();
+        sbt.missRecordBase          = record_buffer.data();
         sbt.missRecordStrideInBytes = sizeof(EmptyRecord);
-        sbt.missRecordCount = 2;
+        sbt.missRecordCount         = static_cast<uint32_t>(std::size(records));
         m_state.buffers.push_back(std::move(record_buffer));
     }
 
     {
+        size_t default_material_index = m_scene->materials.size();
+        m_scene->materials.push_back(PbrMaterial{});
+
+        m_state.buffers.push_back(CudaDeviceBuffer(m_scene->materials.data(),
+                                                   sizeof(PbrMaterial) * m_scene->materials.size()));
+        CUdeviceptr material_cuptr = m_state.buffers.back().data();
+
+        std::vector<HitgroupRecord> records = {};
+        for (const auto& instance: m_scene->instances) {
+            const auto& mesh = m_scene->meshes[instance->mesh_index];
+            for (size_t i = 0; i < mesh->indices.size(); i++) {
+                int32_t material_index = mesh->material_indices[i];
+                HitgroupRecord record  = {
+                    .header = {},
+                    .data   = HitgroupData{
+                        .indices   = mesh->indices[i],
+                        .positions = mesh->positions[i],
+                        .normals   = mesh->normals[i],
+                        .texcoords = mesh->texcoords[i],
+                        .colors    = mesh->colors[i],
+                        .material  = (material_index >= 0
+                                      ? CudaObjectView<PbrMaterial>(material_cuptr + sizeof(PbrMaterial) * material_index)
+                                      : CudaObjectView<PbrMaterial>(material_cuptr + sizeof(PbrMaterial) * default_material_index))
+                    }
+                };
+
+                OPTIX_CHECK(optixSbtRecordPackHeader(m_state.hit_radiance_pg, &record));
+                records.push_back(record);
+
+                OPTIX_CHECK(optixSbtRecordPackHeader(m_state.hit_occlusion_pg, &record));
+                records.push_back(record);
+            }
+        }
+        CudaDeviceBuffer record_buffer(static_cast<void*>(records.data()), sizeof(HitgroupRecord) * records.size());
+        sbt.hitgroupRecordBase          = record_buffer.data();
+        sbt.hitgroupRecordStrideInBytes = sizeof(HitgroupRecord);
+        sbt.hitgroupRecordCount         = static_cast<uint32_t>(records.size());
+        m_state.buffers.push_back(std::move(record_buffer));
     }
 }

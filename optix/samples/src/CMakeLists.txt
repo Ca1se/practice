@@ -6,6 +6,7 @@ OPTIX_add_sample_executable(pathtracer target_name
     CudaBufferView.h
     CudaDeviceBuffer.cpp
     CudaDeviceBuffer.h
+    CudaObjectView.h
     CudaOutputBuffer.h
     Exception.cpp
     Exception.h
@@ -16,6 +17,7 @@ OPTIX_add_sample_executable(pathtracer target_name
     ManetMacros.h
     Matrix.h
     PbrMaterial.h
+    Record.h
     Scene.cpp
     Scene.h
     Tracer.cpp
