@@ -7,7 +7,7 @@
 #include "Camera.h"
 #include "CudaBufferView.h"
 #include "CudaDeviceBuffer.h"
-#include "cuda/PbrMaterial.h"
+#include "PbrMaterial.h"
 #include "Matrix.h"
 
 struct Scene

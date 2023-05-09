@@ -36,6 +36,8 @@ public:
     MANET_HOSTDEVICE float& operator()(size_t row_index, size_t col_index) noexcept { return m_data[row_index * cols + col_index]; }
 
     MANET_HOSTDEVICE static constexpr size_t size() noexcept { return s_size; }
+    MANET_HOSTDEVICE float* data() noexcept { return m_data; }
+    MANET_HOSTDEVICE const float* data() const noexcept { return m_data; }
 
 private:
     static constexpr size_t s_size = rows * cols;

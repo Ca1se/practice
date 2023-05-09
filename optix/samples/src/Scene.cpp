@@ -65,18 +65,50 @@ struct
     CudaTriangleIndexBufferView::TriangleIndexFormat constexpr indexFormat(int32_t tinygltf_type)
     {
         switch (tinygltf_type) {
-            case TINYGLTF_COMPONENT_TYPE_SHORT:
-                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_SHORT3;
-            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_USHORT3;
-            case TINYGLTF_COMPONENT_TYPE_INT:
-                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_INT3;
-            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-                return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_UINT3;
-            default:
-                throw std::runtime_error{ EXCEPTION_MSG(std::format("unsupported index byte size: {}", tinygltf_type)) };
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+            return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_SHORT3;
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_USHORT3;
+        case TINYGLTF_COMPONENT_TYPE_INT:
+            return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_INT3;
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            return CudaTriangleIndexBufferView::TRIANGLE_INDEX_FORMAT_UINT3;
+        default:
+            throw std::runtime_error{ std::format("indexFormat(): Unsupported index byte size: {}", tinygltf_type) };
         }
     }
+
+    uint32_t constexpr typeSize(int32_t tinygltf_type)
+    {
+        switch (tinygltf_type) {
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            return 2;
+        case TINYGLTF_COMPONENT_TYPE_INT:
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+        case TINYGLTF_COMPONENT_TYPE_FLOAT:
+            return 4;
+        default:
+            throw std::runtime_error{ std::format("typeSize(): Unsupported Gltf component type: {}", tinygltf_type) };
+        }
+    }
+
+    uint32_t constexpr componentNumber(int32_t tinygltf_type)
+    {
+        switch (tinygltf_type) {
+        case TINYGLTF_TYPE_SCALAR:
+            return 1;
+        case TINYGLTF_TYPE_VEC2:
+            return 2;
+        case TINYGLTF_TYPE_VEC3:
+            return 3;
+        case TINYGLTF_TYPE_VEC4:
+            return 4;
+        default:
+            throw std::runtime_error{ std::format("componentNumber(): Unsupported Gltf type: {}", tinygltf_type) };
+        }
+    }
+
 } g_mapper;
 
 void addImage(Scene& scene, int32_t width, int32_t height, int32_t bits_per_component, const void *data)
@@ -180,10 +212,21 @@ CudaBufferView<T> createBufferViewFromGltf(const tinygltf::Model& model,
         .element_count    = static_cast<uint32_t>(accessor.count),
         .stride_byte_size = static_cast<uint32_t>(buffer_view.byteStride)
     };
+    if (ret.stride_byte_size == 0)
+        ret.stride_byte_size = g_mapper.componentNumber(accessor.type) * g_mapper.typeSize(accessor.componentType);
+    /*
+    std::cerr << std::format("count:  {}\n"
+                             "stride: {}",
+                             ret.element_count,
+                             ret.stride_byte_size) << std::endl;
+    */
     if constexpr (std::is_same_v<T, TriangleIndexType>) {
-        ret.element_count /= 3;
-        ret.index_format   = g_mapper.indexFormat(accessor.componentType);
+        ret.element_count    /= 3;
+        ret.stride_byte_size *= 3;
+        ret.index_format      = g_mapper.indexFormat(accessor.componentType);
+        // std::cerr << std::format("format: {}", static_cast<uint32_t>(ret.index_format)) << std::endl;
     }
+
     return ret;
 }
 

@@ -1,15 +1,5 @@
 OPTIX_add_sample_executable(pathtracer target_name
-    cuda/GeometryData.h
-    cuda/helpers.h
-    cuda/Light.h
-    cuda/LocalGeometry.h
-    cuda/LocalShading.h
-    cuda/PbrMaterial.h
-    cuda/random.h
-    cuda/util.h
-    cuda/whitted_cuda.h
-    cuda/whitted.cu
-    cuda/whitted.h
+    PathTracing.cu
     Aabb.h
     Camera.cpp
     Camera.h
@@ -25,6 +15,7 @@ OPTIX_add_sample_executable(pathtracer target_name
     Manet.h
     ManetMacros.h
     Matrix.h
+    PbrMaterial.h
     Scene.cpp
     Scene.h
     Tracer.cpp

@@ -440,6 +440,11 @@ MANET_DECL float4 max_float4(const float4& a, const float4& b) noexcept
     return make_float4(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z), fmaxf(a.w, b.w));
 }
 
+MANET_DECL uint3 make_uint3(const ushort3& v) noexcept
+{
+    return make_uint3(v.x, v.y, v.z);
+}
+
 MANET_DECL float4 make_float4(const float3& xyz, float w) noexcept
 {
     return make_float4(xyz.x, xyz.y, xyz.z, w);
