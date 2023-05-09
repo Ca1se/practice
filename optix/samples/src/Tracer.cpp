@@ -190,6 +190,7 @@ void Tracer::buildAccelerationStructures()
     std::vector<OptixInstance> optix_instances = {};
     uint32_t sbt_offset = 0;
     for (size_t i = 0; i < instance_num; i++) {
+        auto instance = m_scene->instances[i];
         optix_instances.push_back(OptixInstance{
             .transform         = {},
             .instanceId        = static_cast<uint32_t>(i),
@@ -198,7 +199,8 @@ void Tracer::buildAccelerationStructures()
             .flags             = OPTIX_INSTANCE_FLAG_NONE,
             .traversableHandle = gas_handle
         });
-        memcpy(optix_instances.back().transform, m_scene->instances[i]->transform.data(), 12 * sizeof(float));
+        memcpy(optix_instances.back().transform, instance->transform.data(), 12 * sizeof(float));
+        sbt_offset += 2 * static_cast<uint32_t>(m_scene->meshes[instance->mesh_index]->indices.size());
     }
 }
 
