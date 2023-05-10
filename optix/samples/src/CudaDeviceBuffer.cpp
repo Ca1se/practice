@@ -37,6 +37,11 @@ memoryCopyDeviceToHost(void* dest, CUdeviceptr src, size_t byte_size)
 
 }  // namespace
 
+CudaDeviceBuffer::CudaDeviceBuffer()
+{
+    CUDA_CHECK(cudaFree(nullptr));
+}
+
 CudaDeviceBuffer::~CudaDeviceBuffer() noexcept
 {
     try {
@@ -50,6 +55,7 @@ CudaDeviceBuffer::CudaDeviceBuffer(CudaDeviceBuffer&& other)
     : m_data{ other.m_data }
     , m_size{ other.m_size }
 {
+    CUDA_CHECK(cudaFree(nullptr));
     other.m_data = 0;
     other.m_size = 0;
 }
@@ -70,6 +76,7 @@ CudaDeviceBuffer::operator=(CudaDeviceBuffer&& other)
 CudaDeviceBuffer::CudaDeviceBuffer(size_t byte_size)
     : m_size{ byte_size }
 {
+    CUDA_CHECK(cudaFree(nullptr));
     assert(byte_size != 0);
 
     allocateDeviceMemory(m_data, m_size);
@@ -78,6 +85,7 @@ CudaDeviceBuffer::CudaDeviceBuffer(size_t byte_size)
 CudaDeviceBuffer::CudaDeviceBuffer(const void* src, size_t byte_size)
     : m_size{ byte_size }
 {
+    CUDA_CHECK(cudaFree(nullptr));
     assert(src != nullptr);
     assert(byte_size != 0);
 

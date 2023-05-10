@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-GLFWwindow* initGl(const std::string& title, int32_t width, int32_t height);
+GLFWwindow* createGlfwWindow(const std::string& title, int32_t width, int32_t height);
 
 const char* getCompiledCudaCode(const std::string& sample_name, const std::string& source_name, size_t& code_size);
 

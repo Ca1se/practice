@@ -10,13 +10,17 @@ OPTIX_add_sample_executable(pathtracer target_name
     CudaOutputBuffer.h
     Exception.cpp
     Exception.h
+    GlContext.cpp
+    GlContext.h
     GlDisplay.cpp
     GlDisplay.h
+    Helper.h
     Manet.cpp
     Manet.h
     ManetMacros.h
     Matrix.h
     PbrMaterial.h
+    random.h
     Record.h
     Scene.cpp
     Scene.h

@@ -7,17 +7,17 @@
 class CudaDeviceBuffer
 {
 public:
-    CudaDeviceBuffer() = default;
+    CudaDeviceBuffer();
     ~CudaDeviceBuffer() noexcept;
-
-    CudaDeviceBuffer(size_t byte_size);
-    CudaDeviceBuffer(const void* src, size_t byte_size);
 
     CudaDeviceBuffer(const CudaDeviceBuffer&)            = delete;
     CudaDeviceBuffer& operator=(const CudaDeviceBuffer&) = delete;
 
     CudaDeviceBuffer(CudaDeviceBuffer&& other);
     CudaDeviceBuffer& operator=(CudaDeviceBuffer&& other);
+    
+    CudaDeviceBuffer(size_t byte_size);
+    CudaDeviceBuffer(const void* src, size_t byte_size);
 
     CUdeviceptr data() const noexcept { return m_data; }
 

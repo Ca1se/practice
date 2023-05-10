@@ -392,7 +392,7 @@ MANET_DECL unsigned int min(unsigned int a, unsigned int b)
 
 MANET_DECL float3 lerp(const float3& a, const float3& b, const float t)
 {
-  return a + t*(b-a);
+  return a + t * (b - a);
 }
 
 MANET_DECL float clamp(float val, float min, float max)

@@ -7,6 +7,8 @@
 #include <cassert>
 #include <cstring>
 
+#include <glad.h>
+#include <glfw3.h>
 #include <optix.h>
 #include <optix_stack_size.h>
 #include <optix_stubs.h>
@@ -23,6 +25,14 @@
 
 namespace
 {
+
+void ensureMinimumSize(int32_t& width, int32_t& height)
+{
+    if (width <= 0)
+        width = 1;
+    if (height <= 0)
+        height = 1;
+}
 
 void optixContextLogCallback(uint32_t level, const char* tag, const char* message, void*)
 {
@@ -46,10 +56,129 @@ struct
     }
 } g_mapper;
 
+void windowSizeCallback(GLFWwindow* window, int32_t width, int32_t height)
+{
+    auto state = static_cast<TracerState*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+
+    if (state->minimized)
+        return;
+
+    ensureMinimumSize(width, height);
+
+    state->output_size.x  = width;
+    state->output_size.y  = height;
+    state->window_resized = true;
+    state->camera_changed = true;
 }
 
-Tracer::Tracer()
+void windowIconifyCallback(GLFWwindow* window, int32_t iconified)
 {
+    auto state = static_cast<TracerState*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+
+    state->minimized = (iconified > 0);
+}
+
+void mouseButtonCallback(GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
+{
+    auto state = static_cast<TracerState*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+
+    if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT) {
+        state->prior_mouse_pos = make_int2(static_cast<int>(xpos), static_cast<int>(ypos));
+        state->button_pressed  = true;
+    } else {
+        state->button_pressed = false;
+    }
+}
+
+void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    auto state = static_cast<TracerState*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+
+    if (state->button_pressed) {
+        if (!glfwGetWindowAttrib(window, GLFW_HOVERED)) {
+            state->button_pressed = false;
+            return;
+        }
+
+        int2 now_mouse_pos = make_int2(static_cast<int32_t>(xpos), static_cast<int32_t>(ypos));
+        state->camera.rotate(state->prior_mouse_pos,
+                             now_mouse_pos,
+                             state->output_size);
+        state->prior_mouse_pos = now_mouse_pos;
+        state->camera_changed  = true;
+    }
+}
+
+void scrollCallback(GLFWwindow* window, double xscroll, double yscroll)
+{
+    auto state = static_cast<TracerState*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+    
+    state->camera.zoom(static_cast<int>(yscroll));
+    state->camera_changed = true;
+}
+
+void keyCallback(GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
+{
+    auto state = static_cast<TracerState*>(glfwGetWindowUserPointer(window));
+
+    assert(state != nullptr);
+
+    if(action == GLFW_PRESS || action == GLFW_REPEAT) {
+        switch(key) {
+        case GLFW_KEY_W:
+            state->camera.move(make_float3(0.0f, 0.0f, 1.0f));
+            break;
+        case GLFW_KEY_S:
+            state->camera.move(make_float3(0.0f, 0.0f, -1.0f));
+            break;
+        case GLFW_KEY_A:
+            state->camera.move(make_float3(-1.0f, 0.0f, 0.0f));
+            break;
+        case GLFW_KEY_D:
+            state->camera.move(make_float3(1.0f, 0.0f, 0.0f));
+            break;
+        case GLFW_KEY_SPACE:
+            state->camera.move(make_float3(0.0f, 1.0f, 0.0f));
+            break;
+        case GLFW_KEY_LEFT_SHIFT:
+            state->camera.move(make_float3(0.0f, -1.0f, 0.0f));
+            break;
+        case GLFW_KEY_P:
+            auto pos = state->camera.getPosition();
+            std::cout << std::format("({}, {}, {})\n", pos.x, pos.y, pos.z);
+            break;
+        }
+        state->camera_changed = true;
+    }
+}
+
+}
+
+Tracer::Tracer(int32_t output_width, int32_t output_height)
+    : m_gl_context{ "Manet", output_width, output_height }
+{
+    ensureMinimumSize(output_width, output_height);
+
+    m_state.accum_buffer.resize(sizeof(float4) * output_width * output_height);
+    m_state.color_buffer.resize(output_width, output_height);
+    m_state.launch_params = LaunchParams{
+        .background_color = make_float3(0.5f, 0.7f, 1.0f)
+    };
+    m_state.output_size = make_int2(output_width, output_height);
+
     createOptixContext();
     buildModule();
     buildProgramGroups();
@@ -80,18 +209,56 @@ Tracer::~Tracer() noexcept
     } catch (std::exception& e) {
         std::cerr << std::format("Tracer::~Tracer(): {}", e.what()) << std::endl;
     }
+
+    glfwTerminate();
 }
 
 void Tracer::loadScene(std::shared_ptr<Scene> scene)
 {
     m_state.shader_binding_table = {};
-    m_state.ias_handle = 0;
+    m_state.ias_handle           = 0;
     m_state.buffers.clear();
 
     assert(scene);
     m_scene = scene;
     buildAccelerationStructures();
     buildShaderBindingTable();
+
+    for (const auto& camera: m_scene->cameras) {
+        if (camera.isValid()) {
+            m_state.camera = camera;
+            break;
+        }
+    }
+
+    if (!m_state.camera.isValid()) {
+        const float3& center = m_scene->aabb.center();
+        m_state.camera = Camera(center + make_float3(1.0f, 0.0f, 0.0f),
+                                center,
+                                make_float3(0.0f, 1.0f, 0.0f),
+                                MANET_PIDIV4,
+                                static_cast<float>(m_state.output_size.x)
+                                / static_cast<float>(m_state.output_size.y));
+    }
+}
+
+void Tracer::start()
+{
+    m_state.window = m_gl_context.getWindow();
+    glfwSetWindowSizeCallback(m_state.window, windowSizeCallback);
+    glfwSetWindowIconifyCallback(m_state.window, windowIconifyCallback);
+    glfwSetMouseButtonCallback(m_state.window, mouseButtonCallback);
+    glfwSetCursorPosCallback(m_state.window, cursorPosCallback);
+    glfwSetScrollCallback(m_state.window, scrollCallback);
+    glfwSetKeyCallback(m_state.window, keyCallback);
+    glfwSetWindowUserPointer(m_state.window, static_cast<void*>(&m_state));
+
+    do {
+        glfwPollEvents();
+        updateState();
+        launch();
+        present();
+    } while (!glfwWindowShouldClose(m_state.window));
 }
 
 void Tracer::createOptixContext()
@@ -507,4 +674,72 @@ void Tracer::buildShaderBindingTable()
         sbt.hitgroupRecordCount         = static_cast<uint32_t>(records.size());
         m_state.buffers.push_back(std::move(record_buffer));
     }
+}
+
+void Tracer::updateState()
+{
+    auto [width, height] = m_state.output_size;
+    if (m_state.window_resized) {
+        m_state.accum_buffer.resize(sizeof(float4) * width * height);
+        m_state.color_buffer.resize(width, height);
+        m_state.launch_params.frame.accum_count = 0;
+        m_state.window_resized = false;
+    }
+
+    if (m_state.camera_changed) {
+        auto& [pos, u, v, w] = m_state.launch_params.camera;
+
+        m_state.camera.setAspectRatio(static_cast<float>(width) / static_cast<float>(height));
+        m_state.camera.update();
+
+        pos = m_state.camera.getPosition();
+        m_state.camera.getUVW(u, v, w);
+        m_state.launch_params.frame.accum_count = 0;
+
+        m_state.camera_changed = false;
+    }
+}
+
+void Tracer::launch()
+{
+    uint32_t pixel_num = static_cast<uint32_t>(m_state.output_size.x * m_state.output_size.y);
+    m_state.launch_params.frame.accum_buffer = CudaBufferView<float4>{
+        .buffer_ptr       = m_state.accum_buffer.data(),
+        .element_count    = pixel_num,
+        .stride_byte_size = sizeof(float4)
+    };
+    m_state.launch_params.frame.color_buffer = CudaBufferView<uchar4>{
+        .buffer_ptr       = reinterpret_cast<CUdeviceptr>(m_state.color_buffer.map()),
+        .element_count    = pixel_num,
+        .stride_byte_size = sizeof(uchar4)
+    };
+    m_state.launch_params.handle = m_state.ias_handle;
+    m_state.launch_params_buffer.upload(static_cast<void*>(&m_state.launch_params), sizeof(LaunchParams));
+
+    OPTIX_CHECK(optixLaunch(m_state.pipeline,
+                            0,
+                            m_state.launch_params_buffer.data(),
+                            sizeof(LaunchParams),
+                            &m_state.shader_binding_table,
+                            m_state.output_size.x,
+                            m_state.output_size.y,
+                            1));
+    m_state.color_buffer.unmap();
+
+    CUDA_SYNC_CHECK();
+
+    m_state.launch_params.frame.accum_count++;
+}
+
+void Tracer::present()
+{
+    int32_t res_width;
+    int32_t res_height;
+    glfwGetFramebufferSize(m_state.window, &res_width, &res_height);
+    m_gl_display.display(m_state.color_buffer.width(),
+                         m_state.color_buffer.height(),
+                         res_width,
+                         res_height,
+                         m_state.color_buffer.getPbo());
+    glfwSwapBuffers(m_state.window);
 }

@@ -1,5 +1,8 @@
 #include "Camera.h"
 
+#include <iostream>
+#include <format>
+
 #include "Transform.h"
 
 bool Camera::isValid() const
@@ -72,6 +75,8 @@ Camera::rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size)
 
     float x_delta_theta = std::acosf(dnm.x) - std::acosf(dpm.x);
     float y_delta_theta = std::acosf(dnm.y) - std::acosf(dpm.y);
+
+    std::cerr << std::format("dx: {}, dy: {}", x_delta_theta, y_delta_theta) << std::endl;
 
     m_delta_angle += make_float2(x_delta_theta, y_delta_theta);
     m_rotated = true;

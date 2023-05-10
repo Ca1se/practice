@@ -9,6 +9,7 @@
 class Camera
 {
 public:
+    Camera() = default;
     Camera(const float3& position, const float3& target, const float3& up, float vfov, float aspect_ratio);
     ~Camera() noexcept = default;
 
@@ -32,10 +33,9 @@ public:
     void rotate(int2 prior_mouse_pos, int2 now_mouse_pos, int2 screen_size);
 
     void update();
-
-private:
     void computeUVW();
 
+private:
     float3 m_position;
     float3 m_target;
     float3 m_up;

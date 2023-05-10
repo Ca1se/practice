@@ -16,13 +16,15 @@ template <typename PixelFormat>
 class CudaOutputBuffer
 {
 public:
-    CudaOutputBuffer(int32_t width, int32_t height);
+    CudaOutputBuffer() = default;
     ~CudaOutputBuffer() noexcept;
 
     CudaOutputBuffer(const CudaOutputBuffer&)            = delete;
     CudaOutputBuffer& operator=(const CudaOutputBuffer&) = delete;
     CudaOutputBuffer(CudaOutputBuffer&&)                 = delete;
     CudaOutputBuffer& operator=(CudaOutputBuffer&&)      = delete;
+
+    CudaOutputBuffer(int32_t width, int32_t height);
 
     void resize(int32_t width, int32_t height);
     void destory();
