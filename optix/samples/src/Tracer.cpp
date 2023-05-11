@@ -112,9 +112,7 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         }
 
         int2 now_mouse_pos = make_int2(static_cast<int32_t>(xpos), static_cast<int32_t>(ypos));
-        state->camera.rotate(state->prior_mouse_pos,
-                             now_mouse_pos,
-                             state->output_size);
+        state->camera.rotate(state->prior_mouse_pos, now_mouse_pos, state->output_size);
         state->prior_mouse_pos = now_mouse_pos;
         state->camera_changed  = true;
     }
@@ -209,8 +207,6 @@ Tracer::~Tracer() noexcept
     } catch (std::exception& e) {
         std::cerr << std::format("Tracer::~Tracer(): {}", e.what()) << std::endl;
     }
-
-    glfwTerminate();
 }
 
 void Tracer::loadScene(std::shared_ptr<Scene> scene)
@@ -231,6 +227,8 @@ void Tracer::loadScene(std::shared_ptr<Scene> scene)
         }
     }
 
+    const float3& extent = m_scene->aabb.extent();
+    float max_extent = std::max({ extent.x, extent.y, extent.z });
     if (!m_state.camera.isValid()) {
         const float3& center = m_scene->aabb.center();
         m_state.camera = Camera(center + make_float3(1.0f, 0.0f, 0.0f),
@@ -238,8 +236,10 @@ void Tracer::loadScene(std::shared_ptr<Scene> scene)
                                 make_float3(0.0f, 1.0f, 0.0f),
                                 MANET_PIDIV4,
                                 static_cast<float>(m_state.output_size.x)
-                                / static_cast<float>(m_state.output_size.y));
+                                / static_cast<float>(m_state.output_size.y),
+                                max_extent);
     }
+    std::cerr << "max extent: " << max_extent << std::endl;
 }
 
 void Tracer::start()
@@ -277,7 +277,8 @@ void Tracer::createOptixContext()
 void Tracer::buildAccelerationStructures()
 {
     // build geometry acceleration structures
-    static constexpr uint32_t triangle_input_flags[2] = { OPTIX_GEOMETRY_FLAG_DISABLE_ANYHIT | OPTIX_GEOMETRY_FLAG_DISABLE_TRIANGLE_FACE_CULLING, OPTIX_GEOMETRY_FLAG_DISABLE_ANYHIT };
+    static constexpr uint32_t triangle_input_flags[2] = { OPTIX_GEOMETRY_FLAG_DISABLE_ANYHIT | OPTIX_GEOMETRY_FLAG_DISABLE_TRIANGLE_FACE_CULLING,
+                                                          OPTIX_GEOMETRY_FLAG_DISABLE_ANYHIT };
 
     OptixTraversableHandle gas_handle = 0;
     CudaDeviceBuffer       gas_buffer;
@@ -695,6 +696,13 @@ void Tracer::updateState()
         pos = m_state.camera.getPosition();
         m_state.camera.getUVW(u, v, w);
         m_state.launch_params.frame.accum_count = 0;
+
+        /*
+        std::cerr << std::format("u: ({}, {}, {}), v: ({}, {}, {}), w: ({}, {}, {})",
+                                 u.x, u.y, u.z,
+                                 v.x, v.y, v.z,
+                                 w.x, w.y, w.z) << std::endl;
+        */
 
         m_state.camera_changed = false;
     }

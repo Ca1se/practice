@@ -164,19 +164,19 @@ void addTexture(Scene& scene,
 template <typename TextureInfo>
 void loadTextureInfo(PbrMaterial::Texture& tex, const Scene& scene, const TextureInfo& gltf_tex)
 {
-    tex.texture        = 0;
+    tex.texture = 0;
     if (gltf_tex.index >= 0) {
         if (gltf_tex.texCoord >= 1) {
             std::cerr << "\t\tUnsupported multiple texcoords" << std::endl;
             return;
         }
 
-        tex.texture        = scene.textures[gltf_tex.index];
+        tex.texture = scene.textures[gltf_tex.index];
 
-        float2& offset   = tex.texcoord_offset;
-        float2& rotation = tex.texcoord_rotation;
-        float2& scale    = tex.texcoord_scale;
-        if (const auto& itr = gltf_tex.extensions.find("KHR_texture_transform"); itr != gltf_tex.extensions.end()) {
+        float2 offset   = make_float2(0.0f, 0.0f);
+        float2 rotation = make_float2(0.0f, 1.0f);
+        float2 scale    = make_float2(1.0f, 1.0f);
+        if (auto itr = gltf_tex.extensions.find("KHR_texture_transform"); itr != gltf_tex.extensions.end()) {
             if (itr->second.Has("offset")) {
                 auto offset_val = itr->second.Get("offset");
                 offset = make_float2(static_cast<float>(offset_val.Get(0).GetNumberAsDouble()),
@@ -192,6 +192,9 @@ void loadTextureInfo(PbrMaterial::Texture& tex, const Scene& scene, const Textur
                                     static_cast<float>(scale_val.Get(1).GetNumberAsDouble()));
             }
         }
+        tex.texcoord_offset   = offset;
+        tex.texcoord_rotation = rotation;
+        tex.texcoord_scale    = scale;
     }
 }
 
@@ -297,7 +300,7 @@ void loadGltfNode(Scene& scene,
                                      up.x, up.y, up.z,
                                      vfov,
                                      aspect_ratio) << std::endl;
-            Camera cam(position, make_float3(0.0f, 0.0f, 0.0f), up, vfov, aspect_ratio);
+            Camera cam(position, make_float3(0.0f, 0.0f, 0.0f), up, vfov, aspect_ratio, 0.0f);
             scene.cameras.push_back(cam);
         } else if (node.mesh != -1) {
             auto instance = std::make_shared<Scene::Instance>();
@@ -537,16 +540,16 @@ void Scene::loadFromGltf(Scene& scene, const std::string &filename)
             // texcoord
             const auto& texcoord_index_itr = primitive.attributes.find("TEXCOORD_0");
             if (texcoord_index_itr != primitive.attributes.end()) {
-                new_mesh->texcoords.push_back(createBufferViewFromGltf<float2>(model, buffers, texcoord_index_itr->second));
+                new_mesh->texcoords.push_back(createBufferViewFromGltf<Vec2f>(model, buffers, texcoord_index_itr->second));
             } else {
-                new_mesh->texcoords.push_back(CudaBufferView<float2>{});
+                new_mesh->texcoords.push_back(CudaBufferView<Vec2f>{});
             }
             // color
             const auto& color_index_itr = primitive.attributes.find("COLOR_0");
             if (color_index_itr != primitive.attributes.end()) {
-                new_mesh->colors.push_back(createBufferViewFromGltf<float4>(model, buffers, color_index_itr->second));
+                new_mesh->colors.push_back(createBufferViewFromGltf<Vec4f>(model, buffers, color_index_itr->second));
             } else {
-                new_mesh->colors.push_back(CudaBufferView<float4>{});
+                new_mesh->colors.push_back(CudaBufferView<Vec4f>{});
             }
             // material index
             new_mesh->material_indices.push_back(primitive.material);
@@ -570,7 +573,11 @@ void Scene::loadFromGltf(Scene& scene, const std::string &filename)
     for (auto instance: scene.instances)
         scene.aabb.include(instance->aabb);
     
-    float3 center = scene.aabb.center();
-    for (auto& camera: scene.cameras)
+    const float3& center = scene.aabb.center();
+    const float3& extent = scene.aabb.extent();
+    float max_extent = std::max({ extent.x, extent.y, extent.z });
+    for (auto& camera: scene.cameras) {
         camera.setTarget(center);
+        camera.setWorldScale(max_extent);
+    }
 }

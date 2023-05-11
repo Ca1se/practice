@@ -9,6 +9,7 @@
 #include "CudaDeviceBuffer.h"
 #include "PbrMaterial.h"
 #include "Matrix.h"
+#include "Record.h"
 
 struct Scene
 {
@@ -24,8 +25,8 @@ struct Scene
         std::vector<CudaTriangleIndexBufferView> indices;
         std::vector<CudaBufferView<float3>>      positions;
         std::vector<CudaBufferView<float3>>      normals;
-        std::vector<CudaBufferView<float2>>      texcoords;
-        std::vector<CudaBufferView<float4>>      colors;
+        std::vector<CudaBufferView<Vec2f>>       texcoords;
+        std::vector<CudaBufferView<Vec4f>>       colors;
         std::vector<int32_t>                     material_indices;
         Aabb                                     aabb;
     };

@@ -28,7 +28,7 @@ MANET_DECL float2 operator+(float f, float2 a) noexcept
     return a + f;
 }
 
-MANET_DECL float2 operator+=(float2 a, float2 b) noexcept
+MANET_DECL float2& operator+=(float2& a, float2 b) noexcept
 {
     a.x += b.x;
     a.y += b.y;
@@ -51,7 +51,7 @@ MANET_DECL float2 operator-(float2 a, float f) noexcept
     return make_float2(a.x - f, a.y - f);
 }
 
-MANET_DECL float2 operator-=(float2 a, float2 b) noexcept
+MANET_DECL float2& operator-=(float2& a, float2 b) noexcept
 {
     a.x -= b.x;
     a.y -= b.y;
@@ -64,7 +64,7 @@ MANET_DECL float2 operator*(float2 a, float2 b) noexcept
     return make_float2(a.x * b.x, a.y * b.y);
 }
 
-MANET_DECL float2 operator*=(float2 a, float2 b) noexcept
+MANET_DECL float2& operator*=(float2& a, float2 b) noexcept
 {
     a.x *= b.x;
     a.y *= b.y;
@@ -82,7 +82,7 @@ MANET_DECL float2 operator*(float f, float2 a) noexcept
     return a * f;
 }
 
-MANET_DECL float2 operator*=(float2 a, float f) noexcept
+MANET_DECL float2& operator*=(float2& a, float f) noexcept
 {
     a.x *= f;
     a.y *= f;
@@ -95,7 +95,7 @@ MANET_DECL float2 operator/(float2 a, float f) noexcept
     return make_float2(a.x / f, a.y / f);
 }
 
-MANET_DECL float2 operator/=(float2 a, float f) noexcept
+MANET_DECL float2& operator/=(float2& a, float f) noexcept
 {
     a.x /= f;
     a.y /= f;
@@ -377,18 +377,6 @@ MANET_DECL float3 normalize(const float3& a) noexcept
 {
     return a / length(a);
 }
-
-/*
-MANET_DECL unsigned int max(unsigned int a, unsigned int b)
-{
-    return a > b ? a : b;
-}
-
-MANET_DECL unsigned int min(unsigned int a, unsigned int b)
-{
-    return a < b ? a : b;
-}
-*/
 
 MANET_DECL float3 lerp(const float3& a, const float3& b, const float t)
 {

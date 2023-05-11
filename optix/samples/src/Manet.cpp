@@ -17,5 +17,7 @@ int main()
     } catch (std::exception& e) {
         std::cerr << std::format("Caught a exception: {}", e.what()) << std::endl;
     }
+    glfwTerminate();
+
     return 0;
 }
