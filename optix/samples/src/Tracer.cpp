@@ -173,7 +173,8 @@ Tracer::Tracer(int32_t output_width, int32_t output_height)
     m_state.accum_buffer.resize(sizeof(float4) * output_width * output_height);
     m_state.color_buffer.resize(output_width, output_height);
     m_state.launch_params = LaunchParams{
-        .background_color = make_float3(0.5f, 0.7f, 1.0f)
+        .samples_per_pixel = 16,
+        .background_color  = make_float3(0.5f, 0.7f, 1.0f)
     };
     m_state.output_size = make_int2(output_width, output_height);
 
@@ -239,7 +240,6 @@ void Tracer::loadScene(std::shared_ptr<Scene> scene)
                                 / static_cast<float>(m_state.output_size.y),
                                 max_extent);
     }
-    std::cerr << "max extent: " << max_extent << std::endl;
 }
 
 void Tracer::start()

@@ -9,8 +9,14 @@ struct HitResult
 {
     float3 intersection;
     float3 normal;
-    float2 texcoord;
     float4 color;
+
+    struct
+    {
+        float2 uv;
+        float3 t;
+        float3 b;
+    } texcoord;
 };
 
 static __forceinline__ __device__ HitResult getHitResult(const HitgroupData& data)
@@ -42,23 +48,37 @@ static __forceinline__ __device__ HitResult getHitResult(const HitgroupData& dat
     }
     result.normal = normalize(optixTransformNormalFromObjectToWorldSpace(normal));
 
-    float2 texcoord = barycentrics;
-    if (data.texcoords) {
-        const float2 t0 = data.texcoords[index.x];
-        const float2 t1 = data.texcoords[index.y];
-        const float2 t2 = data.texcoords[index.z];
-        texcoord = b0 * t0 + b1 * t1 + b2 * t2;
-    }
-    result.texcoord = texcoord;
-
-    float4 color = make_float4(1.0f);
+    result.color = make_float4(1.0f);
     if (data.colors) {
         const float4 c0 = data.colors[index.x];
         const float4 c1 = data.colors[index.y];
         const float4 c2 = data.colors[index.z];
-        color = b0 * c0 + b1 * c1 + b2 * c2;
+        result.color = b0 * c0 + b1 * c1 + b2 * c2;
     }
-    result.color = color;
+
+    const float3 dp0 = p0 - p2;
+    const float3 dp1 = p1 - p2;
+
+    float2 uv;
+    float3 t, b;
+    if (data.texcoords) {
+        const float2 t0 = data.texcoords[index.x];
+        const float2 t1 = data.texcoords[index.y];
+        const float2 t2 = data.texcoords[index.z];
+        
+        const float2 dt0 = t0 - t2;
+        const float2 dt1 = t1 - t2;
+        const float invdet = 1.0f / (dt0.x * dt1.y - dt0.y * dt1.x);
+
+        uv = b0 * t0 + b1 * t1 + b2 * t2;
+        t  = invdet * (dt1.y * dp0 - dt0.y * dp1);
+        b  = invdet * (dt0.x * dp1 - dt1.x * dp0);
+    } else {
+        uv = barycentrics;
+        t  = -dp0;
+        b  = dp1 - dp0;
+    }
+    result.texcoord = { uv, normalize(t), normalize(b) };
 
     return result;
 }

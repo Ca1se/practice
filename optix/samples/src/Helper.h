@@ -37,7 +37,7 @@ struct RawType<const T&>
     using type = T;
 };
 
-static __forceinline__ __device__ void packPointer(const void* ptr, uint32_t& i0, uint32_t& i1)
+static __forceinline__ __device__ void packPointer(uint32_t& i0, uint32_t& i1, const void* ptr)
 {
     const uint64_t uptr = reinterpret_cast<uint64_t>(ptr);
     i0 = static_cast<uint32_t>(uptr >> 32);
@@ -83,7 +83,7 @@ template <typename T>
 static __forceinline__ __device__ T sampleTexture(const PbrMaterial::Texture& tex, const HitResult& result)
 {
     if (tex) {
-        const float2 uv = result.texcoord * tex.texcoord_scale;
+        const float2 uv = result.texcoord.uv * tex.texcoord_scale;
         const float2 rotation = tex.texcoord_rotation;
         const float2 uv_final = make_float2(dot(uv, make_float2(rotation.y, rotation.x)),
                                             dot(uv, make_float2(-rotation.x, rotation.y)))

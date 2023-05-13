@@ -6,6 +6,7 @@
 #include <optix_types.h>
 
 #include "CudaBufferView.h"
+#include "AreaLight.h"
 
 struct LaunchParams
 {
@@ -24,6 +25,11 @@ struct LaunchParams
         float3 w;
     } camera;
 
+    // CudaBufferView<ParallelogramLight> lights;
+    ParallelogramLight light;
+
+    uint32_t samples_per_pixel;
+    uint32_t max_tracing_num;
     float3 background_color;
     OptixTraversableHandle handle;
 };

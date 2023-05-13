@@ -1,6 +1,8 @@
 OPTIX_add_sample_executable(pathtracer target_name
     PathTracing.cu
+    PathTracing.h
     Aabb.h
+    AreaLight.h
     Camera.cpp
     Camera.h
     CudaBufferView.h
