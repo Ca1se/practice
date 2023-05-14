@@ -22,6 +22,7 @@
 #include "CudaBufferView.h"
 #include "CudaObjectView.h"
 #include "Record.h"
+#include "PathTracing.h"
 
 namespace
 {
@@ -173,7 +174,12 @@ Tracer::Tracer(int32_t output_width, int32_t output_height)
     m_state.accum_buffer.resize(sizeof(float4) * output_width * output_height);
     m_state.color_buffer.resize(output_width, output_height);
     m_state.launch_params = LaunchParams{
-        .samples_per_pixel = 16,
+        .light             = ParallelogramLight{
+            .emission = make_float3(200.0f)
+        },
+        .p_rr              = 0.7f,
+        .samples_per_pixel = 4,
+        .max_tracing_num   = 3,
         .background_color  = make_float3(0.5f, 0.7f, 1.0f)
     };
     m_state.output_size = make_int2(output_width, output_height);
@@ -221,25 +227,35 @@ void Tracer::loadScene(std::shared_ptr<Scene> scene)
     buildAccelerationStructures();
     buildShaderBindingTable();
 
+    /*
     for (const auto& camera: m_scene->cameras) {
         if (camera.isValid()) {
             m_state.camera = camera;
             break;
         }
     }
+    */
 
     const float3& extent = m_scene->aabb.extent();
     float max_extent = std::max({ extent.x, extent.y, extent.z });
-    if (!m_state.camera.isValid()) {
-        const float3& center = m_scene->aabb.center();
-        m_state.camera = Camera(center + make_float3(1.0f, 0.0f, 0.0f),
-                                center,
-                                make_float3(0.0f, 1.0f, 0.0f),
-                                MANET_PIDIV4,
-                                static_cast<float>(m_state.output_size.x)
-                                / static_cast<float>(m_state.output_size.y),
-                                max_extent);
-    }
+
+    // if (!m_state.camera.isValid()) {
+    const float3& center = m_scene->aabb.center();
+    m_state.camera = Camera(center + make_float3(1.0f, 0.0f, 0.0f),
+                            center,
+                            make_float3(0.0f, 1.0f, 0.0f),
+                            MANET_PIDIV4,
+                            static_cast<float>(m_state.output_size.x)
+                            / static_cast<float>(m_state.output_size.y),
+                            max_extent);
+    // }
+
+    const float3 up = m_state.camera.getUp();
+    ParallelogramLight& light = m_state.launch_params.light;
+    light.center = center + 1.2f * max_extent * m_state.camera.getUp();
+    light.half_u = 20.0f * extent.x * make_float3(1.0f, 0.0f, 0.0f);
+    light.half_v = 20.0f * extent.y * make_float3(0.0f, 0.0f, 1.0f);
+    light.normal = -up;
 }
 
 void Tracer::start()
@@ -431,17 +447,30 @@ void Tracer::buildAccelerationStructures()
 
 void Tracer::buildModule()
 {
+    OptixPayloadType payload_types[2] = {
+        {
+            .numPayloadValues = std::size(radiance_payload_semantics),
+            .payloadSemantics = radiance_payload_semantics
+        },
+        {
+            .numPayloadValues = std::size(occlusion_payload_semantics),
+            .payloadSemantics = occlusion_payload_semantics
+        }
+    };
+
     OptixModuleCompileOptions options = {
 #if !defined (NDEBUG)
         .optLevel   = OPTIX_COMPILE_OPTIMIZATION_LEVEL_0,
-        .debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_FULL
+        .debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_FULL,
 #endif
+        .numPayloadTypes = std::size(payload_types),
+        .payloadTypes    = payload_types
     };
 
     m_state.pipeline_compile_options.usesMotionBlur                   = false;
     m_state.pipeline_compile_options.traversableGraphFlags            = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS
                                                                         | OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_LEVEL_INSTANCING;
-    m_state.pipeline_compile_options.numPayloadValues                 = 2;
+    m_state.pipeline_compile_options.numPayloadValues                 = 0;
     m_state.pipeline_compile_options.numAttributeValues               = 2;
     m_state.pipeline_compile_options.exceptionFlags                   = OPTIX_EXCEPTION_FLAG_NONE;
     m_state.pipeline_compile_options.pipelineLaunchParamsVariableName = "g_launch_params";

@@ -105,6 +105,18 @@ static __device__ __forceinline__ float ggxNormal(float N_dot_H, float alpha)
     return alpha_sq / (MANET_PI * x * x);
 }
 
+static __forceinline__ __device__ void cosine_sample_hemisphere(const float u1, const float u2, float3& p)
+{
+  // Uniformly sample disk.
+  const float r   = sqrtf(u1);
+  const float phi = 2.0f * MANET_PI * u2;
+  p.x = r * cosf(phi);
+  p.y = r * sinf(phi);
+
+  // Project up to hemisphere.
+  p.z = sqrtf(fmaxf(0.0f, 1.0f - p.x*p.x - p.y*p.y));
+}
+
 static __device__ __forceinline__ float3 linearize(const float3& c)
 {
     return make_float3(powf(c.x, 2.2f),

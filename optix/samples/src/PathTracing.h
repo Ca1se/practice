@@ -15,8 +15,8 @@ enum RayType
 
 enum PayloadType
 {
-    PAYLOAD_TYPE_RADIANCE,
-    PAYLOAD_TYPE_OCCLUSION
+    PAYLOAD_TYPE_RADIANCE  = static_cast<uint32_t>(OPTIX_PAYLOAD_TYPE_ID_0),
+    PAYLOAD_TYPE_OCCLUSION = static_cast<uint32_t>(OPTIX_PAYLOAD_TYPE_ID_1)
 };
 
 struct RadiancePayload
@@ -29,4 +29,17 @@ struct RadiancePayload
     uint32_t seed;
     uint32_t depth = 0;
     bool     done  = false;
+};
+
+static constexpr uint32_t radiance_payload_semantics[2] = {
+    OPTIX_PAYLOAD_SEMANTICS_TRACE_CALLER_WRITE
+    | OPTIX_PAYLOAD_SEMANTICS_CH_READ
+    | OPTIX_PAYLOAD_SEMANTICS_MS_READ,
+    OPTIX_PAYLOAD_SEMANTICS_TRACE_CALLER_WRITE
+    | OPTIX_PAYLOAD_SEMANTICS_CH_READ
+    | OPTIX_PAYLOAD_SEMANTICS_MS_READ
+};
+
+static constexpr uint32_t occlusion_payload_semantics[1] = {
+    OPTIX_PAYLOAD_SEMANTICS_TRACE_CALLER_READ | OPTIX_PAYLOAD_SEMANTICS_CH_WRITE | OPTIX_PAYLOAD_SEMANTICS_MS_WRITE
 };
