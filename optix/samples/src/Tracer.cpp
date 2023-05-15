@@ -175,11 +175,11 @@ Tracer::Tracer(int32_t output_width, int32_t output_height)
     m_state.color_buffer.resize(output_width, output_height);
     m_state.launch_params = LaunchParams{
         .light             = ParallelogramLight{
-            .emission = make_float3(200.0f)
+            .emission = make_float3(150.0f, 150.0f, 50.0f)
         },
         .p_rr              = 0.7f,
         .samples_per_pixel = 4,
-        .max_tracing_num   = 3,
+        .max_tracing_num   = 16,
         .background_color  = make_float3(0.5f, 0.7f, 1.0f)
     };
     m_state.output_size = make_int2(output_width, output_height);
@@ -241,7 +241,7 @@ void Tracer::loadScene(std::shared_ptr<Scene> scene)
 
     // if (!m_state.camera.isValid()) {
     const float3& center = m_scene->aabb.center();
-    m_state.camera = Camera(center + make_float3(1.0f, 0.0f, 0.0f),
+    m_state.camera = Camera(center + make_float3(0.0f, 0.0f, 3.0f),
                             center,
                             make_float3(0.0f, 1.0f, 0.0f),
                             MANET_PIDIV4,
@@ -250,12 +250,20 @@ void Tracer::loadScene(std::shared_ptr<Scene> scene)
                             max_extent);
     // }
 
+    /*
     const float3 up = m_state.camera.getUp();
     ParallelogramLight& light = m_state.launch_params.light;
     light.center = center + 1.2f * max_extent * m_state.camera.getUp();
-    light.half_u = 20.0f * extent.x * make_float3(1.0f, 0.0f, 0.0f);
-    light.half_v = 20.0f * extent.y * make_float3(0.0f, 0.0f, 1.0f);
+    light.half_u = 1.5f * extent.x * make_float3(1.0f, 0.0f, 0.0f);
+    light.half_v = 1.5f * extent.y * make_float3(0.0f, 0.0f, 1.0f);
     light.normal = -up;
+    */
+
+    ParallelogramLight& light = m_state.launch_params.light;
+    light.center = make_float3(0.0f, 1.97f, 0.0f);
+    light.half_u = make_float3(0.09f, 0.0f, 0.0f);
+    light.half_v = make_float3(0.0f, 0.0f, 0.09f);
+    light.normal = make_float3(0.0f, -1.0f , 0.0f);
 }
 
 void Tracer::start()
@@ -449,11 +457,11 @@ void Tracer::buildModule()
 {
     OptixPayloadType payload_types[2] = {
         {
-            .numPayloadValues = std::size(radiance_payload_semantics),
+            .numPayloadValues = static_cast<uint32_t>(std::size(radiance_payload_semantics)),
             .payloadSemantics = radiance_payload_semantics
         },
         {
-            .numPayloadValues = std::size(occlusion_payload_semantics),
+            .numPayloadValues = static_cast<uint32_t>(std::size(occlusion_payload_semantics)),
             .payloadSemantics = occlusion_payload_semantics
         }
     };
@@ -463,7 +471,7 @@ void Tracer::buildModule()
         .optLevel   = OPTIX_COMPILE_OPTIMIZATION_LEVEL_0,
         .debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_FULL,
 #endif
-        .numPayloadTypes = std::size(payload_types),
+        .numPayloadTypes = static_cast<uint32_t>(std::size(payload_types)),
         .payloadTypes    = payload_types
     };
 

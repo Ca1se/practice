@@ -64,17 +64,17 @@ static __forceinline__ __device__ float3 plainNormal(const float3& A, const floa
     return normalize(cross(B - A, C - A));
 }
 
-static __forceinline__ __device__ uchar4 make_color(const float3& color)
+static __device__ __forceinline__ float3 schlick(float3 F0, float V_dot_H)
 {
-    return make_uchar4(static_cast<uint8_t>(255.99f * color.x),
-                       static_cast<uint8_t>(255.99f * color.y),
-                       static_cast<uint8_t>(255.99f * color.z),
-                       255);
+    return F0 + (make_float3(1.0f) - F0) * powf(1.0f - V_dot_H, 5.0f);
 }
 
-static __device__ __forceinline__ float3 schlick(float3 spec_color, float V_dot_H)
+static __device__ __forceinline__ float vis(const float N_dot_L, const float N_dot_V, const float alpha)
 {
-    return spec_color + (make_float3(1.0f) - spec_color) * powf(1.0f - V_dot_H, 5.0f);
+    const float a  = (alpha + 1) * (alpha + 1);
+    const float g0 = N_dot_V * (8.0f - a) + a;
+    const float g1 = N_dot_L * (8.0f - a) + a;
+    return 16.0f / (g0 * g1);
 }
 
 /*
@@ -89,6 +89,7 @@ static __device__ __forceinline__ float vis(const float N_dot_L, const float N_d
 }
 */
 
+/*
 static __device__ __forceinline__ float smiths(float N_dot_V, float N_dot_L, float roughness)
 {
     const float k    = (roughness + 1.0f) * (roughness + 1.0f) / 8.0f;
@@ -96,6 +97,7 @@ static __device__ __forceinline__ float smiths(float N_dot_V, float N_dot_L, flo
     const float ggx1 = N_dot_L / (N_dot_L * (1.0f - k) + k);
     return ggx0 * ggx1;
 }
+*/
 
 static __device__ __forceinline__ float ggxNormal(float N_dot_H, float alpha)
 {
@@ -117,11 +119,11 @@ static __forceinline__ __device__ void cosine_sample_hemisphere(const float u1, 
   p.z = sqrtf(fmaxf(0.0f, 1.0f - p.x*p.x - p.y*p.y));
 }
 
-static __device__ __forceinline__ float3 linearize(const float3& c)
+static __device__ __forceinline__ float3 gammaCorrect(const float3& color, float gamma)
 {
-    return make_float3(powf(c.x, 2.2f),
-                       powf(c.y, 2.2f),
-                       powf(c.z, 2.2f));
+    return make_float3(powf(color.x, gamma),
+                       powf(color.y, gamma),
+                       powf(color.z, gamma));
 }
 
 template <typename T>
@@ -137,4 +139,43 @@ static __forceinline__ __device__ T sampleTexture(const PbrMaterial::Texture& te
     } else {
         return T{};
     }
+}
+
+/*
+static __forceinline__ __device__ uchar4 make_color(const float3& color)
+{
+    return make_uchar4(static_cast<uint8_t>(255.99f * color.x),
+                       static_cast<uint8_t>(255.99f * color.y),
+                       static_cast<uint8_t>(255.99f * color.z),
+                       255);
+}
+*/
+
+static __forceinline__ __device__ float3 toSRGB( const float3& c )
+{
+    float  invGamma = 1.0f / 2.4f;
+    float3 powed    = make_float3( powf( c.x, invGamma ), powf( c.y, invGamma ), powf( c.z, invGamma ) );
+    return make_float3(
+        c.x < 0.0031308f ? 12.92f * c.x : 1.055f * powed.x - 0.055f,
+        c.y < 0.0031308f ? 12.92f * c.y : 1.055f * powed.y - 0.055f,
+        c.z < 0.0031308f ? 12.92f * c.z : 1.055f * powed.z - 0.055f );
+}
+
+static __forceinline__ __device__ unsigned char min(unsigned char a, unsigned char b)
+{
+    return a > b ? b : a;
+}
+
+static __forceinline__ __device__ unsigned char quantizeUnsigned8Bits( float x )
+{
+    x = clamp( x, 0.0f, 1.0f );
+    enum { N = (1 << 8) - 1, Np1 = (1 << 8) };
+    return (unsigned char)min((unsigned int)(x * (float)Np1), (unsigned int)N);
+}
+
+static __forceinline__ __device__ uchar4 make_color( const float3& c )
+{
+    // first apply gamma, then convert to unsigned char
+    float3 srgb = toSRGB( clamp( c, 0.0f, 1.0f ) );
+    return make_uchar4( quantizeUnsigned8Bits( srgb.x ), quantizeUnsigned8Bits( srgb.y ), quantizeUnsigned8Bits( srgb.z ), 255u );
 }

@@ -191,11 +191,25 @@ MANET_DECL float3 operator/(const float3& a, float f) noexcept
     return make_float3(a.x / f, a.y / f, a.z / f);
 }
 
+MANET_DECL float3 operator/(const float3& a, const float3& b) noexcept
+{
+    return make_float3(a.x / b.x, a.y / b.y, a.z / b.z);
+}
+
 MANET_DECL float3& operator/=(float3& a, float f) noexcept
 {
     a.x /= f;
     a.y /= f;
     a.z /= f;
+
+    return a;
+}
+
+MANET_DECL float3& operator/=(float3& a, const float3& b) noexcept
+{
+    a.x /= b.x;
+    a.y /= b.y;
+    a.z /= b.z;
 
     return a;
 }

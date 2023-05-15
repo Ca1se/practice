@@ -21,8 +21,9 @@ enum PayloadType
 
 struct RadiancePayload
 {
-    float3 attenuation   = { 1.0f, 1.0f, 1.0f };
-    float3 radiance      = { 0.0f, 0.0f, 0.0f };
+    float3 attenuation = { 1.0f, 1.0f, 1.0f };
+    float3 radiance    = { 0.0f, 0.0f, 0.0f };
+    float3 emission    = { 0.0f, 0.0f, 0.0f };
     float3 ray_origin;
     float3 ray_direction;
 
