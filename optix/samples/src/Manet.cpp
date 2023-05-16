@@ -10,8 +10,8 @@ int main()
 {
     try {
         auto scene = std::make_shared<Scene>();
-        Scene::loadFromGltf(*scene, "cornellbox/cornellbox.gltf");
-        // Scene::loadFromGltf(*scene, "sponza/sponza.gltf");
+        // Scene::loadFromGltf(*scene, "cornellbox/cornellbox.gltf");
+        Scene::loadFromGltf(*scene, "sponza/sponza.gltf");
         Tracer tracer(800, 600);
         tracer.loadScene(scene);
         tracer.start();
