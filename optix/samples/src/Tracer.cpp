@@ -175,10 +175,11 @@ Tracer::Tracer(int32_t output_width, int32_t output_height)
     m_state.color_buffer.resize(output_width, output_height);
     m_state.launch_params = LaunchParams{
         .light             = ParallelogramLight{
-            .emission = make_float3(150.0f, 150.0f, 50.0f)
+            .emission = make_float3(100.0f, 100.0f, 50.0f)
+            // .emission = make_float3(0.0f)
         },
         .p_rr              = 0.7f,
-        .samples_per_pixel = 4,
+        .samples_per_pixel = 16,
         .max_tracing_num   = 16,
         .background_color  = make_float3(0.5f, 0.7f, 1.0f)
     };
@@ -241,7 +242,7 @@ void Tracer::loadScene(std::shared_ptr<Scene> scene)
 
     // if (!m_state.camera.isValid()) {
     const float3& center = m_scene->aabb.center();
-    m_state.camera = Camera(center + make_float3(0.0f, 0.0f, 3.0f),
+    m_state.camera = Camera(center + make_float3(0.0f, 0.0f, 4.0f),
                             center,
                             make_float3(0.0f, 1.0f, 0.0f),
                             MANET_PIDIV4,

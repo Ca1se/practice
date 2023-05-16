@@ -147,15 +147,10 @@ extern "C" __global__ void __raygen__pinhole()
 
         do {
             traceRadiance(g_launch_params.handle, 0.01f, 1e16f, payload);
-            // result += payload.emission;
-            // result += payload.radiance * payload.attenuation;
+            result += payload.emission;
             result += payload.radiance;
-
-            if (payload.done || payload.depth >= 3)
-                break;
-
             payload.depth++;
-        } while (true);
+        } while (!payload.done && payload.depth < max_tracing_num);
     }
 
     float3 result_color = result / static_cast<float>(samples_per_pixel);
@@ -189,12 +184,16 @@ extern "C" __global__ void __closesthit__radiance()
         const float3 texture_color_linear = gammaCorrect(make_float3(texture_color), 2.2f); // texture color is stored in sRGB colorspace, add a gamma correction(gamma = 2.2) to it .
         base_color *= make_float4(texture_color_linear, texture_color.w);
     }
-
-    const float3 emissive_factor = material.emissive_factor;
-    float3       emissive_color  = make_float3(1.0f);
-    if (material.emissive_texture)
-        emissive_color = make_float3(sampleTexture<float4>(material.emissive_texture, result));
-    radiance += emissive_factor * emissive_color;
+    
+    if (payload.depth == 0) {
+        const float3 emissive_factor = material.emissive_factor;
+        float3       emissive_color  = make_float3(1.0f);
+        if (material.emissive_texture)
+            emissive_color = make_float3(sampleTexture<float4>(material.emissive_texture, result));
+        payload.emission = emissive_factor * emissive_color;
+    } else {
+        payload.emission = make_float3(0.0f);
+    }
 
     // normal
     float3 normal = result.normal;
@@ -218,204 +217,82 @@ extern "C" __global__ void __closesthit__radiance()
         roughness *= metallic_roughness.y;
     }
 
-    
-    // BRDF
-    const float  s = 2.0f * rnd(seed) - 1.0f;
-    const float  t = 2.0f * rnd(seed) - 1.0f;
-    const float3 sample_pos = light.center + s * light.half_u + t * light.half_v;
-    const float3 sample_dir = normalize(sample_pos - result.intersection);
-    const float3 half_vec   = normalize(sample_dir - payload.ray_direction);
-    const float  N_dot_L    = dot(normal, sample_dir);
-    const float  N_dot_V    = dot(normal, -payload.ray_direction);
-    const float  N_dot_H    = dot(normal, half_vec);
-    const float  V_dot_H    = dot(-payload.ray_direction, half_vec);
-
     const float  alpha  = roughness * roughness;
     const float3 albedo = make_float3(base_color);
     const float3 F0     = lerp(make_float3(0.04f), albedo, metallic);
-    const float3 F      = schlick(F0, V_dot_H);
-    const float  D      = ggxNormal(N_dot_H, alpha);
-    const float  G_vis  = vis(N_dot_L, N_dot_V, alpha);
-    const float3 ks     = F;
-    const float3 kd     = (make_float3(1.0f) - ks) * (1.0f - metallic);
-    
-    // to do correct BRDF
-    const float3 f_r = MANET_1DIVPI * kd * albedo + D * G_vis * ks * F;
 
-    // direct light
-    if (N_dot_L > 0.0f && dot(light.normal, -sample_dir) > 0.0f) {
-        const float distance = length(sample_pos - result.intersection);
-        const bool  occluded = traceOcclusion(g_launch_params.handle,
-                                              result.intersection,
-                                              sample_dir,
-                                              0.01f,
-                                              distance - 0.01f);
-        if (!occluded) {
-            const float area = 4.0f * length(light.half_u) * length(light.half_v);
-            radiance += N_dot_L * dot(light.normal, -sample_dir) * area / (distance * distance) * light.emission * f_r;
-            // radiance += light.emission * albedo * N_dot_L * dot(light.normal, -sample_dir) * area / (distance * distance);
+    // direct light sample
+    {
+        const float  s = 2.0f * rnd(seed) - 1.0f;
+        const float  t = 2.0f * rnd(seed) - 1.0f;
+        const float3 light_sample_pos = light.center + s * light.half_u + t * light.half_v;
+        const float3 light_sample_dir = normalize(light_sample_pos - result.intersection);
+        const float  distance         = length(light_sample_pos - result.intersection);
+        const float3 half_vec   = normalize(light_sample_dir - payload.ray_direction);
+        const float  N_dot_L    = dot(normal, light_sample_dir);
+        const float  N_dot_V    = dot(normal, -payload.ray_direction);
+        const float  N_dot_H    = dot(normal, half_vec);
+        const float  V_dot_H    = dot(-payload.ray_direction, half_vec);
+        const float  LN_dot_IL  = dot(light.normal, -light_sample_dir);
+        
+        const float3 F      = schlick(F0, V_dot_H);
+        const float  D      = ggxNormal(N_dot_H, alpha);
+        const float  G_vis  = vis(N_dot_L, N_dot_V, alpha);
+        const float3 ks     = F;
+        const float3 kd     = (make_float3(1.0f) - ks) * (1.0f - metallic);
+        
+        // BRDF
+        const float3 f_r = MANET_1DIVPI * kd * albedo + D * G_vis * ks * F;
+
+        if (N_dot_L > 0.0f && LN_dot_IL > 0.0f && distance > 0.00001f) {
+            const bool  occluded = traceOcclusion(g_launch_params.handle,
+                                                result.intersection,
+                                                light_sample_dir,
+                                                0.01f,
+                                                distance - 0.01f);
+            if (!occluded) {
+                const float area = 4.0f * length(light.half_u) * length(light.half_v);
+                radiance = N_dot_L * LN_dot_IL * area / (distance * distance) * light.emission * f_r;
+            }
         }
     }
 
     payload.radiance = radiance * payload.attenuation;
-    payload.attenuation *= 2.0f * MANET_PI * N_dot_L / g_launch_params.p_rr * f_r;
-    // payload.attenuation *= 2.0f * MANET_PI * N_dot_L * f_r;
 
     // uniform hemisphere sample
-    float3 sample_vec;
-    cosine_sample_hemisphere(rnd(seed), rnd(seed), sample_vec);
-    Onb onb(normal);
-    onb.inverse_transform(sample_vec);
-
-    payload.ray_origin    = result.intersection;
-    payload.ray_direction = normalize(sample_vec);
-
-    if (rnd(seed) > g_launch_params.p_rr) {
-        payload.done = true;
-        payload.seed = seed;
-        return;
-    }
-    
-    payload.seed          = seed;
-    payload.done          = false;
-}
-
-/*
-extern "C" __global__ void __raygen__pinhole()
-{
-    const uint3    idx               = optixGetLaunchIndex();
-    const uint3    dim               = optixGetLaunchDimensions();
-    const size_t   pixel_index       = dim.x * idx.y + idx.x;
-    const uint32_t accum_count       = g_launch_params.frame.accum_count;
-    const uint32_t samples_per_pixel = g_launch_params.samples_per_pixel;
-    const uint32_t max_tracing_num   = g_launch_params.max_tracing_num;
-    const auto     camera            = g_launch_params.camera;
-
-    uint32_t seed = tea<4>(pixel_index, accum_count);
-    float3 result = make_float3(0.0f);
-
-    for (uint32_t i = 0; i < samples_per_pixel; i++) {
-        const float2 subpixel_jitter = make_float2(rnd(seed), rnd(seed));
-        const float2 st = 2.0f
-                          * make_float2((static_cast<float>(idx.x) + subpixel_jitter.x) / static_cast<float>(dim.x),
-                                        (static_cast<float>(idx.y) + subpixel_jitter.y) / static_cast<float>(dim.y))
-                          - 1.0f;
-        RadiancePayload payload = {};
-        payload.attenuation   = make_float3(1.0f);
-        payload.ray_origin    = camera.position;
-        payload.ray_direction = normalize(st.x * camera.u + st.y * camera.v - camera.w);
-        payload.seed          = seed;
-        payload.depth         = 0;
-
-        do {
-            traceRadiance(g_launch_params.handle, 0.01f, 1e16f, payload);
-            result += payload.emission;
-            result += payload.radiance * payload.attenuation;
-
-            if (payload.done || payload.depth >= max_tracing_num)
-                break;
-
-            payload.depth++;
-        } while (true);
-        // } while (!payload.done);
-    }
-
-    float3 result_color = result / static_cast<float>(samples_per_pixel);
-    float3 accum_color  = make_float3(g_launch_params.frame.accum_buffer[pixel_index]);
-
-    if (accum_count > 0) {
-        const float factor = 1.0f / static_cast<float>(accum_count + 1);
-        result_color = lerp(accum_color, result_color, factor);
-    }
-
-    g_launch_params.frame.accum_buffer[pixel_index] = make_float4(result_color, 1.0f);
-    g_launch_params.frame.color_buffer[pixel_index] = make_color(result_color);
-}
-
-extern "C" __global__ void __closesthit__radiance()
-{
-    optixSetPayloadTypes(PAYLOAD_TYPE_RADIANCE);
-
-    const HitgroupData*       data     = reinterpret_cast<HitgroupData*>(optixGetSbtDataPointer());
-    const HitResult           result   = getHitResult(*data);
-    const PbrMaterial&        material = *(data->material);
-    const ParallelogramLight& light    = g_launch_params.light;
-    RadiancePayload&          payload  = getRadiancePayload();
-    uint32_t                  seed     = payload.seed;
-
-    float4 base_color = material.base_color * result.color;
-    if (material.base_color_texture) {
-        const float4 texture_color        = sampleTexture<float4>(material.base_color_texture, result);
-        const float3 texture_color_linear = gammaCorrect(make_float3(texture_color), 2.2f); // texture color is stored in sRGB colorspace, add a gamma correction(gamma = 2.2) to it .
-        base_color *= make_float4(texture_color_linear, texture_color.w);
-    }
-
-    // emission
-    const float3 emissive_factor = material.emissive_factor;
-    float3       emissive_color  = make_float3(1.0f);
-    if (material.emissive_texture)
-        emissive_color = make_float3(sampleTexture<float4>(material.emissive_texture, result));
-    if (payload.depth == 0)
-        payload.emission = emissive_factor * emissive_color;
-    else
-        payload.emission = make_float3(0.0f);
-
-    // normal
-    float3 normal = result.normal;
-    if (material.normal_texture) {
-        const float4 normal_sampled = 2.0f * sampleTexture<float4>(material.normal_texture, result) - make_float4(1.0f);
-        const float2 rotation       = material.normal_texture.texcoord_rotation;
-        const float2 tb             = make_float2(normal_sampled.x, normal_sampled.y);
-        const float2 tb_trans       = make_float2(dot(tb, make_float2(rotation.y, -rotation.x)),
-                                                  dot(tb, make_float2(rotation.x, rotation.y)));
-        normal = normalize(tb_trans.x * result.texcoord.t + tb_trans.y * result.texcoord.b + normal_sampled.z * result.normal);
-    }
-
-    if (dot(normal, payload.ray_direction) > 0.0f)
-        normal = -normal;
-    
     {
-        const float z1 = rnd(seed);
-        const float z2 = rnd(seed);
-
-        float3 w_in;
-        cosine_sample_hemisphere( z1, z2, w_in );
+        float3 hemisphere_sample_dir;
+        cosine_sample_hemisphere(rnd(seed), rnd(seed), hemisphere_sample_dir);
         Onb onb(normal);
-        onb.inverse_transform( w_in );
-        payload.ray_direction = w_in;
+        onb.inverse_transform(hemisphere_sample_dir);
+        hemisphere_sample_dir = normalize(hemisphere_sample_dir);
+
+        const float3 half_vec = normalize(hemisphere_sample_dir - payload.ray_direction);
+        const float  N_dot_L  = dot(normal, hemisphere_sample_dir);
+        const float  N_dot_V  = dot(normal, -payload.ray_direction);
+        const float  N_dot_H  = dot(normal, half_vec);
+        const float  V_dot_H  = dot(-payload.ray_direction, half_vec);
+
+        const float3 F      = schlick(F0, V_dot_H);
+        const float  D      = ggxNormal(N_dot_H, alpha);
+        const float  G_vis  = vis(N_dot_L, N_dot_V, alpha);
+        const float3 ks     = F;
+        const float3 kd     = (make_float3(1.0f) - ks) * (1.0f - metallic);
+
+        // BRDF
+        const float3 f_r = MANET_1DIVPI * kd * albedo + D * G_vis * ks * F;
+
+        payload.attenuation *= 2.0f * MANET_PI * N_dot_L / g_launch_params.p_rr * f_r;
+
         payload.ray_origin    = result.intersection;
-
-        payload.attenuation *= make_float3(base_color);
+        payload.ray_direction = hemisphere_sample_dir;
     }
 
-    const float z1 = 2.0f * rnd(seed) - 1.0f;
-    const float z2 = 2.0f * rnd(seed) - 1.0f;
+    if (rnd(seed) > g_launch_params.p_rr)
+        payload.done = true;
+
     payload.seed = seed;
-
-    const float3 light_pos = light.center + z1 * light.half_u + z2 * light.half_v;
-
-    const float  Ldist = length(light_pos - result.intersection);
-    const float3 L     = normalize(light_pos - result.intersection);
-    const float  nDl   = dot(normal, L);
-    const float  LnDl  = dot(light.normal, -L);
-
-    float weight = 0.0f;
-    if (nDl > 0.0f && LnDl > 0.0f) {
-        const bool occluded = traceOcclusion(g_launch_params.handle,
-                                             result.intersection,
-                                             L,
-                                             0.01f,
-                                             Ldist - 0.01f);
-        if (!occluded) {
-            const float A = length(cross(2.0f * light.half_u, 2.0f * light.half_v));
-            weight = nDl * LnDl * A / (MANET_PI * Ldist * Ldist);
-        }
-    }
-
-    payload.radiance = light.emission * weight;
-    payload.done     = false;
 }
-*/
 
 extern "C" __global__ void __miss__radiance()
 {
@@ -423,8 +300,10 @@ extern "C" __global__ void __miss__radiance()
     RadiancePayload& payload = getRadiancePayload();
 
     payload.radiance = make_float3(0.0f); // if depth > 0 and ray missed, then no radiance
+    /*
     if (payload.depth == 0) // directly hit the background
         payload.radiance = g_launch_params.background_color;
+    */
 
     payload.emission = make_float3(0.0f);
     payload.done = true;
